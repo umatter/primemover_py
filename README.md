@@ -1,4 +1,4 @@
-# primemover_py: A python client library for the primemover configuration appId
+# primemover_py: A python client library for the primemover configuration API
 
 ## Aim and content
 
