@@ -43,7 +43,7 @@ class Individual:
         :return: json with direct access
         """
 
-    def select_search_tems(self):
+    def select_search_terms(self):
         """
         conducts experiment on search term probs. I.e. coin flip for every term
         :return:
