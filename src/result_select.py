@@ -2,53 +2,6 @@ import math
 import random
 import numpy as np
 
-def media_utility_u_ij(d_tilde_ij, ro_j, epsilon_ij, alpha_tilde,
-                       tau_tilde_ij=1):
-    """
-    :param d_tilde_ij: float > 0, ideological distance |pi_i-pi_tilde_j| where pi_i
-        represents the political orientation of the individual and pi_tilde_j
-        that of outlet j
-    :param ro_j: float >= 0, reach of outlet j
-    :param epsilon_ij: float, noise/error
-    :param alpha_tilde: float >= 0, shift parameter
-    :param tau_tilde_ij: float > 0, "transportation costs" i.e. costs of consuming
-        ideologicaly distant news
-    :return u: float > 0, utility  derived by individual i when consuming news from outlet j
-    """
-    u = alpha_tilde - tau_tilde_ij * d_tilde_ij + ro_j + epsilon_ij
-    return u
-
-
-def search_utility_v_ik(d_hat_ik, epsilon_ik, alpha_hat, tau_hat_ik=1):
-    """
-    :param d_hat_ik: float > 0, ideological distance |pi_i-pi_hat_k| where pi_i
-        represents the political orientation of the individual and pi_hat_j
-        that of search term j
-    :param epsilon_ik: float, noise/error
-    :param alpha_hat: float >= 0, shift parameter
-    :param tau_hat_ik: float > 0, "transportation costs" i.e. costs of consuming
-        ideologicaly distant news
-    :return v: float > 0, utility  derived by individual i when searching phrase k
-    """
-    v = alpha_hat - tau_hat_ik * d_hat_ik + epsilon_ik
-    return v
-
-
-def political_orientation_pi_i_t(psi_i, kappa_j_t_prev, pi_i_prev,
-                                 pi_tilde_j_prev):
-    """
-    :param psi_i: float in [0,1], individuals persuadability
-    :param kappa_j_t_prev: binary in {0,1}, indicates  wether ind. can be persuaded
-        in period t-1
-    :param pi_i_prev: political orientation of individual i in period t-1
-    :param pi_tilde_j_prev: political orientation of outlet j in period t-1
-    :return: pi_i_new: political orientation of individual i in period t, i.e. updated
-        political preferences.
-    """
-    pi_i_new = (
-                       1 - psi_i * kappa_j_t_prev) * pi_i_prev + psi_i * kappa_j_t_prev * pi_tilde_j_prev
-    return pi_i_new
-
 
 def prob_i(utilities):
     """
@@ -75,7 +28,7 @@ def result_utility_w_i_j_t(r_j, known=0, d_tilde_i_j_t=0, ro_j=0, alpha_tilde=1,
     :param alpha_tilde: float >= 0, shift parameter
     :param tau_tilde: float > 0, "transportation costs" i.e. costs of consuming
         ideologically distant news
-    :return:
+    :return: float utility of selecting result
     """
     w = (1 - beta_i * (
                 r_j - 1)) + known * (alpha_tilde - tau_tilde * d_tilde_i_j_t + ro_j)
@@ -86,7 +39,6 @@ def result_utility_w_i_j_t(r_j, known=0, d_tilde_i_j_t=0, ro_j=0, alpha_tilde=1,
 def choose_result(results, outlets, pi):
     """
     :param pi: pi_i  political orientation of the individual
-    :param nr_results: int, nr. of results to view
     :param results: list of shape: [{rank:int, result_url, x_path...}, {rank:int, result_url,...}]
                 assume no missing ranks and first result has rank = 1
     :param outlets: list containing outlets of shape: outlet_prob": [{

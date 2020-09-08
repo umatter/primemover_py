@@ -11,10 +11,11 @@ class Behavior:
         self.active = active
 
     def __str__(self):
-        return {'name': self.name,
-                'description': self.description,
-                'value': self.value,
-                'active': self.active}
+        return \
+            f'{{"name": "{self.name}",\n' \
+            f'"description": "{self.description}",\n' \
+            f'"value": {self.value},\n' \
+            f'"active": {self.active}}}'
 
     @property
     def name(self):
@@ -34,7 +35,7 @@ class Behavior:
         try:
             self._description = str(desc)
         except:
-            raise TypeError('Description must be convertible to type string')
+            raise TypeError('Description must be convertible to kind string')
 
     @property
     def value(self):
@@ -42,7 +43,8 @@ class Behavior:
 
     @value.setter
     def value(self, val):
-        self._value = val
+        if type(val) is str:
+            self._value = f'"{val}"'
 
     @property
     def active(self):
@@ -56,11 +58,12 @@ class Behavior:
             raise ValueError(f'active must be 0 or 1, got {val}')
 
 
-class Type(Behavior):
+class JobType(Behavior):
     def __init__(self, description='', active=1):
         self.description = description
         self.type = description
-        super().__init__(name='type', value=self.type, description=description,
+        super().__init__(name='job_type', value=self.type,
+                         description=description,
                          active=active)
 
     @property
@@ -232,10 +235,10 @@ class Field(Behavior):
 class Text(Behavior):
     def __init__(self, text, active=1):
         """
-        :param string: text tp type into a field
+        :param string: text to type into a field
         """
         self.text = text
-        super().__init__(name='field', value=self.text,
+        super().__init__(name='text', value=self.text,
                          description=f'Enter {self.text} into Field',
                          active=active)
 
@@ -249,16 +252,67 @@ class Text(Behavior):
             self._text = str(string)
 
         except:
-            raise TypeError('Text must be coercable to type string')
+            raise TypeError('Text must be coercable to kind string')
+
+
+class Username(Behavior):
+    def __init__(self, user, active=1):
+        """
+        :param string: Username
+        """
+        self.user = user
+        super().__init__(name='username', value=self.user,
+                         description=f'Username is {self._user}',
+                         active=active)
+
+    @property
+    def user(self):
+        return self._user
+
+    @user.setter
+    def user(self, string):
+        try:
+            self._user = str(string)
+
+        except:
+            raise TypeError('user must be coercable to type string')
+
+
+class Password(Behavior):
+    def __init__(self, password, active=1):
+        """
+        :param string: Password
+        """
+        self.password = password
+        super().__init__(name='password', value=self.password,
+                         description=f'Username is {self._password}',
+                         active=active)
+
+    @property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, string):
+        try:
+            self._password = str(string)
+
+        except:
+            raise TypeError('password must be coercable to kind string')
 
 
 class XPath(Behavior):
-    def __init__(self, x_path, active=1):
+    def __init__(self, x_path, kind=None, active=1):
         """
         :param x_path of some object or field
         """
+        self.kind = kind
         self.x_path = x_path
-        super().__init__(name='field', value=self.x_path,
+        if self.kind is not None:
+            name = f'x_path_{kind}'
+        else:
+            name = 'x_path'
+        super().__init__(name=name, value=self.x_path,
                          description="",
                          active=active)
 
@@ -272,16 +326,34 @@ class XPath(Behavior):
             self._x_path = str(string)
 
         except:
-            raise TypeError('x_path must be coercible to type string')
+            raise TypeError('x_path must be coercible to kind string')
+
+    @property
+    def kind(self):
+        return self._kind
+
+    @kind.setter
+    def kind(self, string):
+        try:
+            self._kind = str(string)
+
+        except:
+            raise TypeError('kind must be coercible to kind string')
 
 
 class CSS(Behavior):
-    def __init__(self, css, active=1):
+    def __init__(self, css, kind=None, active=1):
         """
         :param x_path of some object or field
         """
         self.css = css
-        super().__init__(name='css', value=self.css,
+        self.kind = kind
+        if self.kind is not None:
+            name = f'css_{kind}'
+        else:
+            name = 'css'
+
+        super().__init__(name=name, value=self.css,
                          description="",
                          active=active)
 
@@ -296,6 +368,18 @@ class CSS(Behavior):
 
         except:
             raise TypeError('css must be coercible to type string')
+
+    @property
+    def kind(self):
+        return self._kind
+
+    @kind.setter
+    def kind(self, string):
+        try:
+            self._kind = str(string)
+
+        except:
+            raise TypeError('kind must be coercible to type string')
 
 
 class Duration(Behavior):
@@ -416,3 +500,38 @@ class NoOfScrolls(Behavior):
         except ValueError:
             raise ValueError(f'Expected numeric, received {nr}')
 
+
+class ActiveProbability(Behavior):
+    def __init__(self, prob, active=1):
+
+        self.probability = prob
+        super().__init__(name='active_probability', value=self.probability,
+                         description="",
+                         active=active)
+
+    @property
+    def probability(self):
+        return self._probability
+
+    @probability.setter
+    def probability(self, prob):
+        if 0 <= prob <= 1:
+            self._probability = prob
+        else:
+            raise ValueError(f'probability must be in [0,1]')
+
+
+class UrlId(Behavior):
+    def __init__(self, url_id, kind="", active=1):
+        self.url_id = url_id
+        super().__init__(name=f'{kind}_url_id', value=self.url_id,
+                         description="URL ID",
+                         active=active)
+
+    @property
+    def url_id(self):
+        return self._url_id
+
+    @url_id.setter
+    def url_id(self, id):
+        self._url_id = id
