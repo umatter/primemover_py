@@ -20,17 +20,17 @@ def media_utility_u_ij(d_tilde_ij, ro_j, epsilon_ij, alpha_tilde,
     return u
 
 
-def search_utility_v_ik(d_hat_ik, epsilon_ik, alpha_hat, tau_hat_ik=1):
+def search_utility_v_ik(pi_i, pi_hat_k, epsilon_ik, alpha_hat=0, tau_hat_ik=1):
     """
-    :param d_hat_ik: float > 0, ideological distance |pi_i-pi_hat_k| where pi_i
-        represents the political orientation of the individual and pi_hat_j
-        that of search term j
+    :param pi_hat_k: float, political orientation of the search term k
+    :param pi_i: float, political orientation of the individual
     :param epsilon_ik: float, noise/error
     :param alpha_hat: float >= 0, shift parameter
     :param tau_hat_ik: float > 0, "transportation costs" i.e. costs of consuming
-        ideologicaly distant news
+        ideologically distant news
     :return v: float > 0, utility  derived by individual i when searching phrase k
     """
+    d_hat_ik = abs(pi_i-pi_hat_k)
     v = alpha_hat - tau_hat_ik * d_hat_ik + epsilon_ik
     return v
 
@@ -53,13 +53,25 @@ def political_orientation_pi_i_t(psi_i, kappa_j_t_prev, pi_i_prev,
 
 def prob_i(utilities):
     """
-    :param utilities: float list, orderd list of individual i's utilities from searching/consuming
+    :param utilities: float list, ordered list of individual i's utilities from searching/consuming
             corresponding media
-    :return: ordered list of probabilities for each item, determined by probabilistic choice model
+            or dict with keys and corresponding utilities
+    :return: ordered list or dict of probabilities for each item, determined by probabilistic choice model
     """
-    exp_u_list = [math.exp(u) for u in utilities]
-    total_exp_u = sum(exp_u_list)
-    probabilities = [exp_u/total_exp_u for exp_u in exp_u_list]
+    if type(utilities) is list:
+        exp_u_list = [math.exp(u) for u in utilities]
+        total_exp_u = sum(exp_u_list)
+        probabilities = [exp_u/total_exp_u for exp_u in exp_u_list]
+    elif type(utilities) is dict:
+        probabilities = {}
+        exp_u_dict = {}
+        for key, u in utilities.items():
+            exp_u_dict[key] = math.exp(u)
+        total_exp_u = sum(exp_u_dict.values())
+        for key, exp_u in exp_u_dict:
+            probabilities = exp_u/total_exp_u
+    else:
+        raise TypeError(f'Input must be of type dict or list')
     return probabilities
 
 
