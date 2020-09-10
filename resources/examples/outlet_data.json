@@ -1,0 +1,14 @@
+{"outlets": {
+  "https://www.nytimes.com": {
+    "ro": 5.39634146341463,
+    "title": "The New York Times",
+    "pi": -0.231944004159303
+  },
+  "outlet url as key (redirect url)":{
+    "ro = reach per million": "float>0",
+    "title": "some string",
+    "pi = political orientation": "float"
+  },...
+}
+
+}
