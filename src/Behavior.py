@@ -1,30 +1,22 @@
 from urllib.parse import urlparse
 
-from src.Info import *
 from src.Utilities import *
 
 
 class Behavior:
-    def __init__(self, name, value, behavior_info,
+    def __init__(self, name, value,
                  description="Lorem Ipsum", updated_at=None, created_at=None):
         self.name = name
         self.description = description
         self.value = value
-        self.behavior_info = behavior_info
         self.created_at = created_at
         self.updated_at = updated_at
 
     def __str__(self):
         return \
-            f'{{"id": "{self.behavior_info.behavior_id or ""}",\n' \
             f'"name": "{self.name}",\n' \
             f'"description": "{self.description}",\n' \
-            f'"value": {self.value or ""},\n' \
-            f'"active": {self.behavior_info.active},\n' \
-            f'"user_id": "{self.behavior_info._user_id or ""}",\n' \
-            f'"job_id": {self.behavior_info.job_id or ""},\n' \
-            f'"created_at": "{self.created_at or ""}",\n' \
-            f'"updated_at": "{self.updated_at or ""}"}}'
+            f'"value": {self.value or ""}}}'
 
     @property
     def name(self):
@@ -70,23 +62,16 @@ class Behavior:
         else:
             raise ValueError(f'active must be 0 or 1, got {val}')
 
-    @property
-    def behavior_info(self):
-        return self._behavior_info
-
-    @behavior_info.setter
-    def behavior_info(self, info):
-        if not type(info) is BehaviorInfo:
-            raise TypeError('behavior_info must be of type Behavior Info')
-        else:
-            self._behavior_info = info
+    def as_dict(self):
+        return {"name": self.name,
+                "description": self.description,
+                "value": self.value}
 
 
 class URL(Behavior):
-    def __init__(self, url, behavior_info, description='URL'):
+    def __init__(self, url, description='URL'):
         self.url = url
-        super().__init__(name='url', value=self.url, description=description,
-                         behavior_info=behavior_info)
+        super().__init__(name='url', value=self.url, description=description)
 
     @property
     def url(self):
@@ -107,15 +92,13 @@ class URL(Behavior):
 
 
 class Text(Behavior):
-    def __init__(self, text, behavior_info):
+    def __init__(self, text):
         """
         :param string: text to type into a field
         """
         self.text = text
         super().__init__(name='text', value=self.text,
-                         description=f'Text to enter',
-                         behavior_info=behavior_info
-                         )
+                         description=f'Text to enter')
 
     @property
     def text(self):
@@ -131,14 +114,13 @@ class Text(Behavior):
 
 
 class SelectionType(Behavior):
-    def __init__(self, selector_type, behavior_info):
+    def __init__(self, selector_type):
         """
         :param selector_type: string, one of "XPATH|CSS|CLASS|ID"
         """
         self.selector_type = selector_type
         super().__init__(name='selectionType', value=self.selector_type,
-                         description=f'Type of selection',
-                         behavior_info=behavior_info)
+                         description=f'Type of selection')
 
     @property
     def selector_type(self):
@@ -155,7 +137,7 @@ class SelectionType(Behavior):
 
 
 class Selector(Behavior):
-    def __init__(self, selector, behavior_info, kind=""):
+    def __init__(self, selector, kind=""):
         """
         :param selector: a valid selector one of "XPATH|CSS|CLASS|ID"
         """
@@ -163,8 +145,7 @@ class Selector(Behavior):
         self.kind = kind
 
         super().__init__(name='selector', value=self.selector,
-                         description=f'{kind} selector',
-                         behavior_info=behavior_info)
+                         description=f'{kind} selector')
 
     @property
     def selector(self):
@@ -176,7 +157,7 @@ class Selector(Behavior):
 
 
 class DecisionType(Behavior):
-    def __init__(self, decision_type, behavior_info):
+    def __init__(self, decision_type):
         """
         :param decision_type: string, one of "FIRST|LAST|RANDOM"
         """
@@ -184,7 +165,6 @@ class DecisionType(Behavior):
 
         super().__init__(name='decisionType', value=self.decision_type,
                          description=f'Decision type for choosing an item out of the list given by the selector is {self.decision_type}',
-                         behavior_info=behavior_info,
                          )
 
     @property
@@ -202,14 +182,13 @@ class DecisionType(Behavior):
 
 
 class ScrollDuration(Behavior):
-    def __init__(self, duration, behavior_info):
+    def __init__(self, duration):
         """
         :param duration: float >0 time in seconds
         """
         self.duration = duration
         super().__init__(name='scrollDuration', value=self.duration,
-                         description=f'Scroll for {self.duration} seconds.',
-                         behavior_info=behavior_info
+                         description=f'Scroll for {self.duration} seconds.'
                          )
 
     @property
@@ -231,7 +210,7 @@ class ScrollDuration(Behavior):
 class ScrollDirection(Behavior):
     SCROLL_DESC_DICT = {'UP': 'Scroll up', 'DOWN': 'Scroll down'}
 
-    def __init__(self, direction, behavior_info):
+    def __init__(self, direction):
         """
         :param direction: string, either 'UP'/'U' or 'DOWN'/'D'
         """
@@ -239,8 +218,7 @@ class ScrollDirection(Behavior):
         description = ScrollDirection.SCROLL_DESC_DICT[self.direction]
         super().__init__(name='scrollDirection',
                          value=self.direction,
-                         description=description,
-                         behavior_info=behavior_info)
+                         description=description)
 
     @property
     def direction(self):
@@ -262,14 +240,13 @@ class ScrollDirection(Behavior):
 
 
 class ScrollLength(Behavior):
-    def __init__(self, percentage, behavior_info):
+    def __init__(self, percentage):
         """
         :param percentage: float in [0,100] percentage of window to scroll down
         """
         self.percentage = percentage
         super().__init__(name='length', value=self.percentage,
-                         description=f'Scroll {self.percentage} of window.',
-                         behavior_info=behavior_info)
+                         description=f'Scroll {self.percentage} of window.')
 
     @property
     def percentage(self):
@@ -288,14 +265,13 @@ class ScrollLength(Behavior):
 
 
 class WaitSeconds(Behavior):
-    def __init__(self, duration, behavior_info):
+    def __init__(self, duration):
         """
         :param duration: float >0 time in seconds
         """
         self.duration = duration
         super().__init__(name='seconds', value=self.duration,
-                         description=f'Wait for {self.duration} seconds.',
-                         behavior_info=behavior_info)
+                         description=f'Wait for {self.duration} seconds.')
 
     @property
     def duration(self):

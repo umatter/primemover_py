@@ -151,3 +151,53 @@ class ConfigurationInfo(Info):
     def new_crawler(self):
         return CrawlerInfo(user_id=self._user_id,
                            configuration_id=self.configuration_id)
+
+
+class Agent:
+
+    def __init__(self,
+                 name="Sample agent",
+                 description="Placeholder agent",
+                 identification="Multilogin",
+                 multilogin_id="c6e70352-aa50-4ce0-bd6c-f1d538f6a1dd",
+                 multilogin_profile='\"{ \"key\": \"value\" }\"'):
+        self._name = name
+        self._description = description
+        self._identification = identification
+        self._multilogin_id = multilogin_id
+        self._multilogin_profile = multilogin_profile
+
+    def as_dict(self):
+        return {"name": self._name,
+                "description": self._description,
+                "identification": self._identification,
+                "multilogin_id": self._multilogin_id,
+                "multilogin_profile": self._multilogin_profile}
+
+
+class Proxy:
+
+    def __init__(self,
+                 name="Sample Proxy",
+                 description="Placeholder proxy",
+                 type="HTTP",
+                 hostname="localhost",
+                 port=8080,
+                 username="admin",
+                 password="admin12345"):
+        self._name = name
+        self._description = description
+        self._type = type
+        self._hostname = hostname
+        self._port = port
+        self._username = username
+        self._password = password
+
+    def as_dict(self):
+        return {"name": self._name,
+                "description": self._description,
+                "type": self._type,
+                "hostname": self._hostname,
+                "port": self._port,
+                "username": self._username,
+                "password": self._password}

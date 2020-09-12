@@ -56,7 +56,7 @@ def choose_result(results, outlets, pi):
     # reformat outlets data to reflect unique 'outlet' and allow better access
     outlets_dict = {}
     for url, p, ro in outlets.items():
-        outlets_dict[url] = {'p': p, 'ro': ro}
+        outlets_dict[url] = {'pi': p, 'ro': ro}
 
     # calculate utility of each result
     utilities = []

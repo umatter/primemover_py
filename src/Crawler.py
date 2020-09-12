@@ -1,32 +1,96 @@
-from src.Info import *
+from src.ConfigureProfile import *
+from src.Info import Agent, Proxy
+
+
 class Crawler:
-    def __init__(self, crawler_info=None,name=None, description=None,                  ):
-        self.crawler_info = crawler_info
+    def __init__(self, name="Just a crawler",
+                 description="Crawler created through py", configurations=None,
+                 agents=None, proxies=None, active=0):
         self._description = description
         self._name = name
+        self.configurations = configurations
         self.queues = []
+        self.agents = agents
+        self.proxies = proxies
+        self.active = active
 
     @property
-    def crawler_info(self):
-        return self._crawler_info
+    def configurations(self):
+        return self._configurations
 
-    @crawler_info.setter
-    def crawler_info(self, info):
-        if not type(info) is CrawlerInfo:
-            raise TypeError('crawler_info must be of type QueueInfo')
+    @configurations.setter
+    def configurations(self, configs):
+        if configs is None:
+            self._configurations = [Config()]
+        elif type(configs) is list:
+            check_types = [type(val) is Config for val in configs]
+            if False in check_types:
+                raise TypeError(
+                    'All entries in configurations must be of type Config')
+            else:
+                self._configurations = configs
+        elif type(configs) is Config:
+            self._configurations = [configs]
         else:
-            self._crawler_info = info
+            raise TypeError(
+
+                f'configurations must be a list of or a single Config object')
+
+    @property
+    def agents(self):
+        return self._agents
+
+    @agents.setter
+    def agents(self, agents_in):
+        if agents_in is None:
+            self._agents = []
+        elif type(agents_in) is list:
+            check_types = [type(val) is Agent for val in agents_in]
+            if False in check_types:
+                raise TypeError(
+                    'All entries in Agents must be of type Agent')
+            else:
+                self._agents = agents_in
+        elif type(agents_in) is Agent:
+            self._agents = [agents_in]
+        else:
+            raise TypeError(
+                f'agents must be a list of or a single Agent object')
+
+    @property
+    def proxies(self):
+        return self._proxies
+
+    @proxies.setter
+    def proxies(self, proxies_in):
+        if proxies_in is None:
+            self._proxies = []
+        elif type(proxies_in) is list:
+            check_types = [type(val) is Proxy for val in proxies_in]
+            if False in check_types:
+                raise TypeError(
+                    'All entries in proxies must be of type Proxy')
+            else:
+                self._proxies = proxies_in
+        elif type(proxies_in) is Proxy:
+            self._proxies = [proxies_in]
+        else:
+            raise TypeError(
+                f'proxies must be a list of or a single Proxy object')
 
     def __str__(self):
         crawler_descr = \
-            f'"id": {self.crawler_info.crawler_id or ""},\n' \
-            f'"user_id": "{self.crawler_info._user_id or ""}",\n' \
-            f'"configuration_id": "{self.crawler_info.configuration_id or ""}",\n' \
-            f'"proxy_id": "{self.crawler_info.proxy_id or ""}",\n' \
-            f'"agent_id": "{self.crawler_info.agent_id or ""}",\n' \
             f'"name": "{self._name or ""}",\n' \
-            f'"description": "{self._description or ""}",\n' \
-            f'"active": {self.crawler_info.active or ""}'
-
+            f'"description": "{self._description or ""}",\n'
         formatted = ",\n".join([str(x) for x in self.queues])
         return f'{{{crawler_descr},"queues": [\n{formatted}]}}'
+
+    def as_dict(self):
+        return {
+            "name": self._name,
+            "description": self._description,
+            "active": self.active,
+            "configurations": [x.as_dict() for x in self.configurations],
+            "agents": [x.as_dict() for x in self.agents],
+            "proxies": [x.as_dict() for x in self.proxies],
+            "queues": [x.as_dict() for x in self.queues]}

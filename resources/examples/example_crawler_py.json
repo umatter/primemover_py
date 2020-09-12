@@ -1,0 +1,724 @@
+[
+  {
+    "name": "Just a crawler",
+    "description": "Crawler created through py",
+    "active": 0,
+    "configurations": [
+      {
+        "name": "",
+        "description": "",
+        "parameters": {
+          "pi": -0.561280485013389,
+          "psi": 1.8092817432444381,
+          "alpha": 0,
+          "tau": 0,
+          "kappa": 0,
+          "beta": 1,
+          "search_terms": [
+            "open the government",
+            "pay wall",
+            "school choice",
+            "child care",
+            "first congressional district",
+            "the american people",
+            "extreme cold weather",
+            "intellectual property",
+            "work and family",
+            "air traffic",
+            "low income",
+            "the democratic party",
+            "national defense act",
+            "fair act",
+            "abuse power",
+            "affordable housing",
+            "continuing resolution",
+            "free background check",
+            "civil rights",
+            "public health",
+            "work family",
+            "human rights",
+            "the act",
+            "intellectual property law",
+            "current form",
+            "what percent of",
+            "sandy hook shooting",
+            "maternity leave",
+            "higher education chronicle",
+            "illegal immigration",
+            "cut jobs",
+            "the wall",
+            "california minimum wage",
+            "the table",
+            "teacher year",
+            "low income housing",
+            "the wall",
+            "crystal meth drug",
+            "drug cartel",
+            "student loan",
+            "mexican cartel",
+            "work conditions",
+            "oil",
+            "mid american",
+            "energy",
+            "fossil fuels are",
+            "percent americans",
+            "assault weapons",
+            "fair standards labor act",
+            "federal workers",
+            "chesapeake bay bridge",
+            "chesapeake bay",
+            "make ends meet",
+            "nuclear power",
+            "equal pay",
+            "branches of government",
+            "virginia beach",
+            "women in black",
+            "oil change",
+            "federal workers",
+            "check act",
+            "impeached president",
+            "community color",
+            "offshore oil drilling",
+            "student loans",
+            "traffic control",
+            "california",
+            "illegal immigrants",
+            "back home",
+            "illegal immigrants",
+            "sea level",
+            "social security",
+            "box office",
+            "across country",
+            "congressional budget",
+            "student loan",
+            "bucks county",
+            "born to be alive",
+            "wall street journal",
+            "new york",
+            "puerto rico",
+            "workers rights",
+            "federal government",
+            "housing",
+            "oil drilling",
+            "federal credit union",
+            "criminal background check",
+            "abortion pro life",
+            "across border",
+            "piedmont natural gas",
+            "snap food benefits",
+            "born alive",
+            "abuse",
+            "minimum wage",
+            "eyes roll back",
+            "men and women",
+            "law of one",
+            "federal government",
+            "green new",
+            "one million"
+          ],
+          "media_outlet_urls": [
+            "https://www.popmatters.com/",
+            "https://www.mndaily.com/",
+            "https://www.kfdi.com/",
+            "https://www.mpnnow.com/",
+            "https://www.chanute.com/",
+            "https://eurweb.com/",
+            "https://www.lehighacrescitizen.com/",
+            "https://www.ctpost.com/",
+            "https://bossierpress.com/",
+            "https://www.thechronicleonline.com/",
+            "https://www.wilsonpost.com/",
+            "https://abcnews4.com/",
+            "http://www.bradfordera.com/",
+            "https://www.cbsnews.com/",
+            "https://710keel.com/",
+            "https://wchstv.com/",
+            "https://westseattleblog.com/",
+            "http://crestedbuttenews.com/",
+            "https://eu.caller.com/",
+            "https://www.minotdailynews.com/",
+            "https://omaha.com/",
+            "https://sill-www.army.mil/cannoneer/",
+            "https://ktar.com/",
+            "https://www.twincities.com/",
+            "https://www.nolangroupmedia.com/manchester_enterprise/",
+            "http://www.dailysource.org/",
+            "https://www.mainstreetnews.com/barrow/",
+            "https://mynorthwest.com/",
+            "https://www.rep-am.com/blogs/",
+            "https://www.dailyrepublic.com/",
+            "https://eu.courierpress.com/",
+            "http://www.semissourian.com/",
+            "http://www.lawattstimes.com/",
+            "https://www.cachevalleydaily.com/",
+            "http://katytimes.com/",
+            "https://www.dailyprincetonian.com/",
+            "https://mtstandard.com/",
+            "https://www.kswo.com/",
+            "https://www.wdtimes.com/",
+            "https://ktul.com/",
+            "https://observer-reporter.com/",
+            "https://kvia.com/",
+            "https://edition.cnn.com/business",
+            "https://www.channel3000.com/news/video/",
+            "https://www.jewishexponent.com/",
+            "http://www.news9.com/",
+            "https://www.caravannews.com/",
+            "http://www.kurv.com/",
+            "https://www.brproud.com/",
+            "https://www.clevescene.com/",
+            "https://ashlandtidings.com/",
+            "https://kstp.com/",
+            "http://www.lawattstimes.com/",
+            "https://www.pikecountynews.com/",
+            "https://www.chicagotribune.com/",
+            "https://tuftsdaily.com/",
+            "https://www.klin.com/",
+            "https://eu.wisfarmer.com/",
+            "https://www.phillymag.com/",
+            "https://www.kdlg.org/",
+            "https://bigislandnow.com/",
+            "https://www.bigcountryhomepage.com/",
+            "https://nyunews.com/",
+            "https://www.oleantimesherald.com/",
+            "https://www.wxxinews.org/",
+            "https://www.newslincolncounty.com/",
+            "https://www.coloradodaily.com/",
+            "http://www.theprogressnews.com/",
+            "https://www.taftmidwaydriller.com/",
+            "https://www.newschannel6now.com/",
+            "https://www.fox17online.com/",
+            "https://www.northcountrynow.com/",
+            "https://eu.alamogordonews.com/",
+            "https://newsradio1170.iheart.com/",
+            "https://www.delcotimes.com/",
+            "https://www.cambridgechron.com/",
+            "https://www.ukiahdailyjournal.com/",
+            "https://www.alexandrianews.org/",
+            "https://www.al.com/",
+            "https://www.wjhl.com/",
+            "https://www.boothbayregister.com/",
+            "https://www.chronicleonline.com/",
+            "https://americanindependent.com/",
+            "https://www.rollingstone.com/",
+            "https://www.cbs19.tv/",
+            "https://www.bozemandailychronicle.com/",
+            "https://sfbayview.com/",
+            "https://www.bigspringherald.com/",
+            "https://kttc.com/",
+            "https://www.wric.com/",
+            "http://theorion.com/",
+            "https://salinapost.com/",
+            "https://www.cincinnatimagazine.com/",
+            "https://www.wpri.com/",
+            "https://slate.com/gdpr?redirect_uri=%2F%3Fvia%3Dgdpr-consent&redirect_host=http%3A%2F%2Fwww.slate.com",
+            "https://www.kesq.com/",
+            "https://www.wbbjtv.com/",
+            "https://gothamist.com/",
+            "https://www.wtap.com/",
+            "https://www.theitem.com/"
+          ]
+        }
+      }
+    ],
+    "agents": [
+      {
+        "name": "Sample agent",
+        "description": "Placeholder agent",
+        "identification": "Multilogin",
+        "multilogin_id": "c6e70352-aa50-4ce0-bd6c-f1d538f6a1dd",
+        "multilogin_profile": "\"{ \"key\": \"value\" }\""
+      }
+    ],
+    "proxies": [
+      {
+        "name": "Sample Proxy",
+        "description": "Placeholder proxy",
+        "type": "HTTP",
+        "hostname": "localhost",
+        "port": 8080,
+        "username": "admin",
+        "password": "admin12345"
+      }
+    ],
+    "queues": [
+      {
+        "name": "GoogleSearch",
+        "description": "Open Google, enter a search querry and select a result.",
+        "start_at": "insert time here",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.google.com",
+            "behaviors": [
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "\"https:\\/\\/www.google.com\""
+              }
+            ]
+          },
+          {
+            "name": "Enter Text",
+            "type": "entertextfieldjob",
+            "description": "Enter text into the defined field",
+            "behaviors": [
+              {
+                "name": "text",
+                "description": "Text to enter",
+                "value": "\"insert term here\""
+              },
+              {
+                "name": "selectiontype",
+                "description": "Type of selection",
+                "value": "\"XPATH\""
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "\"\\/\\/input[@name='q']\""
+              }
+            ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "selectiontype",
+                "description": "Type of selection",
+                "value": "\"CLASS\""
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "\"LC20lb.DKV0Md\""
+              },
+              {
+                "name": "decisiontype",
+                "description": "Decision type for choosing an item out of the list given by the selector is RANDOM",
+                "value": "\"RANDOM\""
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "length",
+                "description": "Scroll 80.0 of window.",
+                "value": 80.0
+              },
+              {
+                "name": "scrolldirection",
+                "description": "Scroll down",
+                "value": "\"DOWN\""
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Visit Direct",
+        "description": "Visit a media outlet and scroll for 2-3 minutes.",
+        "start_at": "insert time here",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.nytimes.com",
+            "behaviors": [
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "\"https:\\/\\/www.nytimes.com\""
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "scrollduration",
+                "description": "Scroll for 126.51962317792635 seconds.",
+                "value": 126.51962317792635
+              },
+              {
+                "name": "scrolldirection",
+                "description": "Scroll down",
+                "value": "\"DOWN\""
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Just a crawler",
+    "description": "Crawler created through py",
+    "active": 0,
+    "configurations": [
+      {
+        "name": "",
+        "description": "",
+        "parameters": {
+          "pi": -1.3676223399341474,
+          "psi": -1.7140405572673574,
+          "alpha": 0,
+          "tau": 0,
+          "kappa": 0,
+          "beta": 1,
+          "search_terms": [
+            "environmental protection agency",
+            "domestic violence",
+            "housing",
+            "across the country",
+            "men and women",
+            "separation of family",
+            "air traffic control",
+            "dark money",
+            "republican party",
+            "first congressional district",
+            "meth effects",
+            "physical barriers",
+            "public health department",
+            "the wall",
+            "extreme weather",
+            "affordable housing apartments",
+            "minimum wage",
+            "food table",
+            "republican or democrat",
+            "form union",
+            "teacher salary",
+            "pro choice",
+            "sports authority",
+            "global climate change",
+            "senate republican",
+            "fossil fuel industry",
+            "the people act",
+            "work and family",
+            "domestic abuse",
+            "branches of government",
+            "natural gas",
+            "affordable apartments",
+            "extreme cold",
+            "the new new deal",
+            "new deal",
+            "intellectual property law",
+            "the democratic party",
+            "material measure",
+            "born alive",
+            "the act",
+            "civil rights act",
+            "apartments",
+            "maya angelou i rise",
+            "the far left",
+            "coastal community",
+            "sandy hook shooting",
+            "abortion pro life",
+            "martin luther",
+            "fair standards labor act",
+            "life insurance company",
+            "mexico canada",
+            "pay my bill",
+            "mexican drug cartel",
+            "american pediatrics",
+            "american academy",
+            "oil change",
+            "nuclear plant",
+            "united to protect democracy",
+            "zero tolerance",
+            "pay mortgage",
+            "senate is republican",
+            "illegal immigrants",
+            "women for men",
+            "poison pill",
+            "world war",
+            "rights of workers",
+            "equal rights",
+            "maternity leave",
+            "border wall",
+            "federal employees",
+            "human rights",
+            "medical device",
+            "the work of the people",
+            "illegal immigration",
+            "pay the rent",
+            "expansion of medicaid",
+            "people color",
+            "foreign policy",
+            "roll back",
+            "domestic abuse",
+            "rights act",
+            "piedmont natural gas",
+            "minimum wage",
+            "mutual insurance",
+            "traffic control",
+            "what does temperature measure",
+            "assault weapons ban",
+            "federal contractors",
+            "employees federal credit union",
+            "medicaid expansion",
+            "raising minimum",
+            "federal workers",
+            "renewable energy",
+            "what sexual orientation",
+            "low income",
+            "united states",
+            "the table",
+            "foreign government",
+            "low income housing",
+            "law of one"
+          ],
+          "media_outlet_urls": [
+            "https://www.bastropenterprise.com/",
+            "https://www.theintelligencer.net/",
+            "https://www.heraldstandard.com/",
+            "https://www.wishtv.com/myindy-tv/",
+            "https://www.localmemphis.com/",
+            "https://www.wlbt.com/",
+            "http://chelsearecord.com/",
+            "https://scnow.com/",
+            "https://www.aspentimes.com/",
+            "https://www.wdrb.com/",
+            "https://www.cleburnetimesreview.com/",
+            "https://www.waynecojournalbanner.com/",
+            "https://www.airforcetimes.com/",
+            "https://mynews4.com/",
+            "https://www.arcurrent.com/",
+            "https://whdh.com/",
+            "https://www.lowellsun.com/",
+            "https://www.brushnewstribune.com/",
+            "https://wn.com/",
+            "https://kowb1290.com/",
+            "https://www.bloomberg.com/tosv2.html?vid=&uuid=5b4af320-e7ef-11ea-9454-4d25782d2fc9&url=Lw==",
+            "https://www.auroranewsregister.com/",
+            "https://www.pressandjournal.com/",
+            "http://richmondfreepress.com/",
+            "https://eu.commercialappeal.com/",
+            "https://communitynewspapers.com/",
+            "https://www.wcax.com/",
+            "https://mynorthwest.com/",
+            "https://www.businessinsider.com/international?r=US&IR=T",
+            "https://www.scout.com/",
+            "https://www.popmatters.com/",
+            "https://www.fox17online.com/",
+            "https://eu.lavozarizona.com/",
+            "https://www.sanmarcosrecord.com/",
+            "https://www.goshennews.com/",
+            "https://easttexasreview.com/",
+            "https://flsentinel.com/",
+            "https://www.mpnnow.com/",
+            "https://www.gbtribune.com:443/",
+            "https://thesubtimes.com/",
+            "https://eu.clarionledger.com/",
+            "https://abc30.com/",
+            "https://katu.com/",
+            "https://cnycentral.com/",
+            "https://eu.bucyrustelegraphforum.com/",
+            "https://kttc.com/",
+            "https://www.highlandernews.org/",
+            "https://atlantadailyworld.com/",
+            "http://www.wicz.com/",
+            "https://democratherald.com/",
+            "https://www.theintermountain.com/",
+            "https://www.coloradocountycitizen.com/",
+            "https://www.fourstateshomepage.com/",
+            "https://www.seacoastonline.com/",
+            "https://nbc-2.com/",
+            "https://www.mtdemocrat.com/",
+            "https://www.ualrpublicradio.org/",
+            "https://www.bohemian.com/",
+            "https://www.kcaw.org/",
+            "https://www.actionnewsnow.com/",
+            "https://www.kunr.org/",
+            "https://www.radioiowa.com/",
+            "https://www.berkeleyside.com/",
+            "https://www.kdrv.com/",
+            "https://myfox8.com/",
+            "https://www.coloradoindependent.com/",
+            "https://www.channel3000.com/news/video/",
+            "https://www.wcjb.com/",
+            "https://wflanews.iheart.com/",
+            "https://www.thealpenanews.com/",
+            "https://castlerocknewspress.net/",
+            "http://www.thetribunepapers.com/",
+            "https://alextimes.com/",
+            "https://www.wyomingnewsnow.tv/",
+            "https://www.buckslocalnews.com/",
+            "https://www.mtexpress.com/",
+            "https://eu.theleafchronicle.com/",
+            "http://www.920kvec.com/",
+            "https://www.caribbeannationalweekly.com/",
+            "https://buchtelite.com/",
+            "https://www.kstk.org/",
+            "https://kbnd.com/",
+            "https://www.12news.com/",
+            "https://www.islandssounder.com/",
+            "https://www.gazettenet.com/",
+            "https://www.fox23.com/",
+            "https://www.abc12.com/",
+            "https://abc10up.com/",
+            "https://www.highlandernews.org/",
+            "https://eu.tallahassee.com/",
+            "https://www.wtva.com/",
+            "http://krvn.com/",
+            "https://castlerocknewspress.net/",
+            "https://www.krwg.org/",
+            "https://eu.thecalifornian.com/",
+            "https://www.nhpr.org/",
+            "https://wgno.com/",
+            "https://www.newsontheneck.com/",
+            "https://www.santacruzsentinel.com/",
+            "https://www.bladenjournal.com/"
+          ]
+        }
+      }
+    ],
+    "agents": [
+      {
+        "name": "Sample agent",
+        "description": "Placeholder agent",
+        "identification": "Multilogin",
+        "multilogin_id": "c6e70352-aa50-4ce0-bd6c-f1d538f6a1dd",
+        "multilogin_profile": "\"{ \"key\": \"value\" }\""
+      }
+    ],
+    "proxies": [
+      {
+        "name": "Sample Proxy",
+        "description": "Placeholder proxy",
+        "type": "HTTP",
+        "hostname": "localhost",
+        "port": 8080,
+        "username": "admin",
+        "password": "admin12345"
+      }
+    ],
+    "queues": [
+      {
+        "name": "GoogleSearch",
+        "description": "Open Google, enter a search querry and select a result.",
+        "start_at": "insert time here",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.google.com",
+            "behaviors": [
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "\"https:\\/\\/www.google.com\""
+              }
+            ]
+          },
+          {
+            "name": "Enter Text",
+            "type": "entertextfieldjob",
+            "description": "Enter text into the defined field",
+            "behaviors": [
+              {
+                "name": "text",
+                "description": "Text to enter",
+                "value": "\"insert term here\""
+              },
+              {
+                "name": "selectiontype",
+                "description": "Type of selection",
+                "value": "\"XPATH\""
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "\"\\/\\/input[@name='q']\""
+              }
+            ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "selectiontype",
+                "description": "Type of selection",
+                "value": "\"CLASS\""
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "\"LC20lb.DKV0Md\""
+              },
+              {
+                "name": "decisiontype",
+                "description": "Decision type for choosing an item out of the list given by the selector is RANDOM",
+                "value": "\"RANDOM\""
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "length",
+                "description": "Scroll 80.0 of window.",
+                "value": 80.0
+              },
+              {
+                "name": "scrolldirection",
+                "description": "Scroll down",
+                "value": "\"DOWN\""
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Visit Direct",
+        "description": "Visit a media outlet and scroll for 2-3 minutes.",
+        "start_at": "insert time here",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.nytimes.com",
+            "behaviors": [
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "\"https:\\/\\/www.nytimes.com\""
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "scrollduration",
+                "description": "Scroll for 122.1325730815778 seconds.",
+                "value": 122.1325730815778
+              },
+              {
+                "name": "scrolldirection",
+                "description": "Scroll down",
+                "value": "\"DOWN\""
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
