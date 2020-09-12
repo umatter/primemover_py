@@ -1,20 +1,17 @@
 [
    {
-      "user_id": 1,
-      "configuration_id": 1,
-      "proxy_id":1,
-      "agent_id":1,
-      "name":"Erster Bot via API erstellt",
+      "name": "Erster Crawler",
+      "description": "erstellt via API",
       "configurations": [
           {
-              "name": "Configuration via API",
-              "description": "Einfache Konfiguration"
+              "name": "Configuration created through API",
+              "description": "A basic Configuration"
           }
       ], 
       "agents": [
           {
-              "name": "Agent via API",
-              "description": "Einfacher Agent",
+              "name": "Agent created through API",
+              "description": "A basic Agent",
               "identification": "Multilogin",
               "multilogin_id": "c6e70352-aa50-4ce0-bd6c-f1d538f6a1dd",
               "multilogin_profile": "{ \"key\": \"value\" }"
@@ -22,8 +19,8 @@
       ],      
       "proxies":[
           {
-              "name": "Proxy via API",
-              "description": "Einfacher Proxy",
+              "name": "Proxy created through API",
+              "description": "A basic Proxy",
               "type": "HTTP",
               "hostname": "localhost",
               "port": 8080,
@@ -151,10 +148,9 @@
       ]
    },
    {
-      "proxy_id":1,
-      "agent_id":1,
-      "name":"Zweiter Bot via API erstellt",
-      "configurations": [],      
+      "name": "Zweiter Crawler",
+      "description": "erstellt via API",
+      "configurations": [],
       "proxies":[],
       "agents":[],
       "queues":[
