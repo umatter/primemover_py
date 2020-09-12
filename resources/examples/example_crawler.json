@@ -1,32 +1,51 @@
 [
    {
-      "name": "Erster Crawler",
-      "description": "erstellt via API",
-      "configurations": [
-          {
-              "name": "Configuration created through API",
-              "description": "A basic Configuration"
-          }
-      ], 
-      "agents": [
-          {
-              "name": "Agent created through API",
-              "description": "A basic Agent",
-              "identification": "Multilogin",
-              "multilogin_id": "c6e70352-aa50-4ce0-bd6c-f1d538f6a1dd",
-              "multilogin_profile": "{ \"key\": \"value\" }"
-          }
-      ],      
+      "name":"Just a Crawler",
+      "description":"Crawler created through API",
+      "active":0,
+      "configurations":[
+         {
+            "name":"Configuration created through API",
+            "description":"A basic Configuration",
+            "params":[
+               {
+                  "pi":-0.8441270315193785,
+                  "psi":-0.15200161677194193,
+                  "kappa":"",
+                  "tau":"",
+                  "beta":"",
+                  "alpha":"",
+                  "search_terms":[
+                     "intimate partner",
+                     "american energy"
+                  ],
+                  "media_outlet_urls":[
+                     "https://whoradio.iheart.com/",
+                     "https://www.newschannel10.com/"
+                  ]
+               }
+            ]
+         }
+      ],
+      "agents":[
+         {
+            "name":"Agent created through API",
+            "description":"A basic Agent",
+            "identification":"Multilogin",
+            "multilogin_id":"c6e70352-aa50-4ce0-bd6c-f1d538f6a1dd",
+            "multilogin_profile":"{ \"key\": \"value\" }"
+         }
+      ],
       "proxies":[
-          {
-              "name": "Proxy created through API",
-              "description": "A basic Proxy",
-              "type": "HTTP",
-              "hostname": "localhost",
-              "port": 8080,
-              "username": "admin",
-              "password": "admin12345"
-          }
+         {
+            "name":"Proxy created through API",
+            "description":"A basic Proxy",
+            "type":"HTTP",
+            "hostname":"localhost",
+            "port":8080,
+            "username":"admin",
+            "password":"admin12345"
+         }
       ],
       "queues":[
          {
@@ -148,11 +167,17 @@
       ]
    },
    {
-      "name": "Zweiter Crawler",
-      "description": "erstellt via API",
-      "configurations": [],
-      "proxies":[],
-      "agents":[],
+      "name":"Zweiter Crawler",
+      "description":"erstellt via API",
+      "configurations":[
+         
+      ],
+      "proxies":[
+         
+      ],
+      "agents":[
+         
+      ],
       "queues":[
          {
             "name":"GoogleSearch",
