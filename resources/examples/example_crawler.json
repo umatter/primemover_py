@@ -1,532 +1,279 @@
-{
-  "data": [
-    {
-      "id": 1,
-      "user_id": "",
-      "configuration_id": "1",
-      "proxy_id": "",
-      "agent_id": "",
-      "name": "",
-      "description": "",
-      "active": 1,
-      "queues": [
-        {
-          "id": 1,
-          "user_id": "None",
-          "queue_id": 1,
-          "name": "GoogleSearch",
-          "description": "Open Google, enter a search querry and select a result.",
-          "started": 0,
-          "success": 0,
-          "failure": 0,
-          "order": 1,
-          "active": 1,
-          "start_at": "insert time here",
-          "jobs": [
-            {
-              "id": 1,
-              "user_id": " ",
-              "queue_id": 1,
-              "name": "Visit",
-              "type": "visitjob",
-              "description": "Visit https://www.google.com",
-              "started": 0,
-              "success": 0,
-              "failure": 0,
-              "order": 1,
-              "active": 1,
-              "behaviors": [
-                {
-                  "id": "1",
-                  "name": "url",
-                  "description": "URL",
-                  "value": "https:\/\/www.google.com",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 1,
-                  "created_at": "",
-                  "updated_at": ""
-                }
-              ]
-            },
-            {
-              "id": 2,
-              "user_id": " ",
-              "queue_id": 1,
-              "name": "Enter Text",
-              "type": "entertextfieldjob",
-              "description": "Enter text into the defined field",
-              "started": 0,
-              "success": 0,
-              "failure": 0,
-              "order": 1,
-              "active": 1,
-              "behaviors": [
-                {
-                  "id": "2",
-                  "name": "text",
-                  "description": "Text to enter",
-                  "value": "insert term here",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 2,
-                  "created_at": "",
-                  "updated_at": ""
-                },
-                {
-                  "id": "3",
-                  "name": "selectiontype",
-                  "description": "Type of selection",
-                  "value": "XPATH",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 2,
-                  "created_at": "",
-                  "updated_at": ""
-                },
-                {
-                  "id": "4",
-                  "name": "selector",
-                  "description": " selector",
-                  "value": "\/\/input[@name='q']",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 2,
-                  "created_at": "",
-                  "updated_at": ""
-                }
-              ]
-            },
-            {
-              "id": 3,
-              "user_id": " ",
-              "queue_id": 1,
-              "name": "Select",
-              "type": "singleselecturljob",
-              "description": "Select an item and click",
-              "started": 0,
-              "success": 0,
-              "failure": 0,
-              "order": 1,
-              "active": 1,
-              "behaviors": [
-                {
-                  "id": "5",
-                  "name": "selectiontype",
-                  "description": "Type of selection",
-                  "value": "CLASS",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 3,
-                  "created_at": "",
-                  "updated_at": ""
-                },
-                {
-                  "id": "6",
-                  "name": "selector",
-                  "description": " selector",
-                  "value": "LC20lb.DKV0Md",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 3,
-                  "created_at": "",
-                  "updated_at": ""
-                },
-                {
-                  "id": "7",
-                  "name": "decisiontype",
-                  "description": "Decision type for choosing an item out of the list given by the selector is RANDOM",
-                  "value": "RANDOM",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 3,
-                  "created_at": "",
-                  "updated_at": ""
-                }
-              ]
-            },
-            {
-              "id": 4,
-              "user_id": " ",
-              "queue_id": 1,
-              "name": "Scroll by length",
-              "type": "scrollbylengthjob",
-              "description": "Scroll down",
-              "started": 0,
-              "success": 0,
-              "failure": 0,
-              "order": 1,
-              "active": 1,
-              "behaviors": [
-                {
-                  "id": "8",
-                  "name": "length",
-                  "description": "Scroll 80.0 of window.",
-                  "value": 80.0,
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 4,
-                  "created_at": "",
-                  "updated_at": ""
-                },
-                {
-                  "id": "9",
-                  "name": "scrolldirection",
-                  "description": "Scroll down",
-                  "value": "DOWN",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 4,
-                  "created_at": "",
-                  "updated_at": ""
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": 2,
-          "user_id": "None",
-          "queue_id": 2,
-          "name": "Visit Direct",
-          "description": "Visit a media outlet and scroll for 2-3 minutes.",
-          "started": 0,
-          "success": 0,
-          "failure": 0,
-          "order": 1,
-          "active": 1,
-          "start_at": "insert time here",
-          "jobs": [
-            {
-              "id": 5,
-              "user_id": " ",
-              "queue_id": 2,
-              "name": "Visit",
-              "type": "visitjob",
-              "description": "Visit https://www.nytimes.com",
-              "started": 0,
-              "success": 0,
-              "failure": 0,
-              "order": 1,
-              "active": 1,
-              "behaviors": [
-                {
-                  "id": "10",
-                  "name": "url",
-                  "description": "URL",
-                  "value": "https:\/\/www.nytimes.com",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 5,
-                  "created_at": "",
-                  "updated_at": ""
-                }
-              ]
-            },
-            {
-              "id": 6,
-              "user_id": " ",
-              "queue_id": 2,
-              "name": "Scroll by duration",
-              "type": "scrollbydurationjob",
-              "description": "Scroll down",
-              "started": 0,
-              "success": 0,
-              "failure": 0,
-              "order": 1,
-              "active": 1,
-              "behaviors": [
-                {
-                  "id": "11",
-                  "name": "scrollduration",
-                  "description": "Scroll for 141.62779059506116 seconds.",
-                  "value": 141.62779059506116,
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 6,
-                  "created_at": "",
-                  "updated_at": ""
-                },
-                {
-                  "id": "12",
-                  "name": "scrolldirection",
-                  "description": "Scroll down",
-                  "value": "DOWN",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 6,
-                  "created_at": "",
-                  "updated_at": ""
-                }
-              ]
-            }
-          ]
-        }
+[
+   {
+      "user_id": 1,
+      "configuration_id": 1,
+      "proxy_id":1,
+      "agent_id":1,
+      "name":"Erster Bot via API erstellt",
+      "configurations": [
+          {
+              "name": "Configuration via API",
+              "description": "Einfache Konfiguration"
+          }
+      ], 
+      "agents": [
+          {
+              "name": "Agent via API",
+              "description": "Einfacher Agent",
+              "identification": "Multilogin",
+              "multilogin_id": "c6e70352-aa50-4ce0-bd6c-f1d538f6a1dd",
+              "multilogin_profile": "{ \"key\": \"value\" }"
+          }
+      ],      
+      "proxies":[
+          {
+              "name": "Proxy via API",
+              "description": "Einfacher Proxy",
+              "type": "HTTP",
+              "hostname": "localhost",
+              "port": 8080,
+              "username": "admin",
+              "password": "admin12345"
+          }
+      ],
+      "queues":[
+         {
+            "name":"GoogleSearch",
+            "description":"Open Google, enter a search querry and select a result.",
+            "start_at":"",
+            "jobs":[
+               {
+                  "name":"Visit 1",
+                  "type":"visitjob",
+                  "description":"Visit https://www.google.com",
+                  "behaviors":[
+                     {
+                        "name":"url",
+                        "description":"URL",
+                        "value":"https://www.google.com"
+                     }
+                  ]
+               },
+               {
+                  "name":"Enter Text 1",
+                  "type":"entertextfieldjob",
+                  "description":"Enter text into the defined field",
+                  "behaviors":[
+                     {
+                        "name":"text",
+                        "description":"Text to enter",
+                        "value":"insert term here"
+                     },
+                     {
+                        "name":"selectiontype",
+                        "description":"Type of selection",
+                        "value":"XPATH"
+                     },
+                     {
+                        "name":"selector",
+                        "description":" selector",
+                        "value":"//input[@name='q']"
+                     }
+                  ]
+               },
+               {
+                  "name":"Select 1",
+                  "type":"singleselecturljob",
+                  "description":"Select an item and click",
+                  "behaviors":[
+                     {
+                        "name":"selectiontype",
+                        "description":"Type of selection",
+                        "value":"CLASS"
+                     },
+                     {
+                        "name":"selector",
+                        "description":" selector",
+                        "value":"LC20lb.DKV0Md"
+                     },
+                     {
+                        "name":"decisiontype",
+                        "description":"Decision type for choosing an item out of the list given by the selector is RANDOM",
+                        "value":"RANDOM"
+                     }
+                  ]
+               },
+               {
+                  "name":"Scroll by length",
+                  "type":"scrollbylengthjob",
+                  "description":"Scroll down",
+                  "behaviors":[
+                     {
+                        "name":"length",
+                        "description":"Scroll 80.0 of window.",
+                        "value":80.0
+                     },
+                     {
+                        "name":"scrolldirection",
+                        "description":"Scroll down",
+                        "value":"DOWN"
+                     }
+                  ]
+               }
+            ]
+         },
+         {
+            "name":"Visit Direct",
+            "description":"Visit a media outlet and scroll for 2-3 minutes.",
+            "start_at":"",
+            "jobs":[
+               {
+                  "name":"Visit",
+                  "type":"visitjob",
+                  "description":"Visit https://www.nytimes.com",
+                  "behaviors":[
+                     {
+                        "name":"url",
+                        "description":"URL",
+                        "value":"https://www.nytimes.com"
+                     }
+                  ]
+               },
+               {
+                  "name":"Scroll by duration",
+                  "type":"scrollbydurationjob",
+                  "description":"Scroll down",
+                  "behaviors":[
+                     {
+                        "name":"scrollduration",
+                        "description":"Scroll for 141.62779059506116 seconds.",
+                        "value":141.62779059506116
+                     },
+                     {
+                        "name":"scrolldirection",
+                        "description":"Scroll down",
+                        "value":"DOWN"
+                     }
+                  ]
+               }
+            ]
+         }
       ]
-    },
-    {
-      "id": 2,
-      "user_id": "",
-      "configuration_id": "2",
-      "proxy_id": "",
-      "agent_id": "",
-      "name": "",
-      "description": "",
-      "active": 1,
-      "queues": [
-        {
-          "id": 3,
-          "user_id": "None",
-          "queue_id": 3,
-          "name": "GoogleSearch",
-          "description": "Open Google, enter a search querry and select a result.",
-          "started": 0,
-          "success": 0,
-          "failure": 0,
-          "order": 1,
-          "active": 1,
-          "start_at": "insert time here",
-          "jobs": [
-            {
-              "id": 7,
-              "user_id": " ",
-              "queue_id": 3,
-              "name": "Visit",
-              "type": "visitjob",
-              "description": "Visit https://www.google.com",
-              "started": 0,
-              "success": 0,
-              "failure": 0,
-              "order": 1,
-              "active": 1,
-              "behaviors": [
-                {
-                  "id": "13",
-                  "name": "url",
-                  "description": "URL",
-                  "value": "https:\/\/www.google.com",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 7,
-                  "created_at": "",
-                  "updated_at": ""
-                }
-              ]
-            },
-            {
-              "id": 8,
-              "user_id": " ",
-              "queue_id": 3,
-              "name": "Enter Text",
-              "type": "entertextfieldjob",
-              "description": "Enter text into the defined field",
-              "started": 0,
-              "success": 0,
-              "failure": 0,
-              "order": 1,
-              "active": 1,
-              "behaviors": [
-                {
-                  "id": "14",
-                  "name": "text",
-                  "description": "Text to enter",
-                  "value": "insert term here",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 8,
-                  "created_at": "",
-                  "updated_at": ""
-                },
-                {
-                  "id": "15",
-                  "name": "selectiontype",
-                  "description": "Type of selection",
-                  "value": "XPATH",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 8,
-                  "created_at": "",
-                  "updated_at": ""
-                },
-                {
-                  "id": "16",
-                  "name": "selector",
-                  "description": " selector",
-                  "value": "\/\/input[@name='q']",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 8,
-                  "created_at": "",
-                  "updated_at": ""
-                }
-              ]
-            },
-            {
-              "id": 9,
-              "user_id": " ",
-              "queue_id": 3,
-              "name": "Select",
-              "type": "singleselecturljob",
-              "description": "Select an item and click",
-              "started": 0,
-              "success": 0,
-              "failure": 0,
-              "order": 1,
-              "active": 1,
-              "behaviors": [
-                {
-                  "id": "17",
-                  "name": "selectiontype",
-                  "description": "Type of selection",
-                  "value": "CLASS",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 9,
-                  "created_at": "",
-                  "updated_at": ""
-                },
-                {
-                  "id": "18",
-                  "name": "selector",
-                  "description": " selector",
-                  "value": "LC20lb.DKV0Md",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 9,
-                  "created_at": "",
-                  "updated_at": ""
-                },
-                {
-                  "id": "19",
-                  "name": "decisiontype",
-                  "description": "Decision type for choosing an item out of the list given by the selector is RANDOM",
-                  "value": "RANDOM",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 9,
-                  "created_at": "",
-                  "updated_at": ""
-                }
-              ]
-            },
-            {
-              "id": 10,
-              "user_id": " ",
-              "queue_id": 3,
-              "name": "Scroll by length",
-              "type": "scrollbylengthjob",
-              "description": "Scroll down",
-              "started": 0,
-              "success": 0,
-              "failure": 0,
-              "order": 1,
-              "active": 1,
-              "behaviors": [
-                {
-                  "id": "20",
-                  "name": "length",
-                  "description": "Scroll 80.0 of window.",
-                  "value": 80.0,
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 10,
-                  "created_at": "",
-                  "updated_at": ""
-                },
-                {
-                  "id": "21",
-                  "name": "scrolldirection",
-                  "description": "Scroll down",
-                  "value": "DOWN",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 10,
-                  "created_at": "",
-                  "updated_at": ""
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": 4,
-          "user_id": "None",
-          "queue_id": 4,
-          "name": "Visit Direct",
-          "description": "Visit a media outlet and scroll for 2-3 minutes.",
-          "started": 0,
-          "success": 0,
-          "failure": 0,
-          "order": 1,
-          "active": 1,
-          "start_at": "insert time here",
-          "jobs": [
-            {
-              "id": 11,
-              "user_id": " ",
-              "queue_id": 4,
-              "name": "Visit",
-              "type": "visitjob",
-              "description": "Visit https://www.nytimes.com",
-              "started": 0,
-              "success": 0,
-              "failure": 0,
-              "order": 1,
-              "active": 1,
-              "behaviors": [
-                {
-                  "id": "22",
-                  "name": "url",
-                  "description": "URL",
-                  "value": "https:\/\/www.nytimes.com",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 11,
-                  "created_at": "",
-                  "updated_at": ""
-                }
-              ]
-            },
-            {
-              "id": 12,
-              "user_id": " ",
-              "queue_id": 4,
-              "name": "Scroll by duration",
-              "type": "scrollbydurationjob",
-              "description": "Scroll down",
-              "started": 0,
-              "success": 0,
-              "failure": 0,
-              "order": 1,
-              "active": 1,
-              "behaviors": [
-                {
-                  "id": "23",
-                  "name": "scrollduration",
-                  "description": "Scroll for 160.64071261513556 seconds.",
-                  "value": 160.64071261513556,
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 12,
-                  "created_at": "",
-                  "updated_at": ""
-                },
-                {
-                  "id": "24",
-                  "name": "scrolldirection",
-                  "description": "Scroll down",
-                  "value": "DOWN",
-                  "active": 1,
-                  "user_id": "",
-                  "job_id": 12,
-                  "created_at": "",
-                  "updated_at": ""
-                }
-              ]
-            }
-          ]
-        }
+   },
+   {
+      "proxy_id":1,
+      "agent_id":1,
+      "name":"Zweiter Bot via API erstellt",
+      "configurations": [],      
+      "proxies":[],
+      "agents":[],
+      "queues":[
+         {
+            "name":"GoogleSearch",
+            "description":"Open Google, enter a search querry and select a result.",
+            "start_at":"",
+            "jobs":[
+               {
+                  "name":"Visit",
+                  "type":"visitjob",
+                  "description":"Visit https://www.google.com",
+                  "behaviors":[
+                     {
+                        "name":"url",
+                        "description":"URL",
+                        "value":"https://www.google.com"
+                     }
+                  ]
+               },
+               {
+                  "name":"Enter Text",
+                  "type":"entertextfieldjob",
+                  "description":"Enter text into the defined field",
+                  "behaviors":[
+                     {
+                        "name":"text",
+                        "description":"Text to enter",
+                        "value":"insert term here"
+                     },
+                     {
+                        "name":"selectiontype",
+                        "description":"Type of selection",
+                        "value":"XPATH"
+                     },
+                     {
+                        "name":"selector",
+                        "description":" selector",
+                        "value":"//input[@name='q']"
+                     }
+                  ]
+               },
+               {
+                  "name":"Select",
+                  "type":"singleselecturljob",
+                  "description":"Select an item and click",
+                  "behaviors":[
+                     {
+                        "name":"selectiontype",
+                        "description":"Type of selection",
+                        "value":"CLASS"
+                     },
+                     {
+                        "name":"selector",
+                        "description":" selector",
+                        "value":"LC20lb.DKV0Md"
+                     },
+                     {
+                        "name":"decisiontype",
+                        "description":"Decision type for choosing an item out of the list given by the selector is RANDOM",
+                        "value":"RANDOM"
+                     }
+                  ]
+               },
+               {
+                  "name":"Scroll by length",
+                  "type":"scrollbylengthjob",
+                  "description":"Scroll down",
+                  "behaviors":[
+                     {
+                        "name":"length",
+                        "description":"Scroll 80.0 of window.",
+                        "value":80.0
+                     },
+                     {
+                        "name":"scrolldirection",
+                        "description":"Scroll down",
+                        "value":"DOWN"
+                     }
+                  ]
+               }
+            ]
+         },
+         {
+            "name":"Visit Direct",
+            "description":"Visit a media outlet and scroll for 2-3 minutes.",
+            "start_at":"",
+            "jobs":[
+               {
+                  "name":"Visit",
+                  "type":"visitjob",
+                  "description":"Visit https://www.nytimes.com",
+                  "behaviors":[
+                     {
+                        "name":"url",
+                        "description":"URL",
+                        "value":"https://www.nytimes.com"
+                     }
+                  ]
+               },
+               {
+                  "name":"Scroll by duration",
+                  "type":"scrollbydurationjob",
+                  "description":"Scroll down",
+                  "behaviors":[
+                     {
+                        "name":"scrollduration",
+                        "description":"Scroll for 160.64071261513556 seconds.",
+                        "value":160.64071261513556
+                     },
+                     {
+                        "name":"scrolldirection",
+                        "description":"Scroll down",
+                        "value":"DOWN"
+                     }
+                  ]
+               }
+            ]
+         }
       ]
-    }
-  ]
-}
+   }
+]
