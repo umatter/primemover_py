@@ -3,7 +3,7 @@
       "name":"Just a Crawler",
       "description":"Crawler created through API",
       "active":0,
-      "configurations":[
+      "configuration":[
          {
             "name":"Configuration created through API",
             "description":"A basic Configuration",
@@ -27,7 +27,7 @@
             ]
          }
       ],
-      "agents":[
+      "agent":[
          {
             "name":"Agent created through API",
             "description":"A basic Agent",
@@ -36,7 +36,7 @@
             "multilogin_profile":"{ \"key\": \"value\" }"
          }
       ],
-      "proxies":[
+      "proxy":[
          {
             "name":"Proxy created through API",
             "description":"A basic Proxy",
@@ -169,13 +169,13 @@
    {
       "name":"Zweiter Crawler",
       "description":"erstellt via API",
-      "configurations":[
+      "configuration":[
          
       ],
-      "proxies":[
+      "proxy":[
          
       ],
-      "agents":[
+      "agent":[
          
       ],
       "queues":[
