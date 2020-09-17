@@ -330,7 +330,7 @@ class TypingMode(Behavior):
         Simulated_NoTypos: Simulate key presses, make no mistakes
         """
         self.mode = mode
-        super().__init__(name='typingMode', value=self.send_return,
+        super().__init__(name='typingMode', value=self.mode,
                          description=f'OOptional field: How the text is entered into the field')
 
     @property
