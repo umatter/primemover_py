@@ -1,300 +1,309 @@
 [
-   {
-      "name":"Just a Crawler",
-      "description":"Crawler created through API",
-      "active":0,
-      "configurations":[
-         {
-            "name":"Configuration created through API",
-            "description":"A basic Configuration",
-            "params":[
-               {
-                  "pi":-0.8441270315193785,
-                  "psi":-0.15200161677194193,
-                  "kappa":"",
-                  "tau":"",
-                  "beta":"",
-                  "alpha":"",
-                  "search_terms":[
-                     "intimate partner",
-                     "american energy"
-                  ],
-                  "media_outlet_urls":[
-                     "https://whoradio.iheart.com/",
-                     "https://www.newschannel10.com/"
-                  ]
-               }
+  {
+    "name": "Just a Crawler",
+    "description": "Crawler created through API",
+    "active": 1,
+    "testing": 1,
+    "configuration": [
+      {
+        "name": "Configuration created through API",
+        "description": "A basic Configuration",
+        "params": [
+          {
+            "pi": -0.8441270315193785,
+            "psi": -0.15200161677194193,
+            "kappa": "",
+            "tau": "",
+            "beta": "",
+            "alpha": "",
+            "search_terms": [
+              "intimate partner",
+              "american energy"
+            ],
+            "media_outlet_urls": [
+              "https://whoradio.iheart.com/",
+              "https://www.newschannel10.com/"
             ]
-         }
-      ],
-      "agents":[
-         {
-            "name":"Agent created through API",
-            "description":"A basic Agent",
-            "identification":"Multilogin",
-            "multilogin_id":"c6e70352-aa50-4ce0-bd6c-f1d538f6a1dd",
-            "multilogin_profile":"{ \"key\": \"value\" }"
-         }
-      ],
-      "proxies":[
-         {
-            "name":"Proxy created through API",
-            "description":"A basic Proxy",
-            "type":"HTTP",
-            "hostname":"localhost",
-            "port":8080,
-            "username":"admin",
-            "password":"admin12345"
-         }
-      ],
-      "queues":[
-         {
-            "name":"GoogleSearch",
-            "description":"Open Google, enter a search querry and select a result.",
-            "start_at":"",
-            "jobs":[
-               {
-                  "name":"Visit 1",
-                  "type":"visitjob",
-                  "description":"Visit https://www.google.com",
-                  "behaviors":[
-                     {
-                        "name":"url",
-                        "description":"URL",
-                        "value":"https://www.google.com"
-                     }
-                  ]
-               },
-               {
-                  "name":"Enter Text 1",
-                  "type":"entertextfieldjob",
-                  "description":"Enter text into the defined field",
-                  "behaviors":[
-                     {
-                        "name":"text",
-                        "description":"Text to enter",
-                        "value":"insert term here"
-                     },
-                     {
-                        "name":"selectiontype",
-                        "description":"Type of selection",
-                        "value":"XPATH"
-                     },
-                     {
-                        "name":"selector",
-                        "description":" selector",
-                        "value":"//input[@name='q']"
-                     }
-                  ]
-               },
-               {
-                  "name":"Select 1",
-                  "type":"singleselecturljob",
-                  "description":"Select an item and click",
-                  "behaviors":[
-                     {
-                        "name":"selectiontype",
-                        "description":"Type of selection",
-                        "value":"CLASS"
-                     },
-                     {
-                        "name":"selector",
-                        "description":" selector",
-                        "value":"LC20lb.DKV0Md"
-                     },
-                     {
-                        "name":"decisiontype",
-                        "description":"Decision type for choosing an item out of the list given by the selector is RANDOM",
-                        "value":"RANDOM"
-                     }
-                  ]
-               },
-               {
-                  "name":"Scroll by length",
-                  "type":"scrollbylengthjob",
-                  "description":"Scroll down",
-                  "behaviors":[
-                     {
-                        "name":"length",
-                        "description":"Scroll 80.0 of window.",
-                        "value":80.0
-                     },
-                     {
-                        "name":"scrolldirection",
-                        "description":"Scroll down",
-                        "value":"DOWN"
-                     }
-                  ]
-               }
+          }
+        ]
+      }
+    ],
+    "agent": [
+      {
+        "name": "Agent created through API",
+        "description": "A basic Agent",
+        "location": "",
+        "identification": "Multilogin",
+        "multilogin_id": "c6e70352-aa50-4ce0-bd6c-f1d538f6a1dd",
+        "multilogin_profile": "{ \"key\": \"value\" }"
+      }
+    ],
+    "proxy": [
+      {
+        "name": "Proxy created through API",
+        "description": "A basic Proxy",
+        "type": "HTTP",
+        "hostname": "localhost",
+        "port": 8080,
+        "username": "admin",
+        "password": "admin12345"
+      }, {
+        "name": "US-GeoSurf Proxy created through API",
+        "description": "A GeoSurf Proxy for US (reusable). Requires location set on agent!",
+        "type": "GEOSURF",
+        "hostname": "state.geosurf.io",
+        "port": 8000,
+        "username": "UserIDFromGeosurf",
+        "password": "changeme"
+      }
+    ],
+    "queues": [
+      {
+        "name": "GoogleSearch",
+        "description": "Open Google, enter a search querry and select a result.",
+        "start_at": "2020-09-11T17:32:01.000+02:00",
+        "jobs": [
+          {
+            "name": "Visit 1",
+            "type": "visitjob",
+            "description": "Visit https://www.google.com",
+            "behaviors": [
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "https://www.google.com"
+              }
             ]
-         },
-         {
-            "name":"Visit Direct",
-            "description":"Visit a media outlet and scroll for 2-3 minutes.",
-            "start_at":"",
-            "jobs":[
-               {
-                  "name":"Visit",
-                  "type":"visitjob",
-                  "description":"Visit https://www.nytimes.com",
-                  "behaviors":[
-                     {
-                        "name":"url",
-                        "description":"URL",
-                        "value":"https://www.nytimes.com"
-                     }
-                  ]
-               },
-               {
-                  "name":"Scroll by duration",
-                  "type":"scrollbydurationjob",
-                  "description":"Scroll down",
-                  "behaviors":[
-                     {
-                        "name":"scrollduration",
-                        "description":"Scroll for 141.62779059506116 seconds.",
-                        "value":141.62779059506116
-                     },
-                     {
-                        "name":"scrolldirection",
-                        "description":"Scroll down",
-                        "value":"DOWN"
-                     }
-                  ]
-               }
+          },
+          {
+            "name": "Enter Text 1",
+            "type": "entertextfieldjob",
+            "description": "Enter text into the defined field",
+            "behaviors": [
+              {
+                "name": "text",
+                "description": "Text to enter",
+                "value": "insert term here"
+              },
+              {
+                "name": "selectiontype",
+                "description": "Type of selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "//input[@name='q']"
+              }
             ]
-         }
-      ]
-   },
-   {
-      "name":"Zweiter Crawler",
-      "description":"erstellt via API",
-      "configurations":[
-         
-      ],
-      "proxies":[
-         
-      ],
-      "agents":[
-         
-      ],
-      "queues":[
-         {
-            "name":"GoogleSearch",
-            "description":"Open Google, enter a search querry and select a result.",
-            "start_at":"",
-            "jobs":[
-               {
-                  "name":"Visit",
-                  "type":"visitjob",
-                  "description":"Visit https://www.google.com",
-                  "behaviors":[
-                     {
-                        "name":"url",
-                        "description":"URL",
-                        "value":"https://www.google.com"
-                     }
-                  ]
-               },
-               {
-                  "name":"Enter Text",
-                  "type":"entertextfieldjob",
-                  "description":"Enter text into the defined field",
-                  "behaviors":[
-                     {
-                        "name":"text",
-                        "description":"Text to enter",
-                        "value":"insert term here"
-                     },
-                     {
-                        "name":"selectiontype",
-                        "description":"Type of selection",
-                        "value":"XPATH"
-                     },
-                     {
-                        "name":"selector",
-                        "description":" selector",
-                        "value":"//input[@name='q']"
-                     }
-                  ]
-               },
-               {
-                  "name":"Select",
-                  "type":"singleselecturljob",
-                  "description":"Select an item and click",
-                  "behaviors":[
-                     {
-                        "name":"selectiontype",
-                        "description":"Type of selection",
-                        "value":"CLASS"
-                     },
-                     {
-                        "name":"selector",
-                        "description":" selector",
-                        "value":"LC20lb.DKV0Md"
-                     },
-                     {
-                        "name":"decisiontype",
-                        "description":"Decision type for choosing an item out of the list given by the selector is RANDOM",
-                        "value":"RANDOM"
-                     }
-                  ]
-               },
-               {
-                  "name":"Scroll by length",
-                  "type":"scrollbylengthjob",
-                  "description":"Scroll down",
-                  "behaviors":[
-                     {
-                        "name":"length",
-                        "description":"Scroll 80.0 of window.",
-                        "value":80.0
-                     },
-                     {
-                        "name":"scrolldirection",
-                        "description":"Scroll down",
-                        "value":"DOWN"
-                     }
-                  ]
-               }
+          },
+          {
+            "name": "Select 1",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "selectiontype",
+                "description": "Type of selection",
+                "value": "CLASS"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "LC20lb.DKV0Md"
+              },
+              {
+                "name": "decisiontype",
+                "description": "Decision type for choosing an item out of the list given by the selector is RANDOM",
+                "value": "RANDOM"
+              }
             ]
-         },
-         {
-            "name":"Visit Direct",
-            "description":"Visit a media outlet and scroll for 2-3 minutes.",
-            "start_at":"",
-            "jobs":[
-               {
-                  "name":"Visit",
-                  "type":"visitjob",
-                  "description":"Visit https://www.nytimes.com",
-                  "behaviors":[
-                     {
-                        "name":"url",
-                        "description":"URL",
-                        "value":"https://www.nytimes.com"
-                     }
-                  ]
-               },
-               {
-                  "name":"Scroll by duration",
-                  "type":"scrollbydurationjob",
-                  "description":"Scroll down",
-                  "behaviors":[
-                     {
-                        "name":"scrollduration",
-                        "description":"Scroll for 160.64071261513556 seconds.",
-                        "value":160.64071261513556
-                     },
-                     {
-                        "name":"scrolldirection",
-                        "description":"Scroll down",
-                        "value":"DOWN"
-                     }
-                  ]
-               }
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "length",
+                "description": "Scroll 80.0 of window.",
+                "value": 80.0
+              },
+              {
+                "name": "scrolldirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
             ]
-         }
-      ]
-   }
+          }
+        ]
+      },
+      {
+        "name": "Visit Direct",
+        "description": "Visit a media outlet and scroll for 2-3 minutes.",
+        "start_at": "2020-09-11T17:32:01.000+02:00",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.nytimes.com",
+            "behaviors": [
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "https://www.nytimes.com"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "scrollduration",
+                "description": "Scroll for 141.62779059506116 seconds.",
+                "value": 141.62779059506116
+              },
+              {
+                "name": "scrolldirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Zweiter Crawler",
+    "active": 1,
+    "testing": 1,
+    "description": "erstellt via API",
+    "configuration": [
+    ],
+    "proxy": [
+    ],
+    "agent": [
+    ],
+    "queues": [
+      {
+        "name": "GoogleSearch",
+        "description": "Open Google, enter a search querry and select a result.",
+        "start_at": "2020-09-11T17:32:01.000+02:00",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.google.com",
+            "behaviors": [
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "https://www.google.com"
+              }
+            ]
+          },
+          {
+            "name": "Enter Text",
+            "type": "entertextfieldjob",
+            "description": "Enter text into the defined field",
+            "behaviors": [
+              {
+                "name": "text",
+                "description": "Text to enter",
+                "value": "insert term here"
+              },
+              {
+                "name": "selectiontype",
+                "description": "Type of selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "//input[@name='q']"
+              }
+            ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "selectiontype",
+                "description": "Type of selection",
+                "value": "CLASS"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "LC20lb.DKV0Md"
+              },
+              {
+                "name": "decisiontype",
+                "description": "Decision type for choosing an item out of the list given by the selector is RANDOM",
+                "value": "RANDOM"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "length",
+                "description": "Scroll 80.0 of window.",
+                "value": 80.0
+              },
+              {
+                "name": "scrolldirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Visit Direct",
+        "description": "Visit a media outlet and scroll for 2-3 minutes.",
+        "start_at": "2020-09-11T17:32:01.000+02:00",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.nytimes.com",
+            "behaviors": [
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "https://www.nytimes.com"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "scrollduration",
+                "description": "Scroll for 160.64071261513556 seconds.",
+                "value": 160.64071261513556
+              },
+              {
+                "name": "scrolldirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 ]
