@@ -1,9 +1,13 @@
 import random as r
 from src.Preferences import *
+import json
 
 """
 Use this file or copies of it to control how the Config class generates user profiles
 """
+
+with open("resources/other/geosurf_cities.json", 'r') as file:
+    LOCATION_LIST = list(json.load(file).keys())
 
 
 def Psi():
@@ -50,6 +54,7 @@ def SelectMediaOutlets(url_pi_tbl=None, n=1000, pi_i=0):
     #                                             tau_hat_ik=1)
     return random.sample(url_pi_tbl['url'].to_list(), n)
 
+
 def alpha():
     """
     :return alpha_hat: float >= 0, shift parameter in search term utility
@@ -72,9 +77,12 @@ def tau():
     return 1
 
 
-
 def kappa():
     """
     :return kappa: binary {0,1}, indicates  whether ind. can be persuaded
     """
     return 0
+
+
+def location():
+    return random.choice(LOCATION_LIST)

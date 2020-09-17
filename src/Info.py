@@ -1,3 +1,6 @@
+import json
+import src.ConfigurationFunctions as Config
+
 class Info:
     def __init__(self, user_id=None, active=1, created_at=None,
                  updated_at=None):
@@ -154,22 +157,41 @@ class ConfigurationInfo(Info):
 
 
 class Agent:
+    with open("resources/other/geosurf_cities.json", 'r') as file:
+        LOCATION_LIST = list(json.load(file).keys())
 
     def __init__(self,
-                 name="Sample agent",
-                 description="Placeholder agent",
-                 identification="Multilogin",
-                 multilogin_id="c6e70352-aa50-4ce0-bd6c-f1d538f6a1dd",
-                 multilogin_profile='\"{ \"key\": \"value\" }\"'):
+                 location=None,
+                 name=None,
+                 description=None,
+                 identification=None,
+                 multilogin_id=None,
+                 multilogin_profile=None):
         self._name = name
         self._description = description
+        self.location = location
         self._identification = identification
         self._multilogin_id = multilogin_id
         self._multilogin_profile = multilogin_profile
 
+    @property
+    def location(self):
+        return self._location
+
+    @location.setter
+    def location(self, val):
+        if val is None:
+            self._location = Config.location()
+        elif val in Agent.LOCATION_LIST:
+            self._location = val
+        else:
+            raise ValueError(
+                f'{val} is not a valid location see geosurf cities')
+
     def as_dict(self):
         return {"name": self._name,
                 "description": self._description,
+                "location": self._location,
                 "identification": self._identification,
                 "multilogin_id": self._multilogin_id,
                 "multilogin_profile": self._multilogin_profile}

@@ -3,3 +3,4 @@ def EscapeStrings(text):
         raise TypeError('Expected str')
     text = text.replace("/", "\/")
     return text
+

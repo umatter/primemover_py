@@ -1,18 +1,28 @@
 from src.ConfigureProfile import *
 from src.Info import Agent, Proxy
-
+from src.TimeHandler import TimeHandler
 
 class Crawler:
-    def __init__(self, name="Just a crawler",
+    def __init__(self, global_schedule=None, name="Just a crawler",
                  description="Crawler created through py", configurations=None,
-                 agents=None, proxies=None, active=0):
+                 agents=None, proxies=None, active=0, schedule=None):
         self._description = description
         self._name = name
         self.configurations = configurations
-        self.queues = []
         self.agents = agents
+        if schedule is None and global_schedule is not None:
+            self._schedule = TimeHandler(global_schedule, self.agents[0].location, bed_time=23*60*60, wake_time=8*60*60)
+        elif schedule is None and global_schedule is None:
+            raise Exception('f global_schedule and schedule cant bot be None')
+        else:
+            self._schedule = schedule
+        self.queues = []
         self.proxies = proxies
         self.active = active
+
+    @property
+    def schedule(self):
+        return self._schedule
 
     @property
     def configurations(self):
@@ -43,7 +53,7 @@ class Crawler:
     @agents.setter
     def agents(self, agents_in):
         if agents_in is None:
-            self._agents = []
+            self._agents = [Agent()]
         elif type(agents_in) is list:
             check_types = [type(val) is Agent for val in agents_in]
             if False in check_types:
