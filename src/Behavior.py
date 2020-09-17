@@ -24,7 +24,7 @@ class Behavior:
 
     @name.setter
     def name(self, string):
-        string = string.lower().strip().replace(' ', '_')
+        string = string.strip().replace(' ', '_')
         self._name = string
 
     @property
@@ -331,7 +331,7 @@ class TypingMode(Behavior):
         """
         self.mode = mode
         super().__init__(name='typingMode', value=self.mode,
-                         description=f'OOptional field: How the text is entered into the field')
+                         description=f'Optional field: How the text is entered into the field')
 
     @property
     def mode(self):
