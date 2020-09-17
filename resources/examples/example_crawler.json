@@ -47,6 +47,14 @@
         "port": 8080,
         "username": "admin",
         "password": "admin12345"
+      }, {
+        "name": "US-GeoSurf Proxy created through API",
+        "description": "A GeoSurf Proxy for US (reusable). Requires location set on agent!",
+        "type": "GEOSURF",
+        "hostname": "state.geosurf.io",
+        "port": 8000,
+        "username": "UserIDFromGeosurf",
+        "password": "changeme"
       }
     ],
     "queues": [
