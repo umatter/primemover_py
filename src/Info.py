@@ -1,6 +1,7 @@
 import json
 import src.ConfigurationFunctions as Config
 
+
 class Info:
     def __init__(self, user_id=None, active=1, created_at=None,
                  updated_at=None):

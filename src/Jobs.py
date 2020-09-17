@@ -42,6 +42,7 @@ class Job:
             "description": self._description,
             "behaviors": [x.as_dict() for x in self.behaviors]}
 
+
 class VisitJob(Job):
     def __init__(self, url):
         """
@@ -65,10 +66,18 @@ class Wait(Job):
 
 
 class EnterText(Job):
-    def __init__(self, text, selector, selector_type='XPATH'):
+    def __init__(self,
+                 text,
+                 selector,
+                 selector_type='XPATH',
+                 send_return=True,
+                 type_mode="SIMULATED_NOTYPOS"
+                 ):
         """
         :param text:
         :param selector:
+        :param send_return:
+        :param type_mode:
         :param selector_type:
         """
         super().__init__(job_type='entertextfieldjob',
@@ -79,6 +88,10 @@ class EnterText(Job):
             Behavior.SelectionType(selector_type))
         self.behaviors.append(
             Behavior.Selector(selector))
+        self.behaviors.append(
+            Behavior.AppendReturn(send_return))
+        self.behaviors.append(
+            Behavior.TypingMode(type_mode))
 
 
 class SingleSelect(Job):

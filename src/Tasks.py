@@ -45,7 +45,9 @@ class GoogleSearch(Queue):
         # Add Job to select the search field via XPATH and type the search term
         self.jobs.append(Jobs.EnterText(text=term,
                                         selector="//input[@name='q']",
-                                        selector_type='XPATH')
+                                        selector_type='XPATH',
+                                        send_return=True,
+                                        type_mode="SIMULATED_FIXINGTYPOS")
                          )
         # Add Job to select a result randomly
         self.jobs.append(Jobs.SingleSelect(selector="LC20lb.DKV0Md",

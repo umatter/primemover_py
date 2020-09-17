@@ -68,7 +68,6 @@ class Behavior:
                 "value": self.value}
 
 
-
 class URL(Behavior):
     def __init__(self, url, description='URL'):
         self.url = url
@@ -288,3 +287,65 @@ class WaitSeconds(Behavior):
             raise ValueError(f'Duration must be > 0')
         else:
             self._duration = d
+
+
+class AppendReturn(Behavior):
+    def __init__(self, send_return=False):
+        """
+        :param send_return: bool or str "true/false"
+        """
+        self.send_return = send_return
+        super().__init__(name='appendReturn', value=self.send_return,
+                         description=f'Optional field: appends a return key after the text given if true.')
+
+    @property
+    def send_return(self):
+        return self._send_return
+
+    @send_return.setter
+    def send_return(self, val):
+        if type(val) is str:
+            val.strip().lower()
+            if val == 'false':
+                self._send_return = False
+            elif val == 'true':
+                self._send_return = True
+            else:
+                raise ValueError(
+                    f'send_return must be true/false, recived {val}')
+        elif type(val) is bool:
+            self._send_return = val
+        else:
+            raise TypeError(
+                f'send_return must be type bool or a string "true"/"false", received {val}')
+
+
+class TypingMode(Behavior):
+    def __init__(self, mode="SIMULATED_NOTYPOS"):
+        """
+        :param mode: str, in {"DIRECT","SIMULATED_KEEPINGTYPOS","SIMULATED_FIXINGTYPOS","SIMULATED_NOTYPOS"}
+        Direct: send keys at once (imagine copy and paste)
+        Simulated_KeepingTypos: Simulate key presses, make typos and keep some of them
+        Simulated_FixingTypos: Simulate key presses, make typos fix all of them
+        Simulated_NoTypos: Simulate key presses, make no mistakes
+        """
+        self.mode = mode
+        super().__init__(name='typingMode', value=self.send_return,
+                         description=f'OOptional field: How the text is entered into the field')
+
+    @property
+    def mode(self):
+        return self._mode
+
+    @mode.setter
+    def mode(self, val):
+        if type(val) is str:
+            val.strip().upper()
+            if val in {"DIRECT","SIMULATED_KEEPINGTYPOS","SIMULATED_FIXINGTYPOS","SIMULATED_NOTYPOS"}:
+                self._mode = val
+            else:
+                raise ValueError(
+                    f'send_return must be one of {{"DIRECT","SIMULATED_KEEPINGTYPOS","SIMULATED_FIXINGTYPOS","SIMULATED_NOTYPOS"}}, got {val}')
+        else:
+            raise TypeError(
+                f'mode must be type str')
