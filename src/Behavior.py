@@ -25,6 +25,7 @@ class Behavior:
     @name.setter
     def name(self, string):
         string = string.strip().replace(' ', '_')
+        # string = string.lower()
         self._name = string
 
     @property
