@@ -1,6 +1,8 @@
 from src.ConfigureProfile import *
 from src.Info import Agent, Proxy
 from src.TimeHandler import TimeHandler
+from src.Preferences import *
+from src.Tasks import *
 
 class Crawler:
     def __init__(self, global_schedule=None, name="Just a crawler",
@@ -104,3 +106,18 @@ class Crawler:
             "agents": [x.as_dict() for x in self.agents],
             "proxies": [x.as_dict() for x in self.proxies],
             "queues": [x.as_dict() for x in self.queues]}
+
+    def add_searches(self, nr):
+        terms = self.configurations[0].terms
+        to_search = random.choices(terms, k=nr)
+        for term in to_search:
+            self.queues.append(
+                GoogleSearch(term, self.schedule.new_time()))
+
+    def add_direct_visits(self, nr):
+        outlets = self.configurations[0].media
+        to_visit = random.choices(outlets, k=nr)
+        for outlet in to_visit:
+            self.queues.append(
+                VisitDirect(outlet, self.schedule.new_time()))
+

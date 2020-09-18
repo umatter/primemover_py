@@ -26,7 +26,6 @@ class Job:
     #     else:
     #         self._behaviors = behavior_list
 
-
     def __str__(self):
         job_descr = \
             f'"name": "{self._name or ""}",\n' \
@@ -36,7 +35,7 @@ class Job:
         return f'{{{job_descr},"behaviors": [\n{formatted}]}}'
 
     def as_dict(self):
-         return {
+        return {
             "name": self._name,
             "type": self.type,
             "description": self._description,

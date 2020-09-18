@@ -13,6 +13,7 @@ class Behavior:
         self.updated_at = updated_at
 
     def __str__(self):
+
         return \
             f'"name": "{self.name}",\n' \
             f'"description": "{self.description}",\n' \
@@ -45,9 +46,7 @@ class Behavior:
 
     @value.setter
     def value(self, val):
-        if type(val) is str:
-            self._value = f'"{val}"'
-        elif val is None:
+        if val is None:
             self._val = ""
         else:
             self._value = val
@@ -64,6 +63,7 @@ class Behavior:
             raise ValueError(f'active must be 0 or 1, got {val}')
 
     def as_dict(self):
+
         return {"name": self.name,
                 "description": self.description,
                 "value": self.value}
@@ -83,7 +83,8 @@ class URL(Behavior):
         try:
             result = urlparse(passed_url)
             if all([result.scheme, result.netloc]):
-                passed_url = EscapeStrings(passed_url)
+                # passed_url = EscapeStrings(passed_url)
+                passed_url = passed_url
                 self._url = passed_url
             else:
                 raise ValueError(
@@ -154,7 +155,8 @@ class Selector(Behavior):
 
     @selector.setter
     def selector(self, value):
-        self._selector = EscapeStrings(value)
+        # self._selector = EscapeStrings(value)
+        self._selector = value
 
 
 class DecisionType(Behavior):

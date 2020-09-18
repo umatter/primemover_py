@@ -22,6 +22,7 @@ class Queue:
         return f'{{{queue_descr},"jobs": [\n{formatted}]}}'
 
     def as_dict(self):
+
         return {
             "name": self._name,
             "description": self._description,

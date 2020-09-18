@@ -17,10 +17,8 @@ if __name__ == "__main__":
     crawler_list = [Crawler(global_schedule=global_schedule, proxies=Proxy()) for i in
                     range(nr_ind)]
     for individual in crawler_list:
-        individual.queues.append(
-            GoogleSearch('insert term here', individual.schedule.new_time()))
-        individual.queues.append(
-            VisitDirect('https://www.nytimes.com', individual.schedule.new_time()))
+        individual.add_searches(10)
+        individual.add_direct_visits(10)
 
     with open("resources/examples/example_crawler_py.json", 'w') as file:
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
