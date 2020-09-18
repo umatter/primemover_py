@@ -37,6 +37,7 @@ class Config:
         self.pi = pi
         self.alpha = alpha
         self.tau = tau
+
         self.beta = beta
         self.kappa = kappa
         self.path_media_outlets = path_media_outlets
@@ -68,7 +69,7 @@ class Config:
 
     @property
     def tau(self):
-        return self._alpha
+        return self._tau
 
     @tau.setter
     def tau(self, value):
