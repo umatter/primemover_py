@@ -8,7 +8,7 @@ from src.Tasks import *
 class Crawler:
     def __init__(self, global_schedule=None, name="Just a crawler",
                  description="Crawler created through py", configurations=None,
-                 agents=None, proxies=None, active=0, schedule=None, testing=0):
+                 agents=None, proxies=None, active=1, schedule=None, testing=0):
         self._description = description
         self._name = name
         self.configurations = configurations
