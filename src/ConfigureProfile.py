@@ -216,7 +216,7 @@ class Config:
         return {
             "name": "",
             "description": "",
-            "parameters": {
+            "params": {
                 "pi": self.pi,
                 "psi": self.psi,
                 "alpha": self.alpha,

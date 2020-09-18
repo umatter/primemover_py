@@ -8,7 +8,7 @@ from src.Tasks import *
 class Crawler:
     def __init__(self, global_schedule=None, name="Just a crawler",
                  description="Crawler created through py", configurations=None,
-                 agents=None, proxies=None, active=0, schedule=None):
+                 agents=None, proxies=None, active=0, schedule=None, testing=0):
         self._description = description
         self._name = name
         self.configurations = configurations
@@ -26,6 +26,7 @@ class Crawler:
         self.queues = []
         self.proxies = proxies
         self.active = active
+        self._testing = testing
 
     @property
     def schedule(self):
@@ -107,9 +108,10 @@ class Crawler:
             "name": self._name,
             "description": self._description,
             "active": self.active,
-            "configurations": [x.as_dict() for x in self.configurations],
-            "agents": [x.as_dict() for x in self.agents],
-            "proxies": [x.as_dict() for x in self.proxies],
+            "testing": self._testing,
+            "configuration": [x.as_dict() for x in self.configurations],
+            "agent": [x.as_dict() for x in self.agents],
+            "proxy": [x.as_dict() for x in self.proxies],
             "queues": [x.as_dict() for x in self.queues]}
 
     def add_searches(self, nr, t_list=None):

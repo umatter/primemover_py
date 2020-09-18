@@ -9,7 +9,7 @@ PATH_TERMS = "/Users/johannes/Dropbox/websearch_polarization/data/final/searchte
 PATH_MEDIA_OUTLETS = "/Users/johannes/Dropbox/websearch_polarization/data/final/outlets_pool.csv"
 PATH_INDIVIDUAL_ORG = 'resources/other/individuals.json'
 PATH_BENGING_TERMS = 'resources/other/benign_terms.json'
-gkg.main(50)
+# gkg.main(50)
 GenerateBenignTerms()
 
 if __name__ == "__main__":
@@ -39,5 +39,3 @@ if __name__ == "__main__":
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
-    DOMAIN = "https://siaw.qlick.ch/"
-    resp_crawlers = requests.post(DOMAIN + 'api/v1/load', data=[crawler.as_dict() for crawler in crawler_list])
