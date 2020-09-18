@@ -158,12 +158,14 @@ class Config:
     def media(self, media_list):
         if media_list is None:
             all_media_tbl = pd.read_csv(self.path_media_outlets, header=0,
-                                        usecols=['redirect_url', 'pi'])
-            all_media_tbl.rename(columns={'redirect_url': 'url', 'pi': 'pi'},
+                                        usecols=['redirect_url', 'pi', 'avg_reach_permillion'])
+            all_media_tbl.rename(columns={'redirect_url': 'url', 'pi': 'pi', 'avg_reach_permillion': 'e^ro'},
                                  inplace=True)
+
             self._media = C.SelectMediaOutlets(pi_i=self.pi,
                                                url_pi_tbl=all_media_tbl,
-                                               n=100)
+                                               tau_tilde_ij=self.tau,
+                                               k=10)
 
         elif type(media_list) is list and len(media_list) > 0:
             self._media = media_list
@@ -180,8 +182,8 @@ class Config:
         if term_list is None:
             all_terms_tbl = pd.read_csv(self.path_terms, header=0,
                                         usecols=['search_term', 'pi_p'])
-            self._terms = C.SelectSearchTerms(term_pi_tbl=all_terms_tbl, n=100,
-                                              pi_i=self._pi)
+            self._terms = C.SelectSearchTerms(term_pi_tbl=all_terms_tbl, k=30,
+                                              pi_i=self._pi, tau_hat_ik=self.tau, alpha_hat=self.alpha)
         elif type(term_list) is list and len(term_list) > 0:
             self._terms = term_list
         else:

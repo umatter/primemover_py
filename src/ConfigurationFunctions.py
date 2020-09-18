@@ -21,7 +21,7 @@ def Pi():
     """
     :return pi: political orientation of individual i
     """
-    return r.normalvariate(0, 1)
+    return r.uniform(-1, 1)
 
 
 def NoiseUtility():
@@ -31,28 +31,40 @@ def NoiseUtility():
     return r.normalvariate(0, 1)
 
 
-def SelectSearchTerms(pi_i, term_pi_tbl, n):
-    # utilities = {}
-    # for term_k, pi_hat_k in term_pi_tbl:
-    #     epsilon_ik = NoiseUtility()
-    #     utilities['term'] = search_utility_v_ik(pi_i=pi_i,
-    #                                             pi_hat_k=pi_hat_k,
-    #                                             epsilon_ik=epsilon_ik,
-    #                                             alpha_hat=0,
-    #                                             tau_hat_ik=1)
-    return random.sample(term_pi_tbl['search_term'].to_list(), n)
+def SelectSearchTerms(pi_i, term_pi_tbl, k, alpha_hat, tau_hat_ik):
+    utilities = []
+    for row in range(len(term_pi_tbl)):
+        term_k, pi_hat_k = term_pi_tbl.loc[row]
+        epsilon_ik = NoiseUtility()
+        utilities.append((search_utility_v_ik(pi_i=pi_i,
+                                              pi_hat_k=pi_hat_k,
+                                              epsilon_ik=epsilon_ik,
+                                              alpha_hat=alpha_hat,
+                                              tau_hat_ik=tau_hat_ik), term_k))
+    utilities.sort()
+    max_K = utilities[-k:]
+    terms = [b for a, b in max_K]
+    #  random.sample(term_pi_tbl['search_term'].to_list(), k)
+    return terms
 
 
-def SelectMediaOutlets(url_pi_tbl=None, n=1000, pi_i=0):
-    # utilities = {}
-    # for term_k, pi_hat_k in term_pi_tbl:
-    #     epsilon_ik = NoiseUtility()
-    #     utilities['term'] = search_utility_v_ik(pi_i=pi_i,
-    #                                             pi_hat_k=pi_hat_k,
-    #                                             epsilon_ik=epsilon_ik,
-    #                                             alpha_hat=0,
-    #                                             tau_hat_ik=1)
-    return random.sample(url_pi_tbl['url'].to_list(), n)
+def SelectMediaOutlets(url_pi_tbl=None, k=20, tau_tilde_ij=1, pi_i=0 ):
+    # Base on pi, K known outlets,
+    utilities = []
+    for row in range(len(url_pi_tbl)):
+        outlet, exp_ro, pi_tilde_j = url_pi_tbl.loc[row]
+        epsilon_ik = NoiseUtility()
+        utilities.append(((media_utility_u_ij(pi_i=pi_i,
+                                              pi_tilde_j=pi_tilde_j,
+                                              epsilon_ij=epsilon_ik,
+                                              alpha_tilde=0,
+                                              ro_j=math.log(exp_ro),
+                                              tau_tilde_ij=tau_tilde_ij)),
+                          outlet))
+    utilities.sort()
+    max_K = utilities[-k:]
+    outlets = [b for a, b in max_K]
+    return outlets
 
 
 def alpha():
@@ -66,7 +78,7 @@ def beta():
     """
     :return beta: scale parameter in utilities ?
     """
-    return 1
+    return random.uniform(0, 1)
 
 
 def tau():
@@ -85,4 +97,5 @@ def kappa():
 
 
 def location():
+    LOCATION_LIST = ["US-OK-OKLAHOMA_CITY","US-CA-SAN_FRANCISCO", "US-NY-NEW_YORK","US-MA-BOSTON"]
     return random.choice(LOCATION_LIST)

@@ -3,19 +3,22 @@ import random
 import numpy as np
 
 
-def media_utility_u_ij(d_tilde_ij, ro_j, epsilon_ij, alpha_tilde,
+def media_utility_u_ij(pi_i, pi_tilde_j, ro_j, epsilon_ij, alpha_tilde,
                        tau_tilde_ij=1):
     """
+    :param pi_i: float, political orientation of the individual
+    :param pi_tilde_j: float, political orientation of the outlet j
     :param d_tilde_ij: float > 0, ideological distance |pi_i-pi_tilde_j| where pi_i
         represents the political orientation of the individual and pi_tilde_j
         that of outlet j
     :param ro_j: float >= 0, reach of outlet j
-    :param epsilon_ij: float, noise/error
+    :param epsilon_ij: float, noise/errors
     :param alpha_tilde: float >= 0, shift parameter
     :param tau_tilde_ij: float > 0, "transportation costs" i.e. costs of consuming
         ideologicaly distant news
     :return u: float > 0, utility  derived by individual i when consuming news from outlet j
     """
+    d_tilde_ij = abs(pi_i-pi_tilde_j)
     u = alpha_tilde - tau_tilde_ij * d_tilde_ij + ro_j + epsilon_ij
     return u
 

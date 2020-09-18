@@ -8,7 +8,7 @@ import json
 
 class Schedule:
     def __init__(self, interval=60, start_at=32400, end_at=50400, times_set=None):
-        self._min_interval = 1
+        self._min_interval = 0.1
         self._p = 0.8
         self.interval = interval
         if type(times_set) is list:
@@ -212,7 +212,7 @@ class TimeHandler:
         self._server_tz = server_tz
         utc_offset = pytz.timezone(self._tz).utcoffset(datetime.now())
         server_utc_offset = pytz.timezone(server_tz).utcoffset(datetime.now())
-        self._second_modifier = - utc_offset.total_seconds() - server_utc_offset.total_seconds()
+        self._second_modifier = - utc_offset.total_seconds() + server_utc_offset.total_seconds()
         self._wake_time = wake_time + self._second_modifier
         self._bed_time = bed_time + self._second_modifier
         self._schedule = IndividualSchedule(

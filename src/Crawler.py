@@ -4,6 +4,7 @@ from src.TimeHandler import TimeHandler
 from src.Preferences import *
 from src.Tasks import *
 
+
 class Crawler:
     def __init__(self, global_schedule=None, name="Just a crawler",
                  description="Crawler created through py", configurations=None,
@@ -13,7 +14,11 @@ class Crawler:
         self.configurations = configurations
         self.agents = agents
         if schedule is None and global_schedule is not None:
-            self._schedule = TimeHandler(global_schedule, self.agents[0].location, bed_time=23*60*60, wake_time=8*60*60)
+            self._schedule = TimeHandler(global_schedule,
+                                         self.agents[0].location,
+                                         interval=120,
+                                         bed_time=14.5 * 60 * 60,
+                                         wake_time=12 * 60 * 60)
         elif schedule is None and global_schedule is None:
             raise Exception('f global_schedule and schedule cant bot be None')
         else:
@@ -107,17 +112,26 @@ class Crawler:
             "proxies": [x.as_dict() for x in self.proxies],
             "queues": [x.as_dict() for x in self.queues]}
 
-    def add_searches(self, nr):
+    def add_searches(self, nr, t_list=None):
         terms = self.configurations[0].terms
         to_search = random.choices(terms, k=nr)
-        for term in to_search:
-            self.queues.append(
-                GoogleSearch(term, self.schedule.new_time()))
+        if t_list is None:
+            for term in to_search:
+                self.queues.append(
+                    GoogleSearch(term, self.schedule.new_time()))
+        else:
+            for term, t in zip(to_search, t_list):
+                self.queues.append(
+                    GoogleSearch(term, t))
 
-    def add_direct_visits(self, nr):
+    def add_direct_visits(self, nr, t_list=None):
         outlets = self.configurations[0].media
         to_visit = random.choices(outlets, k=nr)
-        for outlet in to_visit:
-            self.queues.append(
-                VisitDirect(outlet, self.schedule.new_time()))
-
+        if t_list is None:
+            for outlet in to_visit:
+                self.queues.append(
+                    VisitDirect(outlet, self.schedule.new_time()))
+        else:
+            for outlet, t in zip(to_visit, t_list):
+                self.queues.append(
+                    VisitDirect(outlet, t))
