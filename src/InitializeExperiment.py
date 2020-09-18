@@ -40,4 +40,4 @@ if __name__ == "__main__":
                   indent='  ')
 
     DOMAIN = "https://siaw.qlick.ch/"
-    # resp_crawlers = requests.post(DOMAIN + 'api/v1/load', data=[crawler.as_dict() for crawler in crawler_list])
+    resp_crawlers = requests.post(DOMAIN + 'api/v1/load', data=[crawler.as_dict() for crawler in crawler_list])
