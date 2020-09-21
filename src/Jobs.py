@@ -132,7 +132,7 @@ class Scroll(Job):
                  percentage=None):
         """
             :param direction:
-            :param duration:
+            :param duration: int
             :param length:
             """
         if percentage is not None:

@@ -3,6 +3,7 @@ import json
 from src.TimeHandler import Schedule
 from src.Crawler import *
 import src.gdelt_gkg as gkg
+import src.api_wrapper as api
 from src.GenerateBenignTerms import GenerateBenignTerms
 
 PATH_TERMS = "/Users/johannes/Dropbox/websearch_polarization/data/final/searchterms_pool.csv"
@@ -17,7 +18,7 @@ if __name__ == "__main__":
     nr_ind = int(input("Please input the desired nr. of individuals: "))
     Config.MEDIA_DEFAULT_PATH = PATH_MEDIA_OUTLETS
     Config.TERM_DEFAULT_PATH = PATH_TERMS
-    crawler_list = [Crawler(global_schedule=global_schedule, proxies=Proxy())
+    crawler_list = [Crawler(global_schedule=global_schedule, name=f'test_crawler_{i}')
                     for i in
                     range(nr_ind)]
     with open(PATH_INDIVIDUAL_ORG, 'r') as file:
@@ -35,7 +36,8 @@ if __name__ == "__main__":
         individual.queues.append(GoogleSearch(random.choice(benign), times[5]))
         individual.queues.append(GoogleSearch(neutral, times[6]))
 
-    with open("resources/examples/example_crawler_py.json", 'w') as file:
+    with open("resources/examples/test_crawler_py.json", 'w') as file:
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
+    #api.push_new(path="resources/examples/test_crawler_py.json")

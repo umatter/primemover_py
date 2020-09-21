@@ -1,5 +1,5 @@
 from urllib.parse import urlparse
-
+import math
 from src.Utilities import *
 
 
@@ -200,14 +200,16 @@ class ScrollDuration(Behavior):
 
     @duration.setter
     def duration(self, d):
-        try:
-            d = float(d)
-        except ValueError:
-            raise ValueError(f'Expected numeric, received {d}')
-        if d <= 0:
-            raise ValueError(f'Duration must be > 0')
-        else:
+        if type(d) is int and d > 0:
             self._duration = d
+        elif type(d) is float or d == 0:
+            self._duration = int(math.ceil(d))
+            if d == 0:
+                self._duration = 1
+            raise Warning(
+                f'Scroll duration expects an integer >0, {d} has been rounded up to {self.duration}')
+        else:
+            raise TypeError('Scroll duration must be of type int')
 
 
 class ScrollDirection(Behavior):
@@ -270,7 +272,7 @@ class ScrollLength(Behavior):
 class WaitSeconds(Behavior):
     def __init__(self, duration):
         """
-        :param duration: float >0 time in seconds
+        :param duration: int >0 time in seconds
         """
         self.duration = duration
         super().__init__(name='seconds', value=self.duration,
@@ -282,14 +284,16 @@ class WaitSeconds(Behavior):
 
     @duration.setter
     def duration(self, d):
-        try:
-            d = float(d)
-        except ValueError:
-            raise ValueError(f'Expected numeric, received {d}')
-        if d <= 0:
-            raise ValueError(f'Duration must be > 0')
-        else:
+        if type(d) is int and d > 0:
             self._duration = d
+        elif type(d) is float or d == 0:
+            self._duration = int(math.ceil(d))
+            if d == 0:
+                self._duration = 1
+            raise Warning(
+                f'Wait duration expects an integer >0, {d} has been rounded up to {self.duration}')
+        else:
+            raise TypeError('Wait duration must be of type int')
 
 
 class AppendReturn(Behavior):
@@ -344,7 +348,8 @@ class TypingMode(Behavior):
     def mode(self, val):
         if type(val) is str:
             val.strip().upper()
-            if val in {"DIRECT","SIMULATED_KEEPINGTYPOS","SIMULATED_FIXINGTYPOS","SIMULATED_NOTYPOS"}:
+            if val in {"DIRECT", "SIMULATED_KEEPINGTYPOS",
+                       "SIMULATED_FIXINGTYPOS", "SIMULATED_NOTYPOS"}:
                 self._mode = val
             else:
                 raise ValueError(

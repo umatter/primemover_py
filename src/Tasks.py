@@ -69,14 +69,14 @@ class VisitDirect(Queue):
 
     def __init__(self, outlet_url, start_time):
         self._outlet_url = outlet_url
-        self._duration = 60 * r.uniform(2, 3)  # choose scroll time in seconds
+        self._duration = r.randint(60, 180)  # choose scroll time in seconds
         super().__init__(start_at=start_time,
                          name='Visit Direct',
                          description='Visit a media outlet and scroll for 2-3 minutes.')
         # Add Job to Visit a media outlet
         self.jobs.append(Jobs.VisitJob(url=self._outlet_url))
 
-        # Add Job to scroll down for random time between 2 and 3 minutes
+        # Add Job to scroll down for random time between 1 and 3 minutes
         self.jobs.append(Jobs.Scroll(direction='DOWN',
                                      duration=self._duration))
 
@@ -88,7 +88,7 @@ class VisitViaGoogle(Queue):
 
     def __init__(self, outlet_name, start_time):
         self._outlet_name = outlet_name
-        self._duration = 60 * r.uniform(2, 3)  # choose scroll time in seconds
+        self._duration = r.randint(60, 180)  # choose scroll time in seconds
         super().__init__(start_at=start_time,
                          name='Visit via Googe',
                          description='Visit a media outlet via google and scroll for some time.')
@@ -101,7 +101,7 @@ class VisitViaGoogle(Queue):
                                         selector_type='XPATH')
                          )
         # Add Job to wait for a random nr. of seconds
-        self.jobs.append(Jobs.Wait(time=r.uniform(1, 6)
+        self.jobs.append(Jobs.Wait(time=r.randint(1, 6)
                                    )
                          )
 

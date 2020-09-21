@@ -1,6 +1,11 @@
 import json
 import src.ConfigurationFunctions as Config
 
+with open('resources/other/keys.json', 'r') as key_file:
+    keys = json.load(key_file)
+GEOSURF_USERNAME = keys['GEOSURF']['username']
+GEOSURF_PASSWORD = keys['GEOSURF']['password']
+
 
 class Info:
     def __init__(self, user_id=None, active=1, created_at=None,
@@ -163,9 +168,9 @@ class Agent:
 
     def __init__(self,
                  location=None,
-                 name=None,
-                 description=None,
-                 identification=None,
+                 name='Agent',
+                 description='This is the agent',
+                 identification="MultiLogin",
                  multilogin_id=None,
                  multilogin_profile=None):
         self._name = name
@@ -201,13 +206,14 @@ class Agent:
 class Proxy:
 
     def __init__(self,
+                 username=GEOSURF_USERNAME,
+                 password=GEOSURF_PASSWORD,
                  name="Sample Proxy",
-                 description="Placeholder proxy",
-                 type="HTTP",
-                 hostname="localhost",
-                 port=8080,
-                 username="admin",
-                 password="admin12345"):
+                 description="Proxy",
+                 type="GEOSURF",
+                 hostname="state.geosurf.io",
+                 port=8000
+                 ):
         self._name = name
         self._description = description
         self._type = type
