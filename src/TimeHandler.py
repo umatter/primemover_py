@@ -7,10 +7,10 @@ import json
 
 
 class Schedule:
-    def __init__(self, interval=60, start_at=32400, end_at=50400, times_set=None):
+    def __init__(self, interval=60, start_at=32400, end_at=50400,
+                 times_set=None):
         self._min_interval = 0.1
         self._p = 0.8
-        self.interval = interval
         if type(times_set) is list:
             self._times_set = times_set
         else:
@@ -21,6 +21,7 @@ class Schedule:
         self.start_at = start_at
         self.end_at = end_at
         self._times_free = [(self.start_at, self.end_at)]
+        self.interval = interval
         if len(self._times_set) != 0:
             self._update_blocked()
         else:
@@ -50,6 +51,8 @@ class Schedule:
             raise ValueError(f'interval should be >= 0 received {val}')
         else:
             self._interval = val
+        if len(self._times_set) != 0:
+            self._update_blocked()
 
     def new_time(self):
         while not self._slots_exist and self._slots_possible and self.interval * self._p >= self._min_interval:
@@ -78,7 +81,6 @@ class Schedule:
         blocked_times = []
         previous_min, previous_max = blocked_times_unclean[0]
         for interval_min, interval_max in blocked_times_unclean:
-
             if previous_max >= interval_min:
                 previous_max = max(interval_max, previous_max)
             else:
@@ -93,41 +95,45 @@ class Schedule:
 
         return blocked_times
 
-    def _update_free(self):
+    def _update_free(self, start=None, end=None):
+        if start is not None:
+            start = max(start, self.start_at)
+        else:
+            start = self.start_at
+        if end is not None:
+            end = min(end, self.end_at)
+        else:
+            end = self.end_at
         free_slots = []
         if len(self._times_blocked) == 0:
-            free_slots.append((self.start_at, self.end_at))
+            free_slots.append((start, end))
             times_exist = True
-        elif len(self._times_blocked) == 1 and self.end_at <= \
-                self.times_blocked[0][1] and self.start_at >= \
+        elif len(self._times_blocked) == 1 and end <= \
+                self.times_blocked[0][1] and start >= \
                 self.times_blocked[0][0]:
             free_slots = []
             self._times_free = []
             times_exist = False
         else:
-
-            previous_max = self._times_blocked[0][0] - 1
-            for interval_min, interval_max in self._times_blocked:
-                if interval_min < self.start_at or previous_max > self.end_at:
+            free_slots = []
+            previous_max = min(self._times_blocked[0][0] - 1, start)
+            for interval_min, interval_max in self.times_blocked:
+                if end < previous_max:
+                    break
+                if start > interval_min:
                     previous_max = interval_max
                     continue
-                else:
-                    tup = (previous_max, interval_min)
-                    free_slots.append(tup)
-                    previous_max = interval_max
-            if self.end_at > previous_max:
-                free_slots.append((previous_max, self.end_at))
-            if times_exist := len(free_slots) > 0:
-                if self.start_at < free_slots[0][1] and self.start_at < \
-                        self._times_blocked[0][0]:
-                    tup = (self.start_at, free_slots[0][1])
-                    free_slots.pop(0)
-                    free_slots.insert(0, tup)
-                if self.end_at > free_slots[-1][0] and self.end_at > \
-                        self._times_blocked[0][1]:
-                    tup = (free_slots[-1][0], self.end_at)
-                    free_slots.pop(-1)
-                    free_slots.append(tup)
+                if end <= interval_min:
+                    interval_min = end
+                if previous_max <= start:
+                    previous_max = start
+                free_slots.append((previous_max, interval_min))
+
+                previous_max = interval_max
+            if end > previous_max:
+                free_slots.append((previous_max, end))
+
+            times_exist = len(free_slots)
         self._times_free = free_slots
         return times_exist, free_slots
 
@@ -138,15 +144,17 @@ class IndividualSchedule(Schedule):
         super().__init__(interval, start_at, end_at, times_set)
         self._global_schedule = global_schedule
         self._slots_cant_exist = False
+        self._update_blocked()
 
     def update(self):
         self._update_blocked()
 
     def new_time(self):
+        self._update_blocked()
         if self._slots_cant_exist:
             self._slots_possible = False
             raise Exception(
-                'There are no free slots available, change remove fixed intervals')
+                'There are no free slots available, change or remove fixed intervals')
         while not self._slots_exist and self._slots_possible and self._global_schedule.interval * self._p >= self._min_interval:
             self._global_schedule.interval *= self._p
             self._update_blocked()
@@ -185,7 +193,8 @@ class IndividualSchedule(Schedule):
             blocked_times.append((previous_min, previous_max))
             self._times_blocked = blocked_times
 
-            self._slots_exist, free_slots = self._update_free()
+            self._slots_exist, free_slots = self._update_free(start=self._global_schedule.start_at,
+                                                              end=self._global_schedule.end_at)
         return blocked_times
 
 
@@ -223,7 +232,7 @@ class TimeHandler:
 
     def consecutive_times(self, nr):
         self._schedule.update()
-        second_list = [self._schedule.new_time() for i in range(0,nr)]
+        second_list = [self._schedule.new_time() for i in range(0, nr)]
         second_list.sort()
         time_list = [self._to_iso_time(t) for t in second_list]
         return time_list
@@ -234,6 +243,9 @@ class TimeHandler:
         return self._to_iso_time(seconds)
 
     def _to_iso_time(self, t):
-        date = datetime.now(pytz.timezone(self._server_tz)).replace(hour=0, minute=0, second=0, microsecond=0)
+        date = datetime.now(pytz.timezone(self._server_tz)).replace(hour=0,
+                                                                    minute=0,
+                                                                    second=0,
+                                                                    microsecond=0)
         t = date + timedelta(seconds=t)
         return t.isoformat()

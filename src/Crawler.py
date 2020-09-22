@@ -3,6 +3,7 @@ from src.Info import Agent, Proxy
 from src.TimeHandler import TimeHandler
 from src.Preferences import *
 from src.Tasks import *
+import src.Utilities as Util
 
 
 class Crawler:
@@ -27,13 +28,13 @@ class Crawler:
             self._schedule = TimeHandler(global_schedule,
                                          self.agent[0].location,
                                          interval=120,
-                                         bed_time=19 * 60 * 60,
-                                         wake_time=17.75 * 60 * 60)
+                                         bed_time=9 * 60 * 60,
+                                         wake_time=7 * 60 * 60)
         elif schedule is None and global_schedule is None:
             raise Exception('f global_schedule and schedule cant bot be None')
         else:
             self._schedule = schedule
-        self.queues = []
+        self.queues = {}
         self.proxy = proxy
         self.active = active
         self._testing = testing
@@ -126,28 +127,87 @@ class Crawler:
             "configuration": [x.as_dict() for x in self.configuration],
             "agent": [x.as_dict() for x in self.agent],
             "proxy": [x.as_dict() for x in self.proxy],
-            "queues": [x.as_dict() for x in self.queues]}
+            "queues": [x.as_dict() for x in self.queues.values()]}
 
-    def add_searches(self, nr, t_list=None):
-        terms = self.configuration[0].terms
-        to_search = random.choices(terms, k=nr)
-        if t_list is None:
-            for term in to_search:
-                self.queues.append(
-                    GoogleSearch(term, self.schedule.new_time()))
+    def add_searches(self, terms=None, nr=1, t_list=None, to_session=None):
+        if terms is None:
+            terms = self.configuration[0].terms
+            to_search = random.choices(terms, k=nr)
+        elif type(terms) is list and len(terms) == nr:
+            to_search = terms
+        elif type(terms) is list:
+            raise ValueError(
+                f'There is a strange number of search terms in the passed list')
+        elif type(terms) is str:
+            to_search = [terms for i in range(nr)]
         else:
+            raise TypeError(
+                f'terms must be a single string, None or a list of strings')
+
+        if t_list is None and to_session is None:
+            t_list = self.schedule.consecutive_times(nr)
+        if to_session is None:
             for term, t in zip(to_search, t_list):
-                self.queues.append(
-                    GoogleSearch(term, t))
-
-    def add_direct_visits(self, nr, t_list=None):
-        outlets = self.configuration[0].media
-        to_visit = random.choices(outlets, k=nr)
-        if t_list is None:
-            for outlet in to_visit:
-                self.queues.append(
-                    VisitDirect(outlet, self.schedule.new_time()))
+                self.queues[Util.new_key(self.queues)] = (GoogleSearch(term, t))
         else:
+            if t_list is None and to_session not in self.queues.keys():
+                t = self.schedule.new_time()
+            elif to_session in self.queues.keys():
+                t = self.queues[to_session].start_at
+            elif type(t_list) is list:
+                t = t_list[0]
+            else:
+                t = t_list
+
+            if to_session not in self.queues.keys():
+                to_session = Util.new_key(self.queues)
+                self.queues[to_session] = Queue(start_at=t,
+                                                name=f'Session_{to_session}',
+                                                delay_min=1,
+                                                delay_max=10)
+
+            for term in to_search:
+                self.queues[to_session] + GoogleSearch(term, t)
+
+            return to_session
+
+    def add_direct_visits(self, outlets=None, nr=1, t_list=None,
+                          to_session=None):
+        if outlets is None:
+            outlets = self.configuration[0].media
+            to_visit = random.choices(outlets, k=nr)
+        elif type(outlets) is list and len(outlets) == nr:
+            to_visit = outlets
+        elif type(outlets) is list:
+            raise ValueError(
+                f'There is a strange number of outlets in the passed list')
+        elif type(outlets) is str:
+            to_visit = [outlets for i in range(nr)]
+        else:
+            raise TypeError(
+                f'outlets must be a single string, None or a list of strings')
+
+        if t_list is None and to_session is None:
+            t_list = self.schedule.consecutive_times(nr)
+        if to_session is None:
             for outlet, t in zip(to_visit, t_list):
-                self.queues.append(
-                    VisitDirect(outlet, t))
+                self.queues[len(self.queues)] = (VisitDirect(outlet, t))
+        else:
+            if t_list is None and to_session not in self.queues.keys():
+                t = self.schedule.new_time()
+            elif to_session in self.queues.keys():
+                t = self.queues[to_session].start_at
+            elif type(t_list) is list:
+                t = t_list[0]
+            else:
+                t = t_list
+
+            if to_session not in self.queues.keys():
+                to_session = Util.new_key(self.queues)
+                self.queues[to_session] = Queue(start_at=t,
+                                                name=f'Session_{to_session}',
+                                                delay_min=1,
+                                                delay_max=10)
+            for outlet in to_visit:
+                self.queues[to_session] + VisitDirect(outlet, t)
+            return to_session
