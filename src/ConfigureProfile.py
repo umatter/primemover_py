@@ -2,15 +2,18 @@ import src.Preferences
 import src.ConfigurationFunctions as C
 import os
 import pandas as pd
-
+from src.Info import ConfigurationInfo
+import json
 
 class Config:
     MEDIA_DEFAULT_PATH = None
     TERM_DEFAULT_PATH = None
 
     def __init__(self,
-                 path_media_outlets=None,
-                 path_terms=None,
+                 name=None,
+                 description=None,
+                 path_media_outlets="/Users/johannes/Dropbox/websearch_polarization/data/final/outlets_pool.csv",
+                 path_terms="/Users/johannes/Dropbox/websearch_polarization/data/final/searchterms_pool.csv",
                  psi=None,
                  pi=None,
                  alpha=None,
@@ -18,7 +21,9 @@ class Config:
                  beta=None,
                  kappa=None,
                  media=None,
-                 terms=None
+                 terms=None,
+                 location=None,
+                 info=None
                  ):
         """
         :param path_media_outlets: path, csv containing media outlet data
@@ -33,6 +38,10 @@ class Config:
         :param media: list, media redirect urls for outlets known to individual
         :param terms: list, search terms individual may search
         """
+        self._name = name
+        self._description = description
+        self._info = info
+
         self.psi = psi
         self.pi = pi
         self.alpha = alpha
@@ -44,6 +53,8 @@ class Config:
         self.path_terms = path_terms
         self.media = media
         self.terms = terms
+        self.location = location
+        self._info = None
 
     @property
     def psi(self):
@@ -218,9 +229,9 @@ class Config:
         return f'{{{config_discr},\n"parameters":{{\n{parameters}}}}}'
 
     def as_dict(self):
-        return {
-            "name": "",
-            "description": "",
+        return_dict = {
+            "name": self._name,
+            "description": self._description,
             "params": [{
                 "pi": self.pi,
                 "psi": self.psi,
@@ -231,6 +242,13 @@ class Config:
                 "search_terms": self.terms,
                 "media_outlet_urls": self.media}]
         }
+        if self._info is not None:
+            for key, value in self._info.as_dict().items():
+                return_dict['key'] = value
+            return_dict['params'][0]['user_id'] = self._info.as_dict()['user_id']
+            return_dict['params'][0]['configuration_id'] = self._info.as_dict()['id']
+
+        return return_dict
 
     def update_config(self, results):
         """
@@ -238,6 +256,24 @@ class Config:
         :param results:
         :return:
         """
+
+    @classmethod
+    def from_dict(cls, config_dict):
+        config_object = cls(name=config_dict.get('name'),
+                            description=config_dict.get('description'),
+                            psi=config_dict['params'][0].get('psi'),
+                            pi=config_dict['params'][0].get('pi'),
+                            alpha=config_dict['params'][0].get('alpha'),
+                            tau=config_dict['params'][0].get('tau'),
+                            beta=config_dict['params'][0].get('beta'),
+                            kappa=config_dict['params'][0].get('kappa'),
+                            media=json.loads(config_dict['params'][0].get('media_outlet_urls')),
+                            terms=json.loads(config_dict['params'][0].get('search_terms')),
+                            location=config_dict['params'][0].get('location'),
+                            info=ConfigurationInfo.from_dict(config_dict)
+                            )
+
+        return config_object
 
 
 if __name__ == "__main__":

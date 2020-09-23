@@ -1,5 +1,5 @@
 from src.ConfigureProfile import *
-from src.Info import Agent, Proxy
+from src.Info import Agent, Proxy, CrawlerInfo
 from src.TimeHandler import TimeHandler
 from src.Preferences import *
 from src.Tasks import *
@@ -15,7 +15,12 @@ class Crawler:
                  description="Crawler created through py",
                  configuration=None,
                  agent=None,
-                 proxy=None, active=1, schedule=None, testing=0):
+                 proxy=None,
+                 active=1,
+                 schedule=None,
+                 testing=0,
+                 crawler_info=None
+                 ):
         self._description = description
         if name is None:
             self._name = f'Crawler_{Crawler.CRAWLER_NR}'
@@ -29,7 +34,8 @@ class Crawler:
                                          self.agent[0].location,
                                          interval=120,
                                          bed_time=9 * 60 * 60,
-                                         wake_time=7 * 60 * 60)
+                                         wake_time=7 * 60 * 60,
+                                         tomorrow=False)
         elif schedule is None and global_schedule is None:
             raise Exception('f global_schedule and schedule cant bot be None')
         else:
@@ -38,6 +44,7 @@ class Crawler:
         self.proxy = proxy
         self.active = active
         self._testing = testing
+        self._crawler_info = crawler_info
 
     @property
     def schedule(self):
@@ -119,7 +126,7 @@ class Crawler:
         return f'{{{crawler_descr},"queues": [\n{formatted}]}}'
 
     def as_dict(self):
-        return {
+        return_dict = {
             "name": self._name,
             "description": self._description,
             "active": self.active,
@@ -128,6 +135,10 @@ class Crawler:
             "agent": [x.as_dict() for x in self.agent],
             "proxy": [x.as_dict() for x in self.proxy],
             "queues": [x.as_dict() for x in self.queues.values()]}
+        if self._crawler_info is not None:
+            for key, value in self._crawler_info.as_dict().items():
+                return_dict['key'] = value
+        return return_dict
 
     def add_searches(self, terms=None, nr=1, t_list=None, to_session=None):
         if terms is None:
@@ -211,3 +222,33 @@ class Crawler:
             for outlet in to_visit:
                 self.queues[to_session] + VisitDirect(outlet, t)
             return to_session
+
+    @classmethod
+    def from_dict(cls, crawler_dict, global_schedule):
+        if 'crawlers' in crawler_dict.keys():
+            crawlers = [cls._single_crawler(ind_crawler, global_schedule) for
+                        ind_crawler in crawler_dict['crawlers']]
+        else:
+            crawlers = [cls._single_crawler(crawler_dict, global_schedule)]
+        return crawlers
+
+    @classmethod
+    def _single_crawler(cls, crawler_dict, global_schedule):
+        proxy_object = cls(name=crawler_dict.get('name'),
+                           description=crawler_dict.get('description'),
+                           global_schedule=global_schedule,
+                           configuration=Config.from_dict(crawler_dict['configuration']),
+                           agent=Agent.from_dict(crawler_dict.get('agent')),
+                           proxy=Proxy.from_dict(crawler_dict.get('proxy')),
+                           crawler_info=CrawlerInfo.from_dict(crawler_dict)
+                           )
+
+        return proxy_object
+
+if __name__ == "__main__":
+    import json
+    from src.TimeHandler import Schedule
+    with open('resources/examples/example_output.json', 'r') as in_file:
+        data = json.load(in_file)
+    trial_crawlers = Crawler.from_dict(data, Schedule())
+    print(trial_crawlers)

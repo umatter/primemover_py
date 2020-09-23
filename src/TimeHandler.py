@@ -193,8 +193,9 @@ class IndividualSchedule(Schedule):
             blocked_times.append((previous_min, previous_max))
             self._times_blocked = blocked_times
 
-            self._slots_exist, free_slots = self._update_free(start=self._global_schedule.start_at,
-                                                              end=self._global_schedule.end_at)
+            self._slots_exist, free_slots = self._update_free(
+                start=self._global_schedule.start_at,
+                end=self._global_schedule.end_at)
         return blocked_times
 
 
@@ -208,7 +209,8 @@ class TimeHandler:
                  wake_time,
                  bed_time,
                  interval=600,
-                 server_tz=time.tzname[0]):
+                 server_tz=time.tzname[0],
+                 tomorrow=False):
         """
         :param global_schedule:
         :param location: geosurf proxy location
@@ -216,6 +218,7 @@ class TimeHandler:
         :param bed_time: time in seconds when bot is to sleep e.g. 8:00 = 28800
         """
         self._global_schedule = global_schedule
+        self._tomorrow = tomorrow
         self._location = location
         self._tz = TimeHandler.LOC_TIMEZONE_DICT.get(self._location)
         self._server_tz = server_tz
@@ -247,5 +250,9 @@ class TimeHandler:
                                                                     minute=0,
                                                                     second=0,
                                                                     microsecond=0)
-        t = date + timedelta(seconds=t)
+        if self._tomorrow:
+            next_day = 1
+        else:
+            next_day = 0
+        t = date + timedelta(days=next_day, seconds=t)
         return t.isoformat()

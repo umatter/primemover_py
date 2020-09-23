@@ -110,9 +110,9 @@ class CrawlerInfo(Info):
                  configuration_id=None, active=1, created_at=None,
                  updated_at=None):
         self.crawler_id = ID
-        self.agent_id = agent_id
-        self.proxy_id = proxy_id
-        self.configuration_id = configuration_id
+        self._agent_id = agent_id
+        self._proxy_id = proxy_id
+        self._configuration_id = configuration_id
         super().__init__(user_id=user_id, active=active, created_at=created_at,
                          updated_at=updated_at)
 
@@ -129,8 +129,28 @@ class CrawlerInfo(Info):
         else:
             self._crawler_id = value
 
+    def as_dict(self):
+        return {
+            'id': self._crawler_id,
+            'agent_id': self._agent_id,
+            'user_id': self._user_id,
+            'configuration_id': self._configuration_id
+        }
+
     def new_queue(self):
         return QueueInfo(user_id=self._user_id, crawler_id=self.crawler_id)
+
+    @classmethod
+    def from_dict(cls, info_dict):
+        info_object = cls(info_dict.get('id'), user_id=info_dict.get('user_id'),
+                          agent_id=info_dict.get('agent_id'),
+                          proxy_id=info_dict.get('proxy_id'),
+                          configuration_id=info_dict.get('configuration_id'),
+                          created_at=info_dict.get('created_at'),
+                          updated_at=info_dict.get('updated_at'),
+                          active=info_dict.get('active')
+                          )
+        return info_object
 
 
 class ConfigurationInfo(Info):
@@ -159,7 +179,55 @@ class ConfigurationInfo(Info):
 
     def new_crawler(self):
         return CrawlerInfo(user_id=self._user_id,
-                           configuration_id=self.configuration_id)
+                           configuration_id=self.configuration_id, )
+
+    def as_dict(self):
+        return {
+            'id': self._configuration_id,
+            'user_id': self._user_id,
+        }
+
+    @classmethod
+    def from_dict(cls, info_dict):
+        info_object = cls(info_dict.get('id'),
+                          user_id=info_dict.get('user_id'),
+                          created_at=info_dict.get('created_at'),
+                          updated_at=info_dict.get('updated_at'),
+                          active=info_dict.get('active'))
+        return info_object
+
+
+class AgentInfo(Info):
+    ID = 0
+
+    def __init__(self, ID=None, user_id=None, active=1, created_at=None,
+                 updated_at=None):
+        self.agent_id = ID
+        super().__init__(user_id=user_id,
+                         active=active,
+                         created_at=created_at,
+                         updated_at=updated_at)
+
+    @property
+    def agent_id(self):
+        return self._agent_id
+
+    @agent_id.setter
+    def agent_id(self, value):
+        if value is None:
+            AgentInfo.ID += 1
+            self._agent_id = AgentInfo.ID
+        else:
+            self._agent_id = value
+
+    @classmethod
+    def from_dict(cls, info_dict):
+        info_object = cls(info_dict.get('id'),
+                          user_id=info_dict.get('user_id'),
+                          created_at=info_dict.get('created_at'),
+                          updated_at=info_dict.get('updated_at'),
+                          active=info_dict.get('active'))
+        return info_object
 
 
 class Agent:
@@ -172,13 +240,15 @@ class Agent:
                  description='This is the agent',
                  identification="MultiLogin",
                  multilogin_id=None,
-                 multilogin_profile=None):
+                 multilogin_profile=None,
+                 info=None):
         self._name = name
         self._description = description
         self.location = location
         self._identification = identification
         self._multilogin_id = multilogin_id
         self._multilogin_profile = multilogin_profile
+        self._info = info
 
     @property
     def location(self):
@@ -195,12 +265,61 @@ class Agent:
                 f'{val} is not a valid location see geosurf cities')
 
     def as_dict(self):
-        return {"name": self._name,
-                "description": self._description,
-                "location": self._location,
-                "identification": self._identification,
-                "multilogin_id": self._multilogin_id,
-                "multilogin_profile": self._multilogin_profile}
+        return_dict = {"name": self._name,
+                       "description": self._description,
+                       "location": self._location,
+                       "identification": self._identification,
+                       "multilogin_id": self._multilogin_id,
+                       "multilogin_profile": self._multilogin_profile}
+        if self._info is not None:
+            for key, value in self._info.as_dict().items():
+                return_dict['key'] = value
+        return return_dict
+
+    @classmethod
+    def from_dict(cls, agent_dict):
+        agent_object = cls(name=agent_dict.get('name'),
+                           description=agent_dict.get('description'),
+                           identification=agent_dict.get('identification'),
+                           multilogin_id=agent_dict.get('multilogin_id'),
+                           multilogin_profile=agent_dict.get(
+                               'multilogin_profile'),
+                           location=agent_dict.get('location'),
+                           info=AgentInfo.from_dict(agent_dict))
+        return agent_object
+
+
+class ProxyInfo(Info):
+    ID = 0
+
+    def __init__(self, ID=None, user_id=None, active=1, created_at=None,
+                 updated_at=None):
+        self.proxy_id = ID
+        super().__init__(user_id=user_id,
+                         active=active,
+                         created_at=created_at,
+                         updated_at=updated_at)
+
+    @property
+    def proxy_id(self):
+        return self._proxy_id
+
+    @proxy_id.setter
+    def proxy_id(self, value):
+        if value is None:
+            ProxyInfo.ID += 1
+            self._proxy_id = ProxyInfo.ID
+        else:
+            self._proxy_id = value
+
+    @classmethod
+    def from_dict(cls, info_dict):
+        info_object = cls(info_dict.get('id'),
+                          user_id=info_dict.get('user_id'),
+                          created_at=info_dict.get('created_at'),
+                          updated_at=info_dict.get('updated_at'),
+                          active=info_dict.get('active'))
+        return info_object
 
 
 class Proxy:
@@ -212,7 +331,8 @@ class Proxy:
                  description="Proxy",
                  type="GEOSURF",
                  hostname="state.geosurf.io",
-                 port=8000
+                 port=8000,
+                 info=None
                  ):
         self._name = name
         self._description = description
@@ -221,12 +341,30 @@ class Proxy:
         self._port = port
         self._username = username
         self._password = password
+        self._info = info
 
     def as_dict(self):
-        return {"name": self._name,
-                "description": self._description,
-                "type": self._type,
-                "hostname": self._hostname,
-                "port": self._port,
-                "username": self._username,
-                "password": self._password}
+        return_dict = {"name": self._name,
+                       "description": self._description,
+                       "type": self._type,
+                       "hostname": self._hostname,
+                       "port": self._port,
+                       "username": self._username,
+                       "password": self._password}
+        if self._info is not None:
+            for key, value in self._info.as_dict().items():
+                return_dict['key'] = value
+        return return_dict
+
+    @classmethod
+    def from_dict(cls, proxy_dict):
+        proxy_object = cls(name=proxy_dict.get('name'),
+                           description=proxy_dict.get('description'),
+                           username=proxy_dict.get('username'),
+                           password=proxy_dict.get('password'),
+                           type=proxy_dict.get('type'),
+                           hostname=proxy_dict.get('hostname'),
+                           port=proxy_dict.get('port'),
+                           info=ProxyInfo.from_dict(proxy_dict))
+        return proxy_object
+
