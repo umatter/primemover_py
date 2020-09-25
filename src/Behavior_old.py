@@ -114,7 +114,7 @@ class StartTime(Behavior):
             actual isoformat! It does not include the timezone!
         """
         self.start_time = start_time
-        super().__init__(name='start_time', value=self.start_time,
+        super().__init__(name='start_at', value=self.start_time,
                          description='Start Job at...', active=active)
 
     @property

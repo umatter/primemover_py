@@ -1,9 +1,9 @@
-import src.Preferences
 import src.ConfigurationFunctions as C
 import os
 import pandas as pd
-from src.Info import ConfigurationInfo
+from src.worker.Info import ConfigurationInfo
 import json
+
 
 class Config:
     MEDIA_DEFAULT_PATH = None
@@ -167,22 +167,26 @@ class Config:
         return self._media
 
     @media.setter
-    def media(self, media_list):
-        if media_list is None:
+    def media(self, media_in):
+        if media_in is None:
             all_media_tbl = pd.read_csv(self.path_media_outlets, header=0,
                                         usecols=['redirect_url', 'pi',
                                                  'avg_reach_permillion'])
             all_media_tbl.rename(columns={'redirect_url': 'url', 'pi': 'pi',
-                                          'avg_reach_permillion': 'e^ro'},
+                                          'avg_reach_permillion': 'e^rho'},
                                  inplace=True)
 
-            self._media = C.SelectMediaOutlets(pi_i=self.pi,
-                                               url_pi_tbl=all_media_tbl,
-                                               tau_tilde_ij=self.tau,
-                                               k=10)
+            media_selection = C.SelectMediaOutlets(pi_i=self.pi,
+                                                   alpha_tilde=self.alpha,
+                                                   url_pi_tbl=all_media_tbl,
+                                                   tau_tilde_ij=self.tau,
+                                                   k=10)
+            self._media = {}
+            for url, pi, rho in media_selection:
+                self._media[url] = {"pi": pi, "rho": rho}
 
-        elif type(media_list) is list and len(media_list) > 0:
-            self._media = media_list
+        elif type(media_in) in {list, dict}:
+            self._media = media_in
         else:
             raise TypeError(
                 f'Media should be a list type object containing unique identifiers of online media outlets')
@@ -196,10 +200,14 @@ class Config:
         if term_list is None:
             all_terms_tbl = pd.read_csv(self.path_terms, header=0,
                                         usecols=['search_term', 'pi_p'])
-            self._terms = C.SelectSearchTerms(term_pi_tbl=all_terms_tbl, k=30,
-                                              pi_i=self._pi,
-                                              tau_hat_ik=self.tau,
-                                              alpha_hat=self.alpha)
+            selected_terms = C.SelectSearchTerms(term_pi_tbl=all_terms_tbl,
+                                                 k=30,
+                                                 pi_i=self._pi,
+                                                 tau_hat_ik=self.tau,
+                                                 alpha_hat=self.alpha)
+            self._terms = {}
+            for term, pi in selected_terms:
+                self._terms[term] = pi
         elif type(term_list) is list and len(term_list) > 0:
             self._terms = term_list
         else:
@@ -245,8 +253,10 @@ class Config:
         if self._info is not None:
             for key, value in self._info.as_dict().items():
                 return_dict['key'] = value
-            return_dict['params'][0]['user_id'] = self._info.as_dict()['user_id']
-            return_dict['params'][0]['configuration_id'] = self._info.as_dict()['id']
+            return_dict['params'][0]['user_id'] = self._info.as_dict()[
+                'user_id']
+            return_dict['params'][0]['configuration_id'] = self._info.as_dict()[
+                'id']
 
         return return_dict
 
@@ -267,8 +277,10 @@ class Config:
                             tau=config_dict['params'][0].get('tau'),
                             beta=config_dict['params'][0].get('beta'),
                             kappa=config_dict['params'][0].get('kappa'),
-                            media=json.loads(config_dict['params'][0].get('media_outlet_urls')),
-                            terms=json.loads(config_dict['params'][0].get('search_terms')),
+                            media=json.loads(config_dict['params'][0].get(
+                                'media_outlet_urls')),
+                            terms=json.loads(
+                                config_dict['params'][0].get('search_terms')),
                             location=config_dict['params'][0].get('location'),
                             info=ConfigurationInfo.from_dict(config_dict)
                             )

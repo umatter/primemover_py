@@ -1,6 +1,5 @@
 from urllib.parse import urlparse
 import math
-from src.Utilities import *
 
 
 class Behavior:

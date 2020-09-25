@@ -3,7 +3,7 @@ import random
 import numpy as np
 
 
-def media_utility_u_ij(pi_i, pi_tilde_j, ro_j, epsilon_ij, alpha_tilde,
+def media_utility_u_ij(pi_i, pi_tilde_j, rho_j, epsilon_ij, alpha_tilde,
                        tau_tilde_ij=1):
     """
     :param pi_i: float, political orientation of the individual
@@ -11,7 +11,7 @@ def media_utility_u_ij(pi_i, pi_tilde_j, ro_j, epsilon_ij, alpha_tilde,
     :param d_tilde_ij: float > 0, ideological distance |pi_i-pi_tilde_j| where pi_i
         represents the political orientation of the individual and pi_tilde_j
         that of outlet j
-    :param ro_j: float >= 0, reach of outlet j
+    :param rho_j: float >= 0, reach of outlet j
     :param epsilon_ij: float, noise/errors
     :param alpha_tilde: float >= 0, shift parameter
     :param tau_tilde_ij: float > 0, "transportation costs" i.e. costs of consuming
@@ -19,7 +19,7 @@ def media_utility_u_ij(pi_i, pi_tilde_j, ro_j, epsilon_ij, alpha_tilde,
     :return u: float > 0, utility  derived by individual i when consuming news from outlet j
     """
     d_tilde_ij = abs(pi_i-pi_tilde_j)
-    u = alpha_tilde - tau_tilde_ij * d_tilde_ij + ro_j + epsilon_ij
+    u = alpha_tilde - tau_tilde_ij * d_tilde_ij + rho_j + epsilon_ij
     return u
 
 
@@ -78,7 +78,7 @@ def prob_i(utilities):
     return probabilities
 
 
-def result_utility_w_i_j_t(r_j, known=0, d_tilde_i_j_t=0, ro_j=0, alpha_tilde=1,
+def result_utility_w_i_j_t(r_j, known=0, d_tilde_i_j_t=0, rho_j=0, alpha_tilde=1,
                            tau_tilde=1, beta_i=0.1):
     """
     :param known: indicates wether or not individual knows the outlet.
@@ -87,14 +87,14 @@ def result_utility_w_i_j_t(r_j, known=0, d_tilde_i_j_t=0, ro_j=0, alpha_tilde=1,
     :param d_tilde_i_j_t: float > 0, ideological distance |pi_i-pi_tilde_j| where pi_i
         represents the political orientation of the individual and pi_tilde_j
         that of outlet j
-    :param ro_j: float >= 0, reach of outlet j
+    :param rho_j: float >= 0, reach of outlet j
     :param alpha_tilde: float >= 0, shift parameter
     :param tau_tilde: float > 0, "transportation costs" i.e. costs of consuming
         ideologically distant news
     :return:
     """
     w = (1 - beta_i * (
-                r_j - 1)) + known * (alpha_tilde - tau_tilde * d_tilde_i_j_t + ro_j)
+                r_j - 1)) + known * (alpha_tilde - tau_tilde * d_tilde_i_j_t + rho_j)
 
     return w
 
@@ -119,15 +119,15 @@ def choose_result(results, outlets, pi):
     """
     # reformat outlets data to reflect unique 'outlet' and allow better access
     outlets_dict = {}
-    for url, p, ro in outlets.items():
-        outlets_dict[url] = {'p': p, 'ro': ro}
+    for url, p, rho in outlets.items():
+        outlets_dict[url] = {'p': p, 'rho': rho}
 
     # calculate utility of each result
     utilities = []
     for rank, result_url in results.items():
         if result_url in outlets_dict.keys():
             d_tilde_i_j_t = abs(pi - outlets_dict[result_url]['p'])
-            u = result_utility_w_i_j_t(rank, 1, d_tilde_i_j_t, outlets_dict['ro'])
+            u = result_utility_w_i_j_t(rank, 1, d_tilde_i_j_t, outlets_dict[result_url]['rho'])
         else:
             u = result_utility_w_i_j_t(rank)
         epsilon = random.uniform(0, 1) # noise parameter

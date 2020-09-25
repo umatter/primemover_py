@@ -1,4 +1,4 @@
-import src.Behavior as Behavior
+import src.worker.Behavior as Behavior
 
 
 class Job:

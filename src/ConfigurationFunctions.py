@@ -40,30 +40,32 @@ def SelectSearchTerms(pi_i, term_pi_tbl, k, alpha_hat, tau_hat_ik):
                                               pi_hat_k=pi_hat_k,
                                               epsilon_ik=epsilon_ik,
                                               alpha_hat=alpha_hat,
-                                              tau_hat_ik=tau_hat_ik), term_k))
+                                              tau_hat_ik=tau_hat_ik), term_k,
+                          pi_hat_k))
     utilities.sort()
     max_K = utilities[-k:]
-    terms = [b for a, b in max_K]
+    terms = [(b, c) for a, b, c in max_K]
     #  random.sample(term_pi_tbl['search_term'].to_list(), k)
     return terms
 
 
-def SelectMediaOutlets(url_pi_tbl=None, k=20, tau_tilde_ij=1, pi_i=0 ):
+def SelectMediaOutlets(url_pi_tbl=None, alpha_tilde=0, k=20, tau_tilde_ij=1, pi_i=0):
     # Base on pi, K known outlets,
     utilities = []
     for row in range(len(url_pi_tbl)):
-        outlet, exp_ro, pi_tilde_j = url_pi_tbl.loc[row]
+        outlet, exp_rho, pi_tilde_j = url_pi_tbl.loc[row]
         epsilon_ik = NoiseUtility()
+        rho = math.log(exp_rho)
         utilities.append(((media_utility_u_ij(pi_i=pi_i,
                                               pi_tilde_j=pi_tilde_j,
                                               epsilon_ij=epsilon_ik,
-                                              alpha_tilde=0,
-                                              ro_j=math.log(exp_ro),
+                                              alpha_tilde=alpha_tilde,
+                                              rho_j=rho,
                                               tau_tilde_ij=tau_tilde_ij)),
-                          outlet))
+                          outlet, pi_tilde_j, rho))
     utilities.sort()
     max_K = utilities[-k:]
-    outlets = [b for a, b in max_K]
+    outlets = [(url, pi, rho) for util, url, pi, rho in max_K]
     return outlets
 
 
@@ -97,5 +99,6 @@ def kappa():
 
 
 def location():
-    LOCATION_LIST = ["US-OK-OKLAHOMA_CITY","US-CA-SAN_FRANCISCO", "US-NY-NEW_YORK","US-MA-BOSTON"]
+    LOCATION_LIST = ["US-OK-OKLAHOMA_CITY", "US-CA-SAN_FRANCISCO",
+                     "US-NY-NEW_YORK", "US-MA-BOSTON"]
     return random.choice(LOCATION_LIST)

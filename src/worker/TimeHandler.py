@@ -200,16 +200,17 @@ class IndividualSchedule(Schedule):
 
 
 class TimeHandler:
+    GLOBAL_SCHEDULE = Schedule()
     with open("resources/other/geosurf_cities.json", 'r') as file:
         LOC_TIMEZONE_DICT = json.load(file)
 
     def __init__(self,
-                 global_schedule,
                  location,
                  wake_time,
                  bed_time,
                  interval=600,
-                 server_tz=time.tzname[0],
+                 local_tz=time.tzname[0],
+                 in_local_time=False,
                  tomorrow=False):
         """
         :param global_schedule:
@@ -217,13 +218,14 @@ class TimeHandler:
         :param wake_time: time in seconds when bot is to wake up e.g. 8:00 = 28800
         :param bed_time: time in seconds when bot is to sleep e.g. 8:00 = 28800
         """
-        self._global_schedule = global_schedule
+        self._global_schedule = TimeHandler.GLOBAL_SCHEDULE
         self._tomorrow = tomorrow
+        self._in_local_time = in_local_time
         self._location = location
         self._tz = TimeHandler.LOC_TIMEZONE_DICT.get(self._location)
-        self._server_tz = server_tz
+        self._local_tz = local_tz
         utc_offset = pytz.timezone(self._tz).utcoffset(datetime.now())
-        server_utc_offset = pytz.timezone(server_tz).utcoffset(datetime.now())
+        server_utc_offset = pytz.timezone(local_tz).utcoffset(datetime.now())
         self._second_modifier = - utc_offset.total_seconds() + server_utc_offset.total_seconds()
         self._wake_time = wake_time + self._second_modifier
         self._bed_time = bed_time + self._second_modifier
@@ -246,13 +248,15 @@ class TimeHandler:
         return self._to_iso_time(seconds)
 
     def _to_iso_time(self, t):
-        date = datetime.now(pytz.timezone(self._server_tz)).replace(hour=0,
-                                                                    minute=0,
-                                                                    second=0,
-                                                                    microsecond=0)
+        date = datetime.now(pytz.timezone(self._local_tz)).replace(hour=0,
+                                                                   minute=0,
+                                                                   second=0,
+                                                                   microsecond=0)
         if self._tomorrow:
             next_day = 1
         else:
             next_day = 0
         t = date + timedelta(days=next_day, seconds=t)
+        if not self._in_local_time:
+            t = t.astimezone(pytz.timezone(self._tz))
         return t.isoformat()
