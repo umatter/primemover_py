@@ -356,3 +356,37 @@ class TypingMode(Behavior):
         else:
             raise TypeError(
                 f'mode must be type str')
+
+
+class TaskBehavior(Behavior):
+    def __init__(self, task):
+        self.task = task
+        super().__init__(name='task', value=self.task,
+                         description=f'This job is part of the task {self.task} ')
+
+    @property
+    def task(self):
+        return self._task
+
+    @task.setter
+    def task(self, val):
+        if type(val) is str:
+            self._task = val
+        else:
+            raise TypeError(
+                f'task must be type str')
+
+
+class FlagBehavior(Behavior):
+    def __init__(self, flag):
+        self.flag = flag
+        super().__init__(name='flag', value=self.flag,
+                         description="")
+
+    @property
+    def flag(self):
+        return self._flag
+
+    @flag.setter
+    def flag(self, val):
+        self._flag = val

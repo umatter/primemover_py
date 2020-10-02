@@ -4,6 +4,7 @@ import random as r
 
 class Queue:
     PASS_CRAWLER = False
+
     def __init__(self,
                  start_at,
                  name="",

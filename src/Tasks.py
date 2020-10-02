@@ -13,8 +13,13 @@ class GoogleSearch(Queue):
     Conduct a google search and scroll to the bottom of the page
     """
 
-    def __init__(self, term, start_at, name='GoogleSearch',
-                 description='Open Google, enter a search querry and select a result.'):
+    def __init__(self,
+                 term,
+                 start_at,
+                 name='GoogleSearch',
+                 description='Open Google, enter a search querry and select a result.',
+                 search_type=''
+                 ):
         self._search_term = term
         super().__init__(start_at=start_at,
                          name=name,
@@ -27,7 +32,10 @@ class GoogleSearch(Queue):
                                         selector="//input[@name='q']",
                                         selector_type='XPATH',
                                         send_return=True,
-                                        type_mode="SIMULATED_FIXINGTYPOS")
+                                        type_mode="SIMULATED_FIXINGTYPOS",
+                                        flag=search_type,
+                                        task=name),
+
                          )
         # Add Job to select a result randomly
         self.jobs.append(Jobs.SingleSelect(selector="LC20lb.DKV0Md",
@@ -128,7 +136,8 @@ class PoliticalSearch(GoogleSearch):
 
         super().__init__(term=term,
                          start_at=start_at,
-                         name='search_google_political')
+                         name='search_google_political',
+                         search_type='political')
 
 
 class VisitMedia(VisitDirect):

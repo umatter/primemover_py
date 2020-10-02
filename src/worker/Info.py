@@ -42,12 +42,12 @@ class BehaviorInfo(Info):
 class JobInfo(Info):
     ID = 0
 
-    def __init__(self, ID=None, user_id=None, queue_id=None, started=0,
+    def __init__(self, ID=None, user_id=None, queue_id=None, started_at=0,
                  sucess=0, failure=0, timeout=0, order=1, active=1,
                  created_at=None, updated_at=None):
         self.queue_id = queue_id
         self.job_id = ID
-        self.started = started
+        self.started_at = started_at
         self.success = sucess
         self.failure = failure
         self.timeout = timeout
@@ -70,19 +70,34 @@ class JobInfo(Info):
         else:
             self._job_id = value
 
+    @classmethod
+    def from_dict(cls, info_dict):
+        info_object = cls(info_dict.get('id'),
+                          user_id=info_dict.get('user_id'),
+                          queue_id=info_dict.get('queue_id'),
+                          started_at=info_dict.get('started_at'),
+                          sucess=info_dict.get('sucess'),
+                          failure=info_dict.get('failure'),
+                          order=info_dict.get('order'),
+                          created_at=info_dict.get('created_at'),
+                          updated_at=info_dict.get('updated_at'),
+                          active=info_dict.get('active')
+                          )
+        return info_object
+
 
 class QueueInfo(Info):
     ID = 0
 
-    def __init__(self, ID=None, user_id=None, crawler_id=None, started=0,
-                 sucess=0, failure=0, timeout=0, order=1, active=1,
-                 created_at=None, updated_at=None):
+    def __init__(self, ID=None, user_id=None, crawler_id=None, started_at=0,
+                 sucess=0, failure=0, order=1, active=1,
+                 created_at=None, updated_at=None, finished_at=None):
         self.queue_id = ID
         self.crawler_id = crawler_id
-        self.started = started
+        self.started_at = started_at
         self.success = sucess
         self.failure = failure
-        self.timeout = timeout
+        self.finished_at = finished_at
         self.order = order
         super().__init__(user_id=user_id, active=active, created_at=created_at,
                          updated_at=updated_at)
@@ -101,6 +116,22 @@ class QueueInfo(Info):
             self._queue_id = QueueInfo.ID
         else:
             self._queue_id = value
+
+    @classmethod
+    def from_dict(cls, info_dict):
+        info_object = cls(info_dict.get('id'),
+                          user_id=info_dict.get('user_id'),
+                          crawler_id=info_dict.get('crawler_id'),
+                          started_at=info_dict.get('started_at'),
+                          sucess=info_dict.get('sucess'),
+                          failure=info_dict.get('failure'),
+                          order=info_dict.get('order'),
+                          created_at=info_dict.get('created_at'),
+                          updated_at=info_dict.get('updated_at'),
+                          active=info_dict.get('active'),
+                          finished_at = info_dict.get('finished_at')
+                          )
+        return info_object
 
 
 class CrawlerInfo(Info):
@@ -132,8 +163,9 @@ class CrawlerInfo(Info):
     def as_dict(self):
         return {
             'id': self._crawler_id,
-            'agent_id': self._agent_id,
             'user_id': self._user_id,
+            'proxy_id':self._proxy_id,
+            'agent_id': self._agent_id,
             'configuration_id': self._configuration_id
         }
 
@@ -367,4 +399,3 @@ class Proxy:
                            port=proxy_dict.get('port'),
                            info=ProxyInfo.from_dict(proxy_dict))
         return proxy_object
-

@@ -7,11 +7,17 @@ class Job:
                  job_type,
                  name="",
                  description="",
+                 task=None,
+                 flag=None,
                  ):
         self.type = job_type
         self._description = description
         self._name = name
         self.behaviors = []
+        if task is not None:
+            self.behaviors.append(Behavior.TaskBehavior(task))
+        if flag is not None:
+            self.behaviors.append(Behavior.FlagBehavior(flag))
 
     # @property
     # def behaviors(self):
@@ -43,23 +49,27 @@ class Job:
 
 
 class VisitJob(Job):
-    def __init__(self, url):
+    def __init__(self, url,
+                 task=None,
+                 flag=None):
         """
         :param url: A valid URL to visit
         """
         super().__init__(job_type='visitjob', name='Visit',
-                         description=f'Visit {url}')
+                         description=f'Visit {url}', task=task, flag=flag)
         self.behaviors.append(Behavior.URL(url))
 
 
 class Wait(Job):
-    def __init__(self, time):
+    def __init__(self, time,
+                 task=None,
+                 flag=None):
         """
         :param time: Wait time in seconds
         :param start_at:
         """
         super().__init__(job_type='waitjob', name='Wait',
-                         description=f'Wait for {time} seconds')
+                         description=f'Wait for {time} seconds', task=task, flag=flag)
         self.behaviors.append(
             Behavior.WaitSeconds(time))
 
@@ -70,7 +80,9 @@ class EnterText(Job):
                  selector,
                  selector_type='XPATH',
                  send_return=True,
-                 type_mode="SIMULATED_NOTYPOS"
+                 type_mode="SIMULATED_NOTYPOS",
+                 task=None,
+                 flag=None
                  ):
         """
         :param text:
@@ -81,7 +93,7 @@ class EnterText(Job):
         """
         super().__init__(job_type='entertextfieldjob',
                          name='Enter Text',
-                         description=f'Enter text into the defined field')
+                         description=f'Enter text into the defined field', task=task, flag=flag)
         self.behaviors.append(Behavior.Text(text))
         self.behaviors.append(
             Behavior.SelectionType(selector_type))
@@ -95,7 +107,9 @@ class EnterText(Job):
 
 class SingleSelect(Job):
     def __init__(self, selector, selector_type='XPATH',
-                 decision_type='FIRST'):
+                 decision_type='FIRST',
+                 task=None,
+                 flag=None):
         """
         :param selector:
         :param selector_type:
@@ -103,7 +117,7 @@ class SingleSelect(Job):
         """
         super().__init__(job_type='singleselecturljob',
                          name='Select',
-                         description=f'Select an item and click')
+                         description=f'Select an item and click', task=task, flag=flag)
         self.behaviors.append(
             Behavior.SelectionType(selector_type))
         self.behaviors.append(
@@ -113,14 +127,16 @@ class SingleSelect(Job):
 
 
 class TryClick(Job):
-    def __init__(self, selector, selector_type='XPATH', ):
+    def __init__(self, selector, selector_type='XPATH',
+                 task=None,
+                 flag=None ):
         """
         :param selector:
         :param selector_type:
         """
         super().__init__(job_type='tryclickjob',
                          name='Try Click',
-                         description=f'Try to click a button/item')
+                         description=f'Try to click a button/item', task=task, flag=flag)
         self.behaviors.append(
             Behavior.SelectionType(selector_type))
         self.behaviors.append(
@@ -129,7 +145,9 @@ class TryClick(Job):
 
 class Scroll(Job):
     def __init__(self, direction='DOWN', duration=None,
-                 percentage=None):
+                 percentage=None,
+                 task=None,
+                 flag=None):
         """
             :param direction:
             :param duration: int
@@ -144,7 +162,7 @@ class Scroll(Job):
 
         super().__init__(job_type=f'scrollby{method}job',
                          name=f'Scroll by {method}',
-                         description=f'Scroll {direction.lower()}')
+                         description=f'Scroll {direction.lower()}', task=task, flag=flag)
         if method == 'length':
             self.behaviors.append(
                 Behavior.ScrollLength(percentage))

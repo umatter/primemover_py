@@ -30,11 +30,11 @@ class Crawler:
         self.configuration = configuration
         self.agent = agent
         if schedule is None:
-            self._schedule = TimeHandler(self.agent[0].location,
+            self._schedule = TimeHandler(self.agent.location,
                                          interval=120,
                                          bed_time=9 * 60 * 60,
                                          wake_time=7 * 60 * 60,
-                                         tomorrow=True)
+                                         day_delta=0)
 
         else:
             self._schedule = schedule
@@ -63,23 +63,17 @@ class Crawler:
 
     @property
     def agent(self):
-        return self._agents
+        return self._agent
 
     @agent.setter
-    def agent(self, agents_in):
-        if agents_in is None:
+    def agent(self, agent_in):
+        if agent_in is None:
             name = self._name.replace('Crawler', 'Agent')
             name = name.replace('crawler', 'agent')
-            self._agents = [Agent(name=name)]
-        elif type(agents_in) is list:
-            check_types = [type(val) is Agent for val in agents_in]
-            if False in check_types:
-                raise TypeError(
-                    'All entries in Agents must be of type Agent')
-            else:
-                self._agents = agents_in
-        elif type(agents_in) is Agent:
-            self._agents = [agents_in]
+            self._agent = Agent(name=name)
+
+        elif type(agent_in) is Agent:
+            self._agent = agent_in
         else:
             raise TypeError(
                 f'agents must be a list of or a single Agent object')
@@ -89,37 +83,35 @@ class Crawler:
         return self._proxy
 
     @proxy.setter
-    def proxy(self, proxies_in):
-        if proxies_in is None:
+    def proxy(self, proxy_in):
+        if proxy_in is None:
             name = self._name.replace('Crawler', 'Proxy')
             name = name.replace('crawler', 'proxy')
-            self._proxy = [Proxy(name=name)]
-        elif type(proxies_in) is list:
-            check_types = [type(val) is Proxy for val in proxies_in]
-            if False in check_types:
-                raise TypeError(
-                    'All entries in proxies must be of type Proxy')
-            else:
-                self._proxy = proxies_in
-        elif type(proxies_in) is Proxy:
-            self._proxy = [proxies_in]
+            self._proxy = Proxy(name=name)
+
+        elif type(proxy_in) is Proxy:
+            self._proxy = proxy_in
         else:
             raise TypeError(
                 f'proxies must be a list of or a single Proxy object')
 
-    def as_dict(self):
+    def as_dict(self, update=False):
         return_dict = {
             "name": self._name,
             "description": self._description,
             "active": self.active,
-            "testing": self._testing,
-            "configuration": [self._configuration.as_dict()],
-            "agent": [x.as_dict() for x in self.agent],
-            "proxy": [x.as_dict() for x in self.proxy],
-            "queues": [x.as_dict() for x in self.queues.values()]}
+            "testing": self._testing}
         if self._crawler_info is not None:
             for key, value in self._crawler_info.as_dict().items():
-                return_dict['key'] = value
+                return_dict[key] = value
+            # return_dict['agent_id'] = self.agent.id
+            # return_dict['configuration_id'] = self.configuration.id
+            # return_dict['proxy_id'] = self.proxy.id
+        else:
+            return_dict["configuration"] = [self._configuration.as_dict()]
+            return_dict["agent"] = [self.agent.as_dict()]
+            return_dict["proxy"] = [self.proxy.as_dict()]
+        return_dict["queues"] = [x.as_dict() for x in self.queues.values()]
         return return_dict
 
     @classmethod
@@ -153,7 +145,8 @@ class Crawler:
             start_at = self._schedule.new_time()
         if cls.PASS_CRAWLER:
             if params is not None:
-                new_queue_object = cls(crawler=self, start_at=start_at, **params)
+                new_queue_object = cls(crawler=self, start_at=start_at,
+                                       **params)
             else:
                 new_queue_object = cls(crawler=self, start_at=start_at)
         else:
@@ -195,11 +188,15 @@ class Crawler:
         if to_session is False:
             if time_list is not None:
                 for t in time_list:
-                    to_session = self.add_task(cls,params=params, start_at=t)
+                    to_session = self.add_task(cls, params=params, start_at=t)
             else:
                 for i in range(nr):
                     to_session = self.add_task(cls, params=params)
         else:
             for i in range(nr):
-                to_session = self.add_task(cls,to_session=to_session, params=params)
+                to_session = self.add_task(cls, to_session=to_session,
+                                           params=params)
         return to_session
+
+    def clear_day(self):
+        self.queues = {}

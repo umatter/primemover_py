@@ -211,7 +211,7 @@ class TimeHandler:
                  interval=600,
                  local_tz=time.tzname[0],
                  in_local_time=False,
-                 tomorrow=False):
+                 day_delta=0):
         """
         :param global_schedule:
         :param location: geosurf proxy location
@@ -219,7 +219,7 @@ class TimeHandler:
         :param bed_time: time in seconds when bot is to sleep e.g. 8:00 = 28800
         """
         self._global_schedule = TimeHandler.GLOBAL_SCHEDULE
-        self._tomorrow = tomorrow
+        self._day_delta = day_delta
         self._in_local_time = in_local_time
         self._location = location
         self._tz = TimeHandler.LOC_TIMEZONE_DICT.get(self._location)
@@ -252,11 +252,8 @@ class TimeHandler:
                                                                    minute=0,
                                                                    second=0,
                                                                    microsecond=0)
-        if self._tomorrow:
-            next_day = 1
-        else:
-            next_day = 0
-        t = date + timedelta(days=next_day, seconds=t)
+
+        t = date + timedelta(days=self._day_delta, seconds=t)
         if not self._in_local_time:
             t = t.astimezone(pytz.timezone(self._tz))
         return t.isoformat()
