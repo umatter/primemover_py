@@ -19,23 +19,32 @@ class Crawler:
                  active=1,
                  schedule=None,
                  testing=0,
-                 crawler_info=None
+                 crawler_info=None,
+                 flag=None,
                  ):
+        self.flag = flag
         self._description = description
         if name is None:
-            self._name = f'Crawler_{Crawler.CRAWLER_NR}'
+            if self._flag is not None:
+                self._name = f'Crawler_{Crawler.CRAWLER_NR}/{self._flag}'
+            else:
+                self._name = f'Crawler_{Crawler.CRAWLER_NR}'
             Crawler.CRAWLER_NR += 1
         else:
             self._name = name
+        if self._flag is None and self._name is not None:
+            split_name = self._name.split('/')
+            if len(split_name) > 0:
+                self.flag = split_name[1]
+
         self.configuration = configuration
         self.agent = agent
         if schedule is None:
             self._schedule = TimeHandler(self.agent.location,
                                          interval=120,
-                                         bed_time=9 * 60 * 60,
-                                         wake_time=7 * 60 * 60,
+                                         wake_time=10 * 60 * 60,
+                                         bed_time=14 * 60 * 60,
                                          day_delta=0)
-
         else:
             self._schedule = schedule
         self.queues = {}
@@ -55,7 +64,8 @@ class Crawler:
     @configuration.setter
     def configuration(self, config):
         if config is None:
-            self._configuration = Config()
+            self._configuration = Config(
+                name=self._name.replace('Crawler', 'Config'))
         elif type(config) is Config:
             self._configuration = config
         else:
@@ -70,7 +80,8 @@ class Crawler:
         if agent_in is None:
             name = self._name.replace('Crawler', 'Agent')
             name = name.replace('crawler', 'agent')
-            self._agent = Agent(name=name)
+            self._agent = Agent(name=name,
+                                location=self._configuration.location)
 
         elif type(agent_in) is Agent:
             self._agent = agent_in
@@ -125,16 +136,16 @@ class Crawler:
 
     @classmethod
     def _single_crawler(cls, crawler_dict):
-        proxy_object = cls(name=crawler_dict.get('name'),
-                           description=crawler_dict.get('description'),
-                           configuration=Config.from_dict(
-                               crawler_dict['configuration']),
-                           agent=Agent.from_dict(crawler_dict.get('agent')),
-                           proxy=Proxy.from_dict(crawler_dict.get('proxy')),
-                           crawler_info=CrawlerInfo.from_dict(crawler_dict)
-                           )
+        crawler_object = cls(name=crawler_dict.get('name'),
+                             description=crawler_dict.get('description'),
+                             configuration=Config.from_dict(
+                                 crawler_dict['configuration']),
+                             agent=Agent.from_dict(crawler_dict.get('agent')),
+                             proxy=Proxy.from_dict(crawler_dict.get('proxy')),
+                             crawler_info=CrawlerInfo.from_dict(crawler_dict)
+                             )
 
-        return proxy_object
+        return crawler_object
 
     def add_task(self, cls, to_session=None, params=None, start_at=None):
 

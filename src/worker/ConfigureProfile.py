@@ -8,6 +8,8 @@ import json
 class Config:
     MEDIA_DEFAULT_PATH = None
     TERM_DEFAULT_PATH = None
+    with open("resources/other/geosurf_cities.json", 'r') as file:
+        LOCATION_LIST = list(json.load(file).keys())
 
     def __init__(self,
                  name=None,
@@ -18,12 +20,13 @@ class Config:
                  pi=None,
                  alpha=None,
                  tau=None,
+                 lambd=None,
                  beta=None,
                  kappa=None,
                  media=None,
                  terms=None,
                  location=None,
-                 info=None
+                 info=None,
                  ):
         """
         :param path_media_outlets: path, csv containing media outlet data
@@ -41,6 +44,10 @@ class Config:
         self._name = name
         self._description = description
         self._info = info
+        if '/' in self._name:
+            self._flag = self._name.split('/')[1]
+        else:
+            self._flag = None
 
         self.psi = psi
         self.pi = pi
@@ -118,7 +125,7 @@ class Config:
     @pi.setter
     def pi(self, value):
         if value is None:
-            self._pi = C.Pi()
+            self._pi = C.Pi(self._flag)
         else:
             self._pi = float(value)
 
@@ -196,8 +203,8 @@ class Config:
         return self._terms
 
     @terms.setter
-    def terms(self, term_list):
-        if term_list is None:
+    def terms(self, term_dict):
+        if term_dict is None:
             all_terms_tbl = pd.read_csv(self.path_terms, header=0,
                                         usecols=['search_term', 'pi_p'])
             selected_terms = C.SelectSearchTerms(term_pi_tbl=all_terms_tbl,
@@ -208,8 +215,8 @@ class Config:
             self._terms = {}
             for term, pi in selected_terms:
                 self._terms[term] = pi
-        elif type(term_list) is list and len(term_list) > 0:
-            self._terms = term_list
+        elif type(term_dict) is dict:
+            self._terms = term_dict
         else:
             raise TypeError(
                 f'terms should be a list type object containing search terms')
@@ -220,7 +227,13 @@ class Config:
 
     @location.setter
     def location(self, val):
-        self._location = val
+        if val is None:
+            self._location = C.location()
+        elif val in Config.LOCATION_LIST:
+            self._location = val
+        else:
+            raise ValueError(
+                f'{val} is not a valid location see geosurf cities')
 
     def __str__(self):
         config_discr = \

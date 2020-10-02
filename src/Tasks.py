@@ -6,6 +6,7 @@ import random as r
 import src.Preferences as Pref
 from src.ConfigurationFunctions import NoiseUtility
 import numpy as np
+import json
 
 
 class GoogleSearch(Queue):
@@ -174,3 +175,11 @@ class VisitMedia(VisitDirect):
 
         super().__init__(outlet_url=url,
                          start_at=start_at)
+
+
+class VisitFrequentDirect(VisitDirect):
+    def __init__(self, start_at, file_path='resources/other/most_visited.json'):
+        with open(file_path, 'r') as file:
+            urls = json.load(file)
+        url = r.choice(urls)
+        super().__init__(outlet_url=url, start_at=start_at)

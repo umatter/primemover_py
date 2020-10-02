@@ -6,9 +6,11 @@ import json
 Use this file or copies of it to control how the Config class generates user profiles
 """
 
-with open("resources/other/geosurf_cities.json", 'r') as file:
-    LOCATION_LIST = list(json.load(file).keys())
+with open("resources/other/testrun_10Oct2020_hometowns.json", 'r') as file:
+    LOCATION_LIST = json.load(file)
 
+# with open("resources/other/geosurf_cities.json", 'r') as file:
+#     LOCATION_LIST = list(json.load(file).keys())
 
 def Psi():
     """
@@ -17,11 +19,16 @@ def Psi():
     return r.normalvariate(0, 1)
 
 
-def Pi():
+def Pi(flag=None):
     """
     :return pi: political orientation of individual i
     """
-    return r.uniform(-1, 1)
+    if flag is None or flag == 'political' or flag == 'none':
+        return r.uniform(-1, 1)
+    elif flag == 'left':
+        return r.uniform(-1, 0)
+    elif flag == 'right':
+        return r.uniform(0, 1)
 
 
 def NoiseUtility():
@@ -49,7 +56,7 @@ def SelectSearchTerms(pi_i, term_pi_tbl, k, alpha_hat, tau_hat_ik):
     return terms
 
 
-def SelectMediaOutlets(url_pi_tbl=None, alpha_tilde=0, k=20, tau_tilde_ij=1, pi_i=0):
+def SelectMediaOutlets(url_pi_tbl=None, alpha_tilde=0, k=10, tau_tilde_ij=1, pi_i=0):
     # Base on pi, K known outlets,
     utilities = []
     for row in range(len(url_pi_tbl)):
@@ -95,7 +102,7 @@ def kappa():
     """
     :return kappa: binary {0,1}, indicates  whether ind. can be persuaded
     """
-    return 0
+    return 1
 
 
 def location():

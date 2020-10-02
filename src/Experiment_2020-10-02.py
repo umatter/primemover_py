@@ -1,7 +1,7 @@
 from src.worker.Crawler import *
 from src.GenerateBenignTerms import GenerateBenignTerms
 from src.worker.TimeHandler import Schedule
-from datetime import datetime,timedelta
+from datetime import datetime
 from src.worker import gdelt_gkg as gkg
 import src.worker.api_wrapper as api
 
@@ -10,28 +10,37 @@ PATH_MEDIA_OUTLETS = "/Users/johannes/Dropbox/websearch_polarization/data/final/
 PATH_INDIVIDUAL_ORG = 'resources/other/individuals.json'
 PATH_BENGING_TERMS = 'resources/other/benign_terms.json'
 
+with open("resources/other/testrun_10Oct2020_hometowns.json", 'r') as file:
+    LOCATION_LIST = json.load(file)
 
 if __name__ == "__main__":
     gkg.main(50)
     GenerateBenignTerms()
 
-    existing_crawler_path = f'resources/crawlers/existing_{(datetime.now().date() + timedelta(days=-1)).isoformat()}.json'
-    TimeHandler.GLOBAL_SCHEDULE = Schedule(start_at=8 * 60 * 60,
-                                           end_at=(8 + 23) * 60 * 60)
-
+    TimeHandler.GLOBAL_SCHEDULE = Schedule(start_at=10 * 60 * 60,
+                                           end_at=(10 + 23) * 60 * 60)
     Config.MEDIA_DEFAULT_PATH = PATH_MEDIA_OUTLETS
     Config.TERM_DEFAULT_PATH = PATH_TERMS
 
-    with open(existing_crawler_path, 'r') as file:
-        raw_crawlers = json.load(file)
-    crawler_list_combined = Crawler.from_dict(json.loads(raw_crawlers))
-    crawler_list_neutral = []
-    crawler_list_political = []
-    for crawler in crawler_list_combined:
-        if crawler.flag in {'right','left'}:
-            crawler_list_political.append(crawler)
-        else:
-            crawler_list_neutral.append(crawler)
+    # generate neutral crawlers
+    config_list_neutral = [
+        Config(name='Config/neutral', location=l, pi=0, media={}, terms={}) for
+        l in LOCATION_LIST]
+    crawler_list_neutral = [Crawler(flag='neutral', configuration=c) for c in
+                            config_list_neutral]
+
+    # generate left wing crawlers
+    config_list_left = [Config(name='Config/left', location=l) for l in
+                        LOCATION_LIST]
+    crawler_list_political = [Crawler(flag='left', configuration=c) for c in
+                              config_list_left]
+
+    # generate right wing crawlers
+    config_list_right = [
+        Config(name='Config/right', location=left_config.location,
+               pi=- left_config.pi) for left_config in config_list_left]
+    crawler_list_political += [Crawler(flag='right', configuration=c) for c in
+                               config_list_right]
 
     with open(PATH_INDIVIDUAL_ORG, 'r') as file:
         neutral = json.load(file)[0]
@@ -78,7 +87,9 @@ if __name__ == "__main__":
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
-    # return_data = api.push_new(path="resources/examples/test_crawler_py.json")
+    return_data = api.push_new(path="resources/examples/test_crawler_py.json")
     #
-    # with open(f'resources/crawlers/existing_{datetime.now().date().isoformat()}.json', 'w') as file:
-    #     json.dump(return_data.text, file, indent='  ')
+    with open(
+            f'resources/crawlers/exp_1_{datetime.now().date().isoformat()}.json',
+            'w') as file:
+        json.dump(return_data.text, file, indent='  ')
