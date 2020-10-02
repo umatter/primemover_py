@@ -1,0 +1,483 @@
+[
+  {
+    "name": "Just a crawler update 5",
+    "id": 14,
+    "description": "Crawler updated through API",
+    "active": 1,
+    "testing": 0,
+    "user_id": 3,
+    "configuration_id": 3,
+    "proxy_id": 3,
+    "agent_id": 3,
+    "queues": [
+      {
+        "name": "GoogleSearc 123",
+        "description": "Open Google, enter a search querry and select a result.",
+        "start_at": "2020-09-18T18:35:40.468229+02:00",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.google.com",
+            "behaviors": [
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "https://www.google.com"
+              }
+            ]
+          },
+          {
+            "name": "Enter Text",
+            "type": "entertextfieldjob",
+            "description": "Enter text into the defined field",
+            "behaviors": [
+              {
+                "name": "text",
+                "description": "Text to enter",
+                "value": "meth effects"
+              },
+              {
+                "name": "selectionType",
+                "description": "Type of selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "//input[@name='q']"
+              },
+              {
+                "name": "appendReturn",
+                "description": "Optional field: appends a return key after the text given if true.",
+                "value": true
+              },
+              {
+                "name": "typingMode",
+                "description": "Optional field: How the text is entered into the field",
+                "value": "SIMULATED_FIXINGTYPOS"
+              }
+            ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "selectionType",
+                "description": "Type of selection",
+                "value": "CLASS"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "LC20lb.DKV0Md"
+              },
+              {
+                "name": "decisionType",
+                "description": "Decision type for choosing an item out of the list given by the selector is RANDOM",
+                "value": "RANDOM"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "length",
+                "description": "Scroll 80.0 of window.",
+                "value": 80.0
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "GoogleSearch",
+        "description": "Open Google, enter a search querry and select a result.",
+        "start_at": "2020-09-18T19:23:29.780228+02:00",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.google.com",
+            "behaviors": [
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "https://www.google.com"
+              }
+            ]
+          },
+          {
+            "name": "Enter Text",
+            "type": "entertextfieldjob",
+            "description": "Enter text into the defined field",
+            "behaviors": [
+              {
+                "name": "text",
+                "description": "Text to enter",
+                "value": "the wall"
+              },
+              {
+                "name": "selectionType",
+                "description": "Type of selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "//input[@name='q']"
+              },
+              {
+                "name": "appendReturn",
+                "description": "Optional field: appends a return key after the text given if true.",
+                "value": true
+              },
+              {
+                "name": "typingMode",
+                "description": "Optional field: How the text is entered into the field",
+                "value": "SIMULATED_FIXINGTYPOS"
+              }
+            ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "selectionType",
+                "description": "Type of selection",
+                "value": "CLASS"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "LC20lb.DKV0Md"
+              },
+              {
+                "name": "decisionType",
+                "description": "Decision type for choosing an item out of the list given by the selector is RANDOM",
+                "value": "RANDOM"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "length",
+                "description": "Scroll 80.0 of window.",
+                "value": 80.0
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Visit Direct",
+        "description": "Visit a media outlet and scroll for 2-3 minutes.",
+        "start_at": "2020-09-18T19:57:52.245481+02:00",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.vox.com/",
+            "behaviors": [
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "https://www.vox.com/"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "scrollDuration",
+                "description": "Scroll for 131.55690500238825 seconds.",
+                "value": 131.55690500238825
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Visit Direct",
+        "description": "Visit a media outlet and scroll for 2-3 minutes.",
+        "start_at": "2020-09-18T20:07:00.072087+02:00",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://mashable.com/",
+            "behaviors": [
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "https://mashable.com/"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "scrollDuration",
+                "description": "Scroll for 175.72263938106144 seconds.",
+                "value": 175.72263938106144
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Visit Direct",
+        "description": "Visit a media outlet and scroll for 2-3 minutes.",
+        "start_at": "2020-09-18T20:20:18.273104+02:00",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.amazon.com",
+            "behaviors": [
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "https://www.amazon.com"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "scrollDuration",
+                "description": "Scroll for 120.08846097683738 seconds.",
+                "value": 120.08846097683738
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "GoogleSearch",
+        "description": "Open Google, enter a search querry and select a result.",
+        "start_at": "2020-09-18T20:24:07.660336+02:00",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.google.com",
+            "behaviors": [
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "https://www.google.com"
+              }
+            ]
+          },
+          {
+            "name": "Enter Text",
+            "type": "entertextfieldjob",
+            "description": "Enter text into the defined field",
+            "behaviors": [
+              {
+                "name": "text",
+                "description": "Text to enter",
+                "value": "Johns Hopkins johns hopkins university"
+              },
+              {
+                "name": "selectionType",
+                "description": "Type of selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "//input[@name='q']"
+              },
+              {
+                "name": "appendReturn",
+                "description": "Optional field: appends a return key after the text given if true.",
+                "value": true
+              },
+              {
+                "name": "typingMode",
+                "description": "Optional field: How the text is entered into the field",
+                "value": "SIMULATED_FIXINGTYPOS"
+              }
+            ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "selectionType",
+                "description": "Type of selection",
+                "value": "CLASS"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "LC20lb.DKV0Md"
+              },
+              {
+                "name": "decisionType",
+                "description": "Decision type for choosing an item out of the list given by the selector is RANDOM",
+                "value": "RANDOM"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "length",
+                "description": "Scroll 80.0 of window.",
+                "value": 80.0
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "GoogleSearch",
+        "description": "Open Google, enter a search querry and select a result.",
+        "start_at": "2020-09-18T20:28:12.758310+02:00",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.google.com",
+            "behaviors": [
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "https://www.google.com"
+              }
+            ]
+          },
+          {
+            "name": "Enter Text",
+            "type": "entertextfieldjob",
+            "description": "Enter text into the defined field",
+            "behaviors": [
+              {
+                "name": "text",
+                "description": "Text to enter",
+                "value": "Donald Trump democratic party"
+              },
+              {
+                "name": "selectionType",
+                "description": "Type of selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "//input[@name='q']"
+              },
+              {
+                "name": "appendReturn",
+                "description": "Optional field: appends a return key after the text given if true.",
+                "value": true
+              },
+              {
+                "name": "typingMode",
+                "description": "Optional field: How the text is entered into the field",
+                "value": "SIMULATED_FIXINGTYPOS"
+              }
+            ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "selectionType",
+                "description": "Type of selection",
+                "value": "CLASS"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "LC20lb.DKV0Md"
+              },
+              {
+                "name": "decisionType",
+                "description": "Decision type for choosing an item out of the list given by the selector is RANDOM",
+                "value": "RANDOM"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "length",
+                "description": "Scroll 80.0 of window.",
+                "value": 80.0
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
