@@ -9,8 +9,10 @@ Use this file or copies of it to control how the Config class generates user pro
 with open("resources/other/testrun_10Oct2020_hometowns.json", 'r') as file:
     LOCATION_LIST = json.load(file)
 
+
 # with open("resources/other/geosurf_cities.json", 'r') as file:
-#     LOCATION_LIST = list(json.load(file).keys())
+#     LOCATION_LIST = list(j
+#     son.load(file).keys())
 
 def Psi():
     """
@@ -56,7 +58,8 @@ def SelectSearchTerms(pi_i, term_pi_tbl, k, alpha_hat, tau_hat_ik):
     return terms
 
 
-def SelectMediaOutlets(url_pi_tbl=None, alpha_tilde=0, k=10, tau_tilde_ij=1, pi_i=0):
+def SelectMediaOutlets(url_pi_tbl=None, alpha_tilde=0, k=10, tau_tilde_ij=1,
+                       pi_i=0):
     # Base on pi, K known outlets,
     utilities = []
     for row in range(len(url_pi_tbl)):

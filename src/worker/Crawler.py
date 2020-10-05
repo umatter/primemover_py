@@ -25,14 +25,14 @@ class Crawler:
         self.flag = flag
         self._description = description
         if name is None:
-            if self._flag is not None:
-                self._name = f'Crawler_{Crawler.CRAWLER_NR}/{self._flag}'
+            if self.flag is not None:
+                self._name = f'Crawler_{Crawler.CRAWLER_NR}/{self.flag}'
             else:
                 self._name = f'Crawler_{Crawler.CRAWLER_NR}'
             Crawler.CRAWLER_NR += 1
         else:
             self._name = name
-        if self._flag is None and self._name is not None:
+        if self.flag is None and self._name is not None:
             split_name = self._name.split('/')
             if len(split_name) > 0:
                 self.flag = split_name[1]
@@ -130,6 +130,9 @@ class Crawler:
         if 'crawlers' in crawler_dict.keys():
             crawlers = [cls._single_crawler(ind_crawler) for
                         ind_crawler in crawler_dict['crawlers']]
+        elif 'data' in crawler_dict.keys():
+            crawlers = [cls._single_crawler(ind_crawler) for
+                        ind_crawler in crawler_dict['data']]
         else:
             crawlers = [cls._single_crawler(crawler_dict)]
         return crawlers
@@ -138,8 +141,7 @@ class Crawler:
     def _single_crawler(cls, crawler_dict):
         crawler_object = cls(name=crawler_dict.get('name'),
                              description=crawler_dict.get('description'),
-                             configuration=Config.from_dict(
-                                 crawler_dict['configuration']),
+                             configuration=Config.from_dict(crawler_dict.get('configuration')),
                              agent=Agent.from_dict(crawler_dict.get('agent')),
                              proxy=Proxy.from_dict(crawler_dict.get('proxy')),
                              crawler_info=CrawlerInfo.from_dict(crawler_dict)

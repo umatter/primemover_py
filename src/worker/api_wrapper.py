@@ -11,8 +11,20 @@ def push_new(path='resources/examples/test_crawler_py.json'):
     post_crawlers = requests.post(DOMAIN + 'load', json=data_crawlers)
     return post_crawlers
 
-def fetch_results(path = f'resources/raw_data/{datetime.today().date().isoformat()}.json'):
+
+def fetch_results(
+        path=f'resources/raw_data/{datetime.today().date().isoformat()}.json'):
     raw_data = requests.get(DOMAIN + 'queues-processed')
     raw_dict = raw_data.json()
     with open(path, 'w') as f:
         json.dump(raw_dict, f, indent='  ')
+
+
+def fetch_all_crawlers(
+        path=f'resources/crawlers/{datetime.today().date().isoformat()}.json'):
+    raw_data = requests.get(DOMAIN + 'crawlers')
+    raw_dict = raw_data.json()
+    with open(path, 'w') as f:
+        json.dump(raw_dict, f, indent='  ')
+
+

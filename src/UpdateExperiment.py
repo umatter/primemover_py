@@ -15,7 +15,7 @@ if __name__ == "__main__":
     gkg.main(50)
     GenerateBenignTerms()
 
-    existing_crawler_path = f'resources/crawlers/existing_{(datetime.now().date() + timedelta(days=-1)).isoformat()}.json'
+    existing_crawler_path = f'resources/crawlers/existing_{(datetime.now().date() + timedelta(days=-2)).isoformat()}.json'
     TimeHandler.GLOBAL_SCHEDULE = Schedule(start_at=8 * 60 * 60,
                                            end_at=(8 + 23) * 60 * 60)
 
@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     with open(existing_crawler_path, 'r') as file:
         raw_crawlers = json.load(file)
-    crawler_list_combined = Crawler.from_dict(json.loads(raw_crawlers))
+    crawler_list_combined = Crawler.from_dict(raw_crawlers)
     crawler_list_neutral = []
     crawler_list_political = []
     for crawler in crawler_list_combined:
@@ -52,33 +52,40 @@ if __name__ == "__main__":
 
         individual.add_task(VisitMedia, to_session=session_id)
 
-        individual.add_task(GoogleSearch, to_session=session_id,
-                            params={'term': random.choice(benign)})
+        individual.add_task(GoogleSearch,
+                            to_session=session_id,
+                            params={'term': random.choice(benign),
+                                    'search_type': 'benign'})
 
         individual.add_task(VisitFrequentDirect, to_session=session_id)
 
+        individual.add_task(VisitMedia, to_session=session_id)
+
         individual.add_task(GoogleSearch, to_session=session_id,
-                            params={'term': neutral})
+                            params={'term': neutral,
+                                    'search_type': 'neutral'})
 
     for individual in crawler_list_neutral:
-
         session_id = individual.add_task(VisitFrequentDirect, to_session=True)
 
         individual.add_task(GoogleSearch, to_session=session_id,
-                            params={'term': random.choice(benign)})
+                            params={'term': random.choice(benign),
+                                    'search_type': 'neutral'})
 
-        session_id = individual.add_task(VisitFrequentDirect, to_session=session_id)
+        session_id = individual.add_task(VisitFrequentDirect,
+                                         to_session=session_id)
 
         individual.add_task(GoogleSearch, to_session=session_id,
-                            params={'term': neutral})
+                            params={'term': neutral,
+                                    'search_type':'neutral'})
 
     crawler_list = crawler_list_neutral + crawler_list_political
 
-    with open("resources/examples/test_crawler_py.json", 'w') as file:
+    with open("resources/examples/test_update_py.json", 'w') as file:
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
-    # return_data = api.push_new(path="resources/examples/test_crawler_py.json")
-    #
-    # with open(f'resources/crawlers/existing_{datetime.now().date().isoformat()}.json', 'w') as file:
-    #     json.dump(return_data.text, file, indent='  ')
+    return_data = api.push_new(path="resources/examples/test_crawler_py.json")
+    data_as_dict = json.loads(return_data.text)
+    with open(f'resources/updates/{datetime.now().date().isoformat()}.json', 'w') as file:
+        json.dump(data_as_dict, file, indent='  ')

@@ -212,14 +212,15 @@ class Config:
                                                  pi_i=self._pi,
                                                  tau_hat_ik=self.tau,
                                                  alpha_hat=self.alpha)
-            self._terms = {}
             for term, pi in selected_terms:
                 self._terms[term] = pi
+        elif type(term_dict) is list:
+            self._terms = term_dict
         elif type(term_dict) is dict:
             self._terms = term_dict
         else:
             raise TypeError(
-                f'terms should be a list type object containing search terms')
+                f'terms should be a dict type object containing search terms')
 
     @property
     def location(self):
@@ -297,7 +298,6 @@ class Config:
                             location=config_dict['params'][0].get('location'),
                             info=ConfigurationInfo.from_dict(config_dict)
                             )
-
         return config_object
 
 
