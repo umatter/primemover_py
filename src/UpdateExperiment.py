@@ -1,7 +1,7 @@
 from src.worker.Crawler import *
 from src.GenerateBenignTerms import GenerateBenignTerms
 from src.worker.TimeHandler import Schedule
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 from src.worker import gdelt_gkg as gkg
 import src.worker.api_wrapper as api
 
@@ -10,12 +10,11 @@ PATH_MEDIA_OUTLETS = "/Users/johannes/Dropbox/websearch_polarization/data/final/
 PATH_INDIVIDUAL_ORG = 'resources/other/individuals.json'
 PATH_BENGING_TERMS = 'resources/other/benign_terms.json'
 
-
 if __name__ == "__main__":
     gkg.main(50)
     GenerateBenignTerms()
 
-    existing_crawler_path = f'resources/crawlers/existing_{(datetime.now().date() + timedelta(days=-2)).isoformat()}.json'
+    existing_crawler_path = f'resources/crawlers/existing_{(datetime.now().date() + timedelta(days=-3)).isoformat()}.json'
     TimeHandler.GLOBAL_SCHEDULE = Schedule(start_at=8 * 60 * 60,
                                            end_at=(8 + 23) * 60 * 60)
 
@@ -28,7 +27,7 @@ if __name__ == "__main__":
     crawler_list_neutral = []
     crawler_list_political = []
     for crawler in crawler_list_combined:
-        if crawler.flag in {'right','left'}:
+        if crawler.flag in {'right', 'left'}:
             crawler_list_political.append(crawler)
         else:
             crawler_list_neutral.append(crawler)
@@ -77,7 +76,7 @@ if __name__ == "__main__":
 
         individual.add_task(GoogleSearch, to_session=session_id,
                             params={'term': neutral,
-                                    'search_type':'neutral'})
+                                    'search_type': 'neutral'})
 
     crawler_list = crawler_list_neutral + crawler_list_political
 
@@ -85,7 +84,8 @@ if __name__ == "__main__":
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
-    return_data = api.push_new(path="resources/examples/test_crawler_py.json")
+    return_data = api.push_new(path="resources/examples/test_update_py.json")
     data_as_dict = json.loads(return_data.text)
-    with open(f'resources/updates/{datetime.now().date().isoformat()}.json', 'w') as file:
+    with open(f'resources/updates/{datetime.now().date().isoformat()}.json',
+              'w') as file:
         json.dump(data_as_dict, file, indent='  ')

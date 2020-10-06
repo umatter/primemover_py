@@ -1,3 +1,5 @@
+tldextract
+beautifulsoup4
 pytz
 numpy
 requests

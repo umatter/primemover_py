@@ -1,6 +1,9 @@
 import requests
 import json
 from datetime import datetime
+import gzip
+import io
+import zipfile
 
 DOMAIN = "https://siaw.qlick.ch/api/v1/"
 
@@ -28,3 +31,14 @@ def fetch_all_crawlers(
         json.dump(raw_dict, f, indent='  ')
 
 
+def fetch_html(url):
+    r = requests.get(url)
+    zipdata = io.BytesIO(r.content)
+    as_zipfile = zipfile.ZipFile(zipdata)
+    name = None
+    for name in as_zipfile.namelist():
+        if 'html' in name:
+            break
+    raw_html = as_zipfile.read(name)
+
+    return raw_html

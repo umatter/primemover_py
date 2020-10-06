@@ -1,3 +1,6 @@
+import tldextract
+
+
 def EscapeStrings(text):
     """
     :param text: string
@@ -18,3 +21,16 @@ def new_key(dictionary):
     while key in dictionary.keys():
         key += 1
     return key
+
+
+def extract_domain(url):
+    """
+    :param url:
+    :return: domain
+    """
+    try:
+        split = tldextract.extract(url)
+    except TypeError:
+        raise TypeError(f'{url} is strange')
+    domain = split.domain + '.' + split.suffix
+    return domain
