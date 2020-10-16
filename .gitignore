@@ -1,2 +1,9 @@
 /resources/other/keys.json
 /resources/examples/test_crawler_py.json
+/resources/cleaned_data
+/resources/crawlers
+/resources/raw_data
+/resources/raw_html
+/resources/updates
+/resources/input_data
+Dockerfile

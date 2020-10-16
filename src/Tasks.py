@@ -33,15 +33,15 @@ class GoogleSearch(Queue):
                                         selector="//input[@name='q']",
                                         selector_type='XPATH',
                                         send_return=True,
-                                        type_mode="SIMULATED_FIXINGTYPOS",
+                                        type_mode="DIRECT",
                                         flag=search_type,
                                         task=name),
 
                          )
         # Add Job to select a result randomly
-        self.jobs.append(Jobs.SingleSelect(selector="LC20lb.DKV0Md",
-                                           selector_type='CLASS',
-                                           decision_type="RANDOM"
+        self.jobs.append(Jobs.SingleSelect(selector="#rso > div > div > div.yuRUbf > a",
+                                           selector_type='CSS',
+                                           decision_type="FIRST"
                                            )
                          )
 
@@ -175,6 +175,13 @@ class VisitMedia(VisitDirect):
 
         super().__init__(outlet_url=url,
                          start_at=start_at)
+
+
+class NeutralGoogleSearch(GoogleSearch):
+    def __init__(self, term, start_at):
+        super().__init__(term=term, name='search_google_neutral',
+                         start_at=start_at,
+                         search_type='political')
 
 
 class VisitFrequentDirect(VisitDirect):

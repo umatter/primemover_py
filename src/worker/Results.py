@@ -1,7 +1,8 @@
 from src.Parser import *
 from src.worker import api_wrapper
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
+from src.worker.Crawler import Crawler
 
 
 class JobResult:
@@ -24,13 +25,20 @@ class JobResult:
         self._extract_flags()
         self._reports = reports
 
-        if self._task in ParserDict.keys() and len(self._reports) > 0:
-            raw_data = self._download_reports()
-            self._parsed_data = ParserDict[self._task](raw_data)
-            self.results = {'finished_at': self._finished_at,
-                            'status_code': self._status_code,
-                            'status_message': self._status_message,
-                            'flag': self._flag, 'data': self._parsed_data}
+        if self._task in ParserDict.keys():
+            if len(self._reports) > 0:
+                raw_data = self._download_reports()
+                self._parsed_data = ParserDict[self._task](self._behaviors,
+                                                           raw_data)
+                self.results = {'finished_at': self._finished_at,
+                                'status_code': self._status_code,
+                                'status_message': self._status_message,
+                                'flag': self._flag, 'data': self._parsed_data}
+            else:
+                self.results = {'finished_at': self._finished_at,
+                                'status_code': self._status_code,
+                                'status_message': self._status_message,
+                                'flag': self._flag, 'data': None}
         else:
             self.results = None
 
@@ -117,21 +125,20 @@ class SessionResult:
                 self.results.append(res)
 
     @classmethod
-    def from_list(cls, result_list):
+    def from_list(cls, result_list, set_reviewed=True):
         session_results = [cls.from_dict(ind_session) for ind_session in
                            result_list]
-        set_reviewed = []
-        for session in session_results:
-            if session._reviewed == 0:
-                set_reviewed.append(session._queue_id)
+        if set_reviewed:
+            for sess in session_results:
+                api_wrapper.set_reviewed(sess._queue_id)
 
-        return session_results, set_reviewed
+        return session_results
 
     @classmethod
     def from_dict(cls, result_dict):
         session_result_object = cls(crawler_id=result_dict.get("crawler_id"),
                                     started_at=result_dict.get("started_at"),
-                                    queue_id=result_dict.get("queue_id"),
+                                    queue_id=result_dict.get("id"),
                                     name=result_dict.get("name"),
                                     description=result_dict.get("description"),
                                     active=result_dict.get("active"),
@@ -152,21 +159,71 @@ class SessionResult:
         return session_result_object
 
 
+def export_results(results, date=datetime.today().date().isoformat()):
+
+    existing_crawler_path = f'resources/updates/{(datetime.now().date() + timedelta(days=-1)).isoformat()}.json'
+    out_path = f'resources/cleaned_data/with_crawler_{date}.json'
+    with open(existing_crawler_path, 'r') as file:
+        crawlers = Crawler.from_dict(json.load(file))
+    combined = []
+    for crawler in crawlers:
+        crawler_dict = crawler.as_dict()
+        key = crawler_dict['id']
+        crawler_dict['results'] = results.get(key)
+        combined.append(crawler_dict)
+    with open(out_path, 'w') as file:
+        json.dump(combined, file, indent='  ')
+
+
 if __name__ == "__main__":
-    path = f'resources/raw_data/{datetime.today().date().isoformat()}.json'
+    # api_wrapper.fetch_results()
+    # path = f'resources/raw_data/{datetime.today().date().isoformat()}.json'
+    path = f'resources/raw_data/2020-10-15.json'
+
     with open(path, 'r') as file:
         raw_data = json.load(file)
-    session_data, to_set_review = SessionResult.from_list(raw_data['data'])
+    session_data = SessionResult.from_list(raw_data['data'], set_reviewed=False)
 
-    combined_sessions = {}
+    # combined_sessions = {}
+    # for session in session_data:
+    #     if session.crawler_id in combined_sessions.keys():
+    #         combined_sessions[session.crawler_id] = combined_sessions[
+    #                                                     session.crawler_id] + session.results
+    #     else:
+    #         combined_sessions[session.crawler_id] = session.results
+    #
+    # with open(
+    #         f'resources/cleaned_data/{datetime.today().date().isoformat()}.json',
+    #         'w') as file:
+    #     json.dump(combined_sessions, file, indent='  ')
+    # export_results(combined_sessions)
+
+    combined_session_1 = {}
+    combined_session_2 = {}
     for session in session_data:
-        if session.crawler_id in combined_sessions.keys():
-            combined_sessions[session.crawler_id] = combined_sessions[
-                                                        session.crawler_id] + session.results
-        else:
-            combined_sessions[session.crawler_id] = session.results
+        if "10-14" in session._start_at:
+
+            if session.crawler_id in combined_session_1.keys():
+                combined_session_1[session.crawler_id] = combined_session_1[
+                                                            session.crawler_id] + session.results
+            else:
+                combined_session_1[session.crawler_id] = session.results
+        elif "10-15" in session._start_at:
+
+            if session.crawler_id in combined_session_2.keys():
+                combined_session_2[session.crawler_id] = combined_session_2[
+                                                            session.crawler_id] + session.results
+            else:
+                combined_session_2[session.crawler_id] = session.results
 
     with open(
-            f'resources/cleaned_data/{datetime.today().date().isoformat()}.json',
+            f'resources/cleaned_data/2020-10-15.json',
             'w') as file:
-        json.dump(combined_sessions, file, indent='  ')
+        json.dump(combined_session_1, file, indent='  ')
+    export_results(combined_session_1, '2020-10-1')
+
+    with open(
+            f'resources/cleaned_data/2020-10-16.json',
+            'w') as file:
+        json.dump(combined_session_2, file, indent='  ')
+    export_results(combined_session_2, date='2020-10-16')

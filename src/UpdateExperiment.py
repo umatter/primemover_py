@@ -14,7 +14,7 @@ if __name__ == "__main__":
     gkg.main(50)
     GenerateBenignTerms()
 
-    existing_crawler_path = f'resources/crawlers/existing_{(datetime.now().date() + timedelta(days=-3)).isoformat()}.json'
+    existing_crawler_path = f'resources/updates/{(datetime.now().date() + timedelta(days=-1)).isoformat()}.json'
     TimeHandler.GLOBAL_SCHEDULE = Schedule(start_at=8 * 60 * 60,
                                            end_at=(8 + 23) * 60 * 60)
 

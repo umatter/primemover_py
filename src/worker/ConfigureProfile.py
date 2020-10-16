@@ -1,4 +1,5 @@
 import src.ConfigurationFunctions as C
+from src.worker import api_wrapper
 import os
 import pandas as pd
 from src.worker.Info import ConfigurationInfo
@@ -6,16 +7,16 @@ import json
 
 
 class Config:
-    MEDIA_DEFAULT_PATH = None
-    TERM_DEFAULT_PATH = None
+    MEDIA_DEFAULT_PATH = 'resources/input_data/outlets.json'
+    TERM_DEFAULT_PATH = 'resources/input_data/terms.json'
     with open("resources/other/geosurf_cities.json", 'r') as file:
         LOCATION_LIST = list(json.load(file).keys())
 
     def __init__(self,
                  name=None,
                  description=None,
-                 path_media_outlets="/Users/johannes/Dropbox/websearch_polarization/data/final/outlets_pool.csv",
-                 path_terms="/Users/johannes/Dropbox/websearch_polarization/data/final/searchterms_pool.csv",
+                 path_media_outlets="resources/input_data/outlets.json",
+                 path_terms="resources/input_data/terms.json",
                  psi=None,
                  pi=None,
                  alpha=None,
@@ -147,7 +148,10 @@ class Config:
         elif os.path.exists(path):
             self._path_media_outlets = path
         else:
-            raise ValueError(f'No such file exists {path}')
+            outlets = api_wrapper.get_outlets()
+            with open(path, 'w') as file:
+                json.dump(outlets, file, indent='  ')
+            self._path_media_outlets = path
 
     @property
     def path_terms(self):
@@ -167,7 +171,10 @@ class Config:
         elif os.path.exists(path):
             self._path_terms = path
         else:
-            raise ValueError(f'No such file exists {path}')
+            res = api_wrapper.get_terms()
+            with open(path, 'w') as file:
+                json.dump(res, file, indent='  ')
+            self._path_terms = 'resources/input_data/terms.json'
 
     @property
     def media(self):
@@ -176,9 +183,25 @@ class Config:
     @media.setter
     def media(self, media_in):
         if media_in is None:
-            all_media_tbl = pd.read_csv(self.path_media_outlets, header=0,
-                                        usecols=['redirect_url', 'pi',
-                                                 'avg_reach_permillion'])
+            # all_media_tbl = pd.read_csv(self.path_media_outlets, header=0,
+            #             #                             usecols=['redirect_url', 'pi',
+            #             #                                      'avg_reach_permillion'])
+            with open(self.path_media_outlets, 'r') as file:
+                all_media_tbl = pd.DataFrame.from_records(json.load(file),
+                                                          columns=[
+                                                              'redirect_url',
+                                                              'pi',
+                                                              'avg_reach_permillion',
+                                                              'source'])
+            all_media_tbl = \
+            all_media_tbl.loc[all_media_tbl['source'] == 'gdelt_gfg'][[
+                'redirect_url',
+                'pi',
+                'avg_reach_permillion']]
+            all_media_tbl['pi'] = all_media_tbl['pi'].astype(float)
+            all_media_tbl['avg_reach_permillion'] = all_media_tbl[
+                'avg_reach_permillion'].astype(float)
+
             all_media_tbl.rename(columns={'redirect_url': 'url', 'pi': 'pi',
                                           'avg_reach_permillion': 'e^rho'},
                                  inplace=True)
@@ -205,13 +228,21 @@ class Config:
     @terms.setter
     def terms(self, term_dict):
         if term_dict is None:
-            all_terms_tbl = pd.read_csv(self.path_terms, header=0,
-                                        usecols=['search_term', 'pi_p'])
+            # all_terms_tbl = pd.read_csv(self.path_terms, header=0,
+            #                             usecols=['search_term', 'pi_p'])
+            with open(self.path_terms, 'r') as file:
+                all_terms_tbl = pd.DataFrame.from_records(json.load(file),
+                                                          columns=[
+                                                              'search_term',
+                                                              'pi_p'])
+            all_terms_tbl['pi_p'] = all_terms_tbl['pi_p'].astype(float)
+
             selected_terms = C.SelectSearchTerms(term_pi_tbl=all_terms_tbl,
                                                  k=30,
                                                  pi_i=self._pi,
                                                  tau_hat_ik=self.tau,
                                                  alpha_hat=self.alpha)
+            self._terms = {}
             for term, pi in selected_terms:
                 self._terms[term] = pi
         elif type(term_dict) is list:

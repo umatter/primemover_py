@@ -14,8 +14,8 @@ with open("resources/other/testrun_10Oct2020_hometowns.json", 'r') as file:
     LOCATION_LIST = json.load(file)
 
 if __name__ == "__main__":
-    gkg.main(50)
-    GenerateBenignTerms()
+    # gkg.main(50)
+    # GenerateBenignTerms()
 
     TimeHandler.GLOBAL_SCHEDULE = Schedule(start_at=10 * 60 * 60,
                                            end_at=(10 + 23) * 60 * 60,
@@ -91,7 +91,6 @@ if __name__ == "__main__":
                                     'search_type': 'neutral'})
 
     crawler_list = crawler_list_neutral + crawler_list_political
-
     with open("resources/examples/test_crawler_py.json", 'w') as file:
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
