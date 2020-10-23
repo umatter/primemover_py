@@ -7,3 +7,5 @@
 /resources/updates
 /resources/input_data
 Dockerfile
+/resources/keys/
+/resources/election_experiment

@@ -154,8 +154,9 @@ class CrawlerInfo(Info):
     @crawler_id.setter
     def crawler_id(self, value):
         if value is None:
-            CrawlerInfo.ID += 1
-            self._crawler_id = CrawlerInfo.ID
+            # CrawlerInfo.ID += 1
+            # self._crawler_id = CrawlerInfo.ID
+            self._crawler_id = None
 
         else:
             self._crawler_id = value

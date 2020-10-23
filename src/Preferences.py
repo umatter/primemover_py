@@ -134,7 +134,7 @@ def choose_result(results, outlets, pi):
         utilities.append(u + epsilon)
     # convert utilities to probabilites of selecting
     probabilities = prob_i(utilities)
-    # conduct experiment to select single result
+    # conduct experiment_id to select single result
     results_idx = np.random.multinomial(1, probabilities).argmax()
 
     return results[results_idx]

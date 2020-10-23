@@ -45,6 +45,7 @@ def fetch_all_crawlers(
 
 
 def fetch_html(url):
+    print(url)
     r = requests.get(url)
     zipdata = io.BytesIO(r.content)
     as_zipfile = zipfile.ZipFile(zipdata)

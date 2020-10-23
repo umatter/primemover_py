@@ -1,4 +1,4 @@
-import src.ConfigurationFunctions as C
+import src.OldExperiments.ConfigurationFunctions as C
 from src.worker import api_wrapper
 import os
 import pandas as pd
@@ -15,12 +15,13 @@ class Config:
     def __init__(self,
                  name=None,
                  description=None,
+                 path_media_outlets="resources/input_data/outlets.json",
+                 path_terms="resources/input_data/terms.json",
                  psi=None,
                  pi=None,
-                 path_media_outlets=None,
-                 path_terms=None,
                  alpha=None,
                  tau=None,
+                 lambd=None,
                  beta=None,
                  kappa=None,
                  media=None,
@@ -158,19 +159,7 @@ class Config:
 
     @path_terms.setter
     def path_terms(self, path):
-        if type(path) is list:
-            for p in path:
-                if not os.path.exists(p):
-                    raise ValueError(
-                        f'Invalid path in list')
-            self._path_terms = path
-        elif type(path) is dict:
-            for p in path.values():
-                if not os.path.exists(p):
-                    raise ValueError(
-                        f'Invalid path in list')
-            self._path_terms = path
-        elif path is None:
+        if path is None:
             if Config.TERM_DEFAULT_PATH is None:
                 raise ValueError(
                     f'No terms outlet path passed, with no default set')
@@ -194,45 +183,43 @@ class Config:
     @media.setter
     def media(self, media_in):
         if media_in is None:
-            all_media_tbl = pd.read_csv(self.path_media_outlets)
-            self._media = C.SelectMediaOutlets(outlets_twitter=all_media_tbl,
-                                               pi=self._pi)
+            # all_media_tbl = pd.read_csv(self.path_media_outlets, header=0,
+            #             #                             usecols=['redirect_url', 'pi',
+            #             #                                      'avg_reach_permillion'])
+            with open(self.path_media_outlets, 'r') as file:
+                all_media_tbl = pd.DataFrame.from_records(json.load(file),
+                                                          columns=[
+                                                              'redirect_url',
+                                                              'pi',
+                                                              'avg_reach_permillion',
+                                                              'source'])
+            all_media_tbl = \
+            all_media_tbl.loc[all_media_tbl['source'] == 'gdelt_gfg'][[
+                'redirect_url',
+                'pi',
+                'avg_reach_permillion']]
+            all_media_tbl['pi'] = all_media_tbl['pi'].astype(float)
+            all_media_tbl['avg_reach_permillion'] = all_media_tbl[
+                'avg_reach_permillion'].astype(float)
+
+            all_media_tbl.rename(columns={'redirect_url': 'url', 'pi': 'pi',
+                                          'avg_reach_permillion': 'e^rho'},
+                                 inplace=True)
+
+            media_selection = C.SelectMediaOutlets(pi_i=self.pi,
+                                                   alpha_tilde=self.alpha,
+                                                   url_pi_tbl=all_media_tbl,
+                                                   tau_tilde_ij=self.tau,
+                                                   k=10)
+            self._media = {}
+            for url, pi, rho in media_selection:
+                self._media[url] = {"pi": pi, "rho": rho}
+
         elif type(media_in) in {list, dict}:
             self._media = media_in
         else:
             raise TypeError(
                 f'Media should be a list type object containing unique identifiers of online media outlets')
-            # all_media_tbl = pd.read_csv(self.path_media_outlets, header=0,
-            #             #                             usecols=['redirect_url', 'pi',
-            #             #                                      'avg_reach_permillion'])
-            # with open(self.path_media_outlets, 'r') as file:
-            #     all_media_tbl = pd.DataFrame.from_records(json.load(file),
-            #                                               columns=[
-            #                                                   'redirect_url',
-            #                                                   'pi',
-            #                                                   'avg_reach_permillion',
-            #                                                   'source'])
-            # all_media_tbl = \
-            # all_media_tbl.loc[all_media_tbl['source'] == 'gdelt_gfg'][[
-            #     'redirect_url',
-            #     'pi',
-            #     'avg_reach_permillion']]
-            # all_media_tbl['pi'] = all_media_tbl['pi'].astype(float)
-            # all_media_tbl['avg_reach_permillion'] = all_media_tbl[
-            #     'avg_reach_permillion'].astype(float)
-            #
-            # all_media_tbl.rename(columns={'redirect_url': 'url', 'pi': 'pi',
-            #                               'avg_reach_permillion': 'e^rho'},
-            #                      inplace=True)
-            #
-            # media_selection = C.SelectMediaOutlets(pi_i=self.pi,
-            #                                        alpha_tilde=self.alpha,
-            #                                        url_pi_tbl=all_media_tbl,
-            #                                        tau_tilde_ij=self.tau,
-            #                                        k=10)
-            # self._media = {}
-            # for url, pi, rho in media_selection:
-            #     self._media[url] = {"pi": pi, "rho": rho}
 
     @property
     def terms(self):
@@ -241,26 +228,23 @@ class Config:
     @terms.setter
     def terms(self, term_dict):
         if term_dict is None:
-            instagram = pd.read_csv(self.path_terms['instagram'])
-            bigram = pd.read_csv(self.path_terms['bigrams'])
-            self._terms = C.SelectSearchTerms(bigram, instagram, pi=self._pi)
             # all_terms_tbl = pd.read_csv(self.path_terms, header=0,
             #                             usecols=['search_term', 'pi_p'])
-            # with open(self.path_terms, 'r') as file:
-            #     all_terms_tbl = pd.DataFrame.from_records(json.load(file),
-            #                                               columns=[
-            #                                                   'search_term',
-            #                                                   'pi_p'])
-            # all_terms_tbl['pi_p'] = all_terms_tbl['pi_p'].astype(float)
-            #
-            # selected_terms = C.SelectSearchTerms(term_pi_tbl=all_terms_tbl,
-            #                                      k=30,
-            #                                      pi_i=self._pi,
-            #                                      tau_hat_ik=self.tau,
-            #                                      alpha_hat=self.alpha)
-            # self._terms = {}
-            # for term, pi in selected_terms:
-            #     self._terms[term] = pi
+            with open(self.path_terms, 'r') as file:
+                all_terms_tbl = pd.DataFrame.from_records(json.load(file),
+                                                          columns=[
+                                                              'search_term',
+                                                              'pi_p'])
+            all_terms_tbl['pi_p'] = all_terms_tbl['pi_p'].astype(float)
+
+            selected_terms = C.SelectSearchTerms(term_pi_tbl=all_terms_tbl,
+                                                 k=30,
+                                                 pi_i=self._pi,
+                                                 tau_hat_ik=self.tau,
+                                                 alpha_hat=self.alpha)
+            self._terms = {}
+            for term, pi in selected_terms:
+                self._terms[term] = pi
         elif type(term_dict) is list:
             self._terms = term_dict
         elif type(term_dict) is dict:

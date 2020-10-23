@@ -6,19 +6,11 @@ import json
 Use this file or copies of it to control how the Config class generates user profiles
 """
 
-with open("resources/other/testrun_10Oct2020_hometowns.json", 'r') as file:
-    LOCATION_LIST = json.load(file)
-
-
-# with open("resources/other/geosurf_cities.json", 'r') as file:
-#     LOCATION_LIST = list(j
-#     son.load(file).keys())
-
 def Psi():
     """
     :return: float in [0,1], individuals persuadability
     """
-    return r.normalvariate(0, 1)
+    return 0
 
 
 def Pi(flag=None):
@@ -26,11 +18,11 @@ def Pi(flag=None):
     :return pi: political orientation of individual i
     """
     if flag is None or flag == 'political' or flag == 'none':
-        return r.uniform(-1, 1)
+        return 0
     elif flag == 'left':
-        return r.uniform(-1, 0)
+        return -1
     elif flag == 'right':
-        return r.uniform(0, 1)
+        return 1
 
 
 def NoiseUtility():
@@ -40,44 +32,33 @@ def NoiseUtility():
     return r.normalvariate(0, 1)
 
 
-def SelectSearchTerms(pi_i, term_pi_tbl, k, alpha_hat, tau_hat_ik):
-    utilities = []
-    for row in term_pi_tbl.index:
-        term_k, pi_hat_k = term_pi_tbl.loc[row]
-        # epsilon_ik = NoiseUtility()
-        utilities.append((search_utility_v_ik(pi_i=pi_i,
-                                              pi_hat_k=pi_hat_k,
-                                              epsilon_ik=0,
-                                              alpha_hat=alpha_hat,
-                                              tau_hat_ik=tau_hat_ik), term_k,
-                          pi_hat_k))
-    utilities.sort()
-    max_K = utilities[-k:]
-    terms = [(b, c) for a, b, c in max_K]
+def SelectSearchTerms(terms_bigrams, terms_instagram, pi):
+    if pi == -1:
+        terms_instagram = terms_instagram.loc[terms_instagram['party'] == 'D']
+        terms_bigrams = terms_bigrams.loc[terms_bigrams['party'] == 'D']
+    elif pi == 1:
+        terms_instagram = terms_instagram.loc[terms_instagram['party'] == 'R']
+        terms_bigrams = terms_bigrams.loc[terms_bigrams['party'] == 'R']
+    else:
+        return {'bigrams': [], 'instagram': []}
+    indexes_bigram = r.choices(terms_bigrams.index, k=10)
+    indexes_insta = r.choices(terms_instagram.index, k=10)
+    terms = {'bigrams': terms_bigrams.loc[indexes_bigram]['search_term'].tolist(),
+             'instagram': terms_instagram.loc[indexes_insta]['hashtag'].tolist()}
     return terms
 
 
-def SelectMediaOutlets(url_pi_tbl=None, alpha_tilde=0, k=10, tau_tilde_ij=1,
-                       pi_i=0):
-    # Base on pi, K known outlets,
-    utilities = []
-    for row in url_pi_tbl.index:
-        outlet, pi_tilde_j, exp_rho = url_pi_tbl.loc[row]
-        # epsilon_ik = NoiseUtility()
-        if exp_rho < 0.000000000000000000001:
-            continue
-        rho = math.log(exp_rho)
-
-        utilities.append(((media_utility_u_ij(pi_i=pi_i,
-                                              pi_tilde_j=pi_tilde_j,
-                                              epsilon_ij=0,
-                                              alpha_tilde=alpha_tilde,
-                                              rho_j=rho,
-                                              tau_tilde_ij=tau_tilde_ij)),
-                          outlet, pi_tilde_j, rho))
-    utilities.sort()
-    max_K = utilities[-k:]
-    outlets = [(url, pi, rho) for util, url, pi, rho in max_K]
+def SelectMediaOutlets(outlets_twitter=None, pi=0):
+    outlets = {}
+    if pi == -1:
+        outlets_twitter = outlets_twitter.loc[outlets_twitter['party'] == 'D']
+    elif pi == 1:
+        outlets_twitter = outlets_twitter.loc[outlets_twitter['party'] == 'R']
+    else:
+        return {}
+    index = r.choices(outlets_twitter.index, k=10)
+    for i in index:
+        outlets[outlets_twitter.loc[i]['domain']] = outlets_twitter.loc[i]['url']
     return outlets
 
 
@@ -111,6 +92,5 @@ def kappa():
 
 
 def location():
-    LOCATION_LIST = ["US-OK-OKLAHOMA_CITY", "US-CA-SAN_FRANCISCO",
-                     "US-NY-NEW_YORK", "US-MA-BOSTON"]
-    return random.choice(LOCATION_LIST)
+
+    return None

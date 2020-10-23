@@ -1,8 +1,6 @@
 from src.worker.ConfigureProfile import *
 from src.worker.Info import Agent, Proxy, CrawlerInfo
 from src.worker.TimeHandler import TimeHandler
-from src.Preferences import *
-from src.worker.Queue import Queue
 from src.Tasks import *
 import src.worker.Utilities as Util
 
@@ -21,6 +19,7 @@ class Crawler:
                  testing=0,
                  crawler_info=None,
                  flag=None,
+                 experiment_id=None
                  ):
         self.flag = flag
         self._description = description
@@ -42,8 +41,8 @@ class Crawler:
         if schedule is None:
             self._schedule = TimeHandler(self.agent.location,
                                          interval=120,
-                                         wake_time=10 * 60 * 60,
-                                         bed_time=14 * 60 * 60,
+                                         wake_time=9 * 60 * 60,
+                                         bed_time=16 * 60 * 60,
                                          day_delta=0)
         else:
             self._schedule = schedule
@@ -52,6 +51,7 @@ class Crawler:
         self.active = active
         self._testing = testing
         self._crawler_info = crawler_info
+        self.experiment_id = experiment_id
 
     @property
     def schedule(self):
@@ -111,7 +111,8 @@ class Crawler:
             "name": self._name,
             "description": self._description,
             "active": self.active,
-            "testing": self._testing}
+            "testing": self._testing,
+            "experiment_id": self.experiment_id}
         if self._crawler_info is not None:
             for key, value in self._crawler_info.as_dict().items():
                 return_dict[key] = value
@@ -124,6 +125,14 @@ class Crawler:
             return_dict["proxy"] = [self.proxy.as_dict()]
         return_dict["queues"] = [x.as_dict() for x in self.queues.values()]
         return return_dict
+
+    @classmethod
+    def from_list(cls, crawler_list):
+
+        crawlers = [cls._single_crawler(ind_crawler) for
+                        ind_crawler in crawler_list]
+        return crawlers
+
 
     @classmethod
     def from_dict(cls, crawler_dict):
@@ -141,10 +150,12 @@ class Crawler:
     def _single_crawler(cls, crawler_dict):
         crawler_object = cls(name=crawler_dict.get('name'),
                              description=crawler_dict.get('description'),
-                             configuration=Config.from_dict(crawler_dict.get('configuration')),
+                             configuration=Config.from_dict(
+                                 crawler_dict.get('configuration')),
                              agent=Agent.from_dict(crawler_dict.get('agent')),
                              proxy=Proxy.from_dict(crawler_dict.get('proxy')),
-                             crawler_info=CrawlerInfo.from_dict(crawler_dict)
+                             crawler_info=CrawlerInfo.from_dict(crawler_dict),
+                             experiment_id=crawler_dict.get('experiment_id'),
                              )
 
         return crawler_object

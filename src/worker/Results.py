@@ -161,7 +161,7 @@ class SessionResult:
 
 def export_results(results, date=datetime.today().date().isoformat()):
 
-    existing_crawler_path = f'resources/updates/{(datetime.now().date() + timedelta(days=-1)).isoformat()}.json'
+    existing_crawler_path = f'resources/updates/exp_2_{(datetime.now().date() + timedelta(days=-1)).isoformat()}.json'
     out_path = f'resources/cleaned_data/with_crawler_{date}.json'
     with open(existing_crawler_path, 'r') as file:
         crawlers = Crawler.from_dict(json.load(file))
@@ -176,54 +176,54 @@ def export_results(results, date=datetime.today().date().isoformat()):
 
 
 if __name__ == "__main__":
-    # api_wrapper.fetch_results()
-    # path = f'resources/raw_data/{datetime.today().date().isoformat()}.json'
-    path = f'resources/raw_data/2020-10-15.json'
+    api_wrapper.fetch_results()
+    path = f'resources/raw_data/{datetime.today().date().isoformat()}.json'
+    # path = f'resources/raw_data/2020-10-15.json'
 
     with open(path, 'r') as file:
         raw_data = json.load(file)
-    session_data = SessionResult.from_list(raw_data['data'], set_reviewed=False)
+    session_data = SessionResult.from_list(raw_data['data'], set_reviewed=True)
 
-    # combined_sessions = {}
+    combined_sessions = {}
+    for session in session_data:
+        if session.crawler_id in combined_sessions.keys():
+            combined_sessions[session.crawler_id] = combined_sessions[
+                                                        session.crawler_id] + session.results
+        else:
+            combined_sessions[session.crawler_id] = session.results
+
+    with open(
+            f'resources/cleaned_data/{datetime.today().date().isoformat()}.json',
+            'w') as file:
+        json.dump(combined_sessions, file, indent='  ')
+    export_results(combined_sessions)
+
+    # combined_session_1 = {}
+    # combined_session_2 = {}
     # for session in session_data:
-    #     if session.crawler_id in combined_sessions.keys():
-    #         combined_sessions[session.crawler_id] = combined_sessions[
-    #                                                     session.crawler_id] + session.results
-    #     else:
-    #         combined_sessions[session.crawler_id] = session.results
+    #     if "10-14" in session._start_at:
+    #
+    #         if session.crawler_id in combined_session_1.keys():
+    #             combined_session_1[session.crawler_id] = combined_session_1[
+    #                                                         session.crawler_id] + session.results
+    #         else:
+    #             combined_session_1[session.crawler_id] = session.results
+    #     elif "10-15" in session._start_at:
+    #
+    #         if session.crawler_id in combined_session_2.keys():
+    #             combined_session_2[session.crawler_id] = combined_session_2[
+    #                                                         session.crawler_id] + session.results
+    #         else:
+    #             combined_session_2[session.crawler_id] = session.results
     #
     # with open(
-    #         f'resources/cleaned_data/{datetime.today().date().isoformat()}.json',
+    #         f'resources/cleaned_data/2020-10-15.json',
     #         'w') as file:
-    #     json.dump(combined_sessions, file, indent='  ')
-    # export_results(combined_sessions)
-
-    combined_session_1 = {}
-    combined_session_2 = {}
-    for session in session_data:
-        if "10-14" in session._start_at:
-
-            if session.crawler_id in combined_session_1.keys():
-                combined_session_1[session.crawler_id] = combined_session_1[
-                                                            session.crawler_id] + session.results
-            else:
-                combined_session_1[session.crawler_id] = session.results
-        elif "10-15" in session._start_at:
-
-            if session.crawler_id in combined_session_2.keys():
-                combined_session_2[session.crawler_id] = combined_session_2[
-                                                            session.crawler_id] + session.results
-            else:
-                combined_session_2[session.crawler_id] = session.results
-
-    with open(
-            f'resources/cleaned_data/2020-10-15.json',
-            'w') as file:
-        json.dump(combined_session_1, file, indent='  ')
-    export_results(combined_session_1, '2020-10-1')
-
-    with open(
-            f'resources/cleaned_data/2020-10-16.json',
-            'w') as file:
-        json.dump(combined_session_2, file, indent='  ')
-    export_results(combined_session_2, date='2020-10-16')
+    #     json.dump(combined_session_1, file, indent='  ')
+    # export_results(combined_session_1, '2020-10-1')
+    #
+    # with open(
+    #         f'resources/cleaned_data/2020-10-16.json',
+    #         'w') as file:
+    #     json.dump(combined_session_2, file, indent='  ')
+    # export_results(combined_session_2, date='2020-10-16')

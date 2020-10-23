@@ -19,7 +19,8 @@ class GoogleSearch(Queue):
                  start_at,
                  name='GoogleSearch',
                  description='Open Google, enter a search querry and select a result.',
-                 search_type=''
+                 search_type='',
+                 select_result=False
                  ):
         self._search_term = term
         super().__init__(start_at=start_at,
@@ -33,21 +34,23 @@ class GoogleSearch(Queue):
                                         selector="//input[@name='q']",
                                         selector_type='XPATH',
                                         send_return=True,
-                                        type_mode="DIRECT",
+                                        type_mode="SIMULATED_FIXINGTYPOS",
                                         flag=search_type,
                                         task=name),
 
                          )
         # Add Job to select a result randomly
-        self.jobs.append(Jobs.SingleSelect(selector="#rso > div > div > div.yuRUbf > a",
-                                           selector_type='CSS',
-                                           decision_type="FIRST"
-                                           )
-                         )
+        if select_result:
+            self.jobs.append(
+                Jobs.SingleSelect(selector="#rso > div > div > div.yuRUbf > a",
+                                  selector_type='CSS',
+                                  decision_type="FIRST"
+                                  )
+            )
 
-        # Add Job to scroll down 80% of the visited page
-        self.jobs.append(Jobs.Scroll(direction='DOWN',
-                                     percentage=80))
+            # Add Job to scroll down 80% of the visited page
+            self.jobs.append(Jobs.Scroll(direction='DOWN',
+                                         percentage=80))
 
 
 class VisitDirect(Queue):
@@ -111,8 +114,10 @@ class PoliticalSearch(GoogleSearch):
     Conduct a google political search and scroll to the bottom of the page
     """
 
-    def __init__(self, crawler, start_at):
+    def __init__(self, crawler, start_at, term_type=None):
         terms = crawler.configuration.terms
+        if term_type is not None:
+            terms = terms.get(term_type)
         pi_i = crawler.configuration.pi
         alpha_hat = crawler.configuration.alpha
         tau_hat_ik = crawler.configuration.tau
@@ -138,7 +143,8 @@ class PoliticalSearch(GoogleSearch):
         super().__init__(term=term,
                          start_at=start_at,
                          name='search_google_political',
-                         search_type='political')
+                         search_type='political',
+                         select_result=True)
 
 
 class VisitMedia(VisitDirect):
@@ -181,7 +187,16 @@ class NeutralGoogleSearch(GoogleSearch):
     def __init__(self, term, start_at):
         super().__init__(term=term, name='search_google_neutral',
                          start_at=start_at,
-                         search_type='political')
+                         search_type='neutral',
+                         select_result=True)
+
+
+class BenignGoogleSearch(GoogleSearch):
+    def __init__(self, term, start_at):
+        super().__init__(term=term, name='search_google_benign',
+                         start_at=start_at,
+                         search_type='benign',
+                         select_result=False)
 
 
 class VisitFrequentDirect(VisitDirect):
@@ -190,3 +205,50 @@ class VisitFrequentDirect(VisitDirect):
             urls = json.load(file)
         url = r.choice(urls)
         super().__init__(outlet_url=url, start_at=start_at)
+
+
+class PoliticalSearchNoUtility(GoogleSearch):
+    PASS_CRAWLER = True
+    """
+    Conduct a google political search and scroll to the bottom of the page
+    """
+
+    def __init__(self, crawler, start_at, term_type=None):
+        terms = crawler.configuration.terms
+        if term_type is not None:
+            terms = terms.get(term_type)
+
+        super().__init__(term=r.choice(terms),
+                         start_at=start_at,
+                         name='search_google_political_no_utility',
+                         search_type='political_' + term_type,
+                         select_result=True)
+
+
+class VisitMediaGoogleNoUtility(GoogleSearch):
+    PASS_CRAWLER = True
+    """
+    Conduct a google political search and scroll to the bottom of the page
+    """
+
+    def __init__(self, crawler, start_at):
+        media = crawler.configuration.media
+        domain = r.choice(list(media.keys()))
+        super().__init__(term=domain,
+                         start_at=start_at,
+                         name='search_google_political_media_no_utility',
+                         search_type='political_media',
+                         select_result=True)
+
+
+class VisitMediaNoUtility(VisitDirect):
+    PASS_CRAWLER = True
+    """
+    Conduct a google political search and scroll to the bottom of the page
+    """
+
+    def __init__(self, crawler, start_at):
+        media = crawler.configuration.media
+        url = r.choice(list(media.values()))
+        super().__init__(outlet_url=url,
+                         start_at=start_at)

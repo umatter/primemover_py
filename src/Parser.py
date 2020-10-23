@@ -33,3 +33,8 @@ def GoogleParser(behaviors, raw_html):
 
 ParserDict['GoogleSearch'] = GoogleParser
 ParserDict['search_google_political'] = GoogleParser
+ParserDict['search_google_political_media_no_utility'] = GoogleParser
+ParserDict['search_google_politica_no_utility'] = GoogleParser
+ParserDict['search_google_neutral'] = GoogleParser
+
+
