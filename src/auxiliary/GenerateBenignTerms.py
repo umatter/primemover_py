@@ -1,5 +1,9 @@
-import pandas as pd
-from datetime import date
+"""
+Generate benign Terms
+
+J.L. 11.2020
+"""
+
 import json
 import random
 
@@ -9,57 +13,14 @@ COL_NAMES = ['term_params',
              'source',
              'domain'
              'political_orientation']
-OUT_PATH = {'right': 'Data/terms/right_terms.json',
-            'left': 'resources/other/left_terms.json',
-            'benign': 'resources/other/benign_terms.json'}
-
-DELETE_TERMS = ['Video:', 'Breaking:', 'Watch: ']
-
-
-def clean_token(token):
-    """ Return a version of string str in which all letters have been
-    converted to lowercase and punctuation characters have been stripped
-    from both ends. Inner punctuation is left untouched. """
-    punctuation = '''!"'`’‘,;:-?)([]<>*#'''
-    token = token.strip(punctuation)
-    return token
-
-
-def clean_header(header):
-    header = header.replace('\n', ' ')
-    header = header.replace('\r', ' ')
-    header = header.replace('\t', ' ')
-    header = header.replace('.', '')
-    header = header.lower()
-    tokens = header.split(' ')
-    result = ''
-    for token in tokens:
-        result = result + clean_token(token) + ' '
-
-    return result.strip()
-
-
-def GenerateSearchTerms(in_path=IN_PATH):
-    today = pd.Timestamp(date.today())
-    headers = pd.read_csv(IN_PATH, header=0, parse_dates=['date_scraped'])
-    headers = headers.loc[headers['date_scraped'] == today]
-    terms = {'right': [], 'left': []}
-    for row in headers.itertuples():
-        term = clean_header(row.search_term)
-        terms[row.political_orientation] = \
-            terms[row.political_orientation] + \
-            [{'term': term, 'choice_type': 'domain', 'choice_param': row.domain, 'type': 'political'}]
-    with open(OUT_PATH['right'], 'w') as jar:
-        json.dump(terms['right'], jar)
-
-    with open(OUT_PATH['left'], 'w') as jar:
-        json.dump(terms['left'], jar)
+OUT_PATH = {'benign': 'resources/other/benign_terms.json'}
 
 
 def conversion():
     units = {'fluid': ['ounces', 'liters', 'ml', 'tbsps', 'tsps', 'gallons'],
              'weight': ['pounds', 'kilos', 'grams', 'ounces', 'tons', 'ounces'],
-             'distance': ['miles', 'nautical miles', 'inches', 'feet', 'cm', 'mm',
+             'distance': ['miles', 'nautical miles', 'inches', 'feet', 'cm',
+                          'mm',
                           'meters', 'kilometers', 'light years'],
              'currency': ['yen', 'dollars', 'euros', 'swiss franc',
                           'rupee', 'singapore dollars', 'dirham',
@@ -73,7 +34,7 @@ def conversion():
 
 
 def equation():
-    operations = ['+','-','/']
+    operations = ['+', '-', '/']
     nr_op = random.randint(1, 3)
     ops = random.choices(operations, k=nr_op)
     eq = str(random.randint(1, 1000))

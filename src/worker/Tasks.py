@@ -225,6 +225,19 @@ class PoliticalSearchNoUtility(GoogleSearch):
                          select_result=True)
 
 
+class VisitMediaNoUtility(VisitDirect):
+    PASS_CRAWLER = True
+    """
+    Conduct a google political search and scroll to the bottom of the page
+    """
+
+    def __init__(self, crawler, start_at):
+        media = crawler.configuration.media
+        url = r.choice(list(media.values()))
+        super().__init__(outlet_url=url,
+                         start_at=start_at)
+
+
 class VisitMediaGoogleNoUtility(GoogleSearch):
     PASS_CRAWLER = True
     """
@@ -241,14 +254,75 @@ class VisitMediaGoogleNoUtility(GoogleSearch):
                          select_result=True)
 
 
-class VisitMediaNoUtility(VisitDirect):
-    PASS_CRAWLER = True
+class BrowserLeaks(Queue):
     """
-    Conduct a google political search and scroll to the bottom of the page
+        Visit browserleaks.com and retrive all content
     """
 
-    def __init__(self, crawler, start_at):
-        media = crawler.configuration.media
-        url = r.choice(list(media.values()))
-        super().__init__(outlet_url=url,
-                         start_at=start_at)
+    def __init__(self, start_at):
+        super().__init__(start_at=start_at,
+                         name='BrowserLeaks',
+                         description='Visit a browserleaks.com and extract all data.')
+        # IP site
+        self.jobs.append(
+            Jobs.VisitJob(url="https://browserleaks.com/ip", flag='leak_ip',
+                          task='BrowserLeaks'))
+        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+
+        # JavaScript
+        self.jobs.append(
+            Jobs.VisitJob(url="https://browserleaks.com/javascript",
+                          flag='leak_javascript', task='BrowserLeaks'))
+        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+
+        # Webrtc
+        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/webrtc",
+                                       flag='leak_webrtc', task='BrowserLeaks'))
+        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+
+        # Canvas
+        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/canvas",
+                                       flag='leak_canvas', task='BrowserLeaks'))
+        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+
+        # Webgl
+        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/webgl",
+                                       flag='leak_webgl', task='BrowserLeaks'))
+        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        # Fonts
+        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/fonts",
+                                       flag='leak_fonts', task='BrowserLeaks'))
+        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        # SSL
+        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/ssl",
+                                       flag='leak_ssl', task='BrowserLeaks'))
+        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        # GeoLocation
+        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/geo",
+                                       flag='leak_geo', task='BrowserLeaks'))
+        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        # Features
+        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/features",
+                                       flag='leak_features',
+                                       task='BrowserLeaks'))
+        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        # Proxy
+        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/proxy",
+                                       flag='leak_proxy', task='BrowserLeaks'))
+        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+
+        # Java system
+        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/java",
+                                       flag='leak_java', task='BrowserLeaks'))
+        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+
+        # Flash
+        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/flash",
+                                       flag='leak_flash', task='BrowserLeaks'))
+        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+
+        # Silverlight
+        self.jobs.append(
+            Jobs.VisitJob(url="https://browserleaks.com/silverlight",
+                          flag='leak_silverlight', task='BrowserLeaks'))
+        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))

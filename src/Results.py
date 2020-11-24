@@ -1,4 +1,8 @@
-from src.Parser import *
+"""
+Process results returned from primemover runner via the API
+"""
+
+from src.worker.Parser import *
 from src.worker import api_wrapper
 import json
 from datetime import datetime, timedelta
@@ -6,6 +10,9 @@ from src.worker.Crawler import Crawler
 
 
 class JobResult:
+    """
+    Stores and processes the returned data for a single job
+    """
     def __init__(self, crawler_id=None, started_at=None,
                  status_code=None, status_message=None,
                  created_at=None, updated_at=None, finished_at=None,
@@ -25,11 +32,18 @@ class JobResult:
         self._extract_flags()
         self._reports = reports
 
+        # Check if flag in parser dict, if yes, parse
         if self._task in ParserDict.keys():
             if len(self._reports) > 0:
-                raw_data = self._download_reports()
-                self._parsed_data = ParserDict[self._task](self._behaviors,
-                                                           raw_data)
+                if ParserDict[self._task]['data'] == 'html':
+                    raw_data = self._download_html()
+                elif ParserDict[self._task]['data'] == 'reports':
+                    raw_data = self._reports
+                else:
+                    raw_data = None
+                self._parsed_data = ParserDict[self._task]['method'](
+                    self._behaviors,
+                    raw_data)
                 self.results = {'finished_at': self._finished_at,
                                 'status_code': self._status_code,
                                 'status_message': self._status_message,
@@ -42,7 +56,7 @@ class JobResult:
         else:
             self.results = None
 
-    def _download_reports(self):
+    def _download_html(self):
         raw_data = []
         for report in self._reports:
             raw_data.append(api_wrapper.fetch_html(report['path']))
@@ -160,8 +174,8 @@ class SessionResult:
 
 
 def export_results(results, date=datetime.today().date().isoformat()):
-
-    existing_crawler_path = f'resources/updates/exp_2_{(datetime.now().date() + timedelta(days=-1)).isoformat()}.json'
+    # existing_crawler_path = f'resources/updates/exp_2_{(datetime.now().date() + timedelta(days=-1)).isoformat()}.json'
+    existing_crawler_path = 'resources/updates/exp_2_2020-11-08.json'
     out_path = f'resources/cleaned_data/with_crawler_{date}.json'
     with open(existing_crawler_path, 'r') as file:
         crawlers = Crawler.from_dict(json.load(file))
@@ -177,8 +191,7 @@ def export_results(results, date=datetime.today().date().isoformat()):
 
 if __name__ == "__main__":
     api_wrapper.fetch_results()
-    path = f'resources/raw_data/{datetime.today().date().isoformat()}.json'
-    # path = f'resources/raw_data/2020-10-15.json'
+    path = f'resources/raw_data/{(datetime.now().date() + timedelta(days=0)).isoformat()}.json'
 
     with open(path, 'r') as file:
         raw_data = json.load(file)
@@ -196,19 +209,20 @@ if __name__ == "__main__":
             f'resources/cleaned_data/{datetime.today().date().isoformat()}.json',
             'w') as file:
         json.dump(combined_sessions, file, indent='  ')
+
     export_results(combined_sessions)
 
     # combined_session_1 = {}
     # combined_session_2 = {}
     # for session in session_data:
-    #     if "10-14" in session._start_at:
+    #     if "10-14" in session.start_at:
     #
     #         if session.crawler_id in combined_session_1.keys():
     #             combined_session_1[session.crawler_id] = combined_session_1[
     #                                                         session.crawler_id] + session.results
     #         else:
     #             combined_session_1[session.crawler_id] = session.results
-    #     elif "10-15" in session._start_at:
+    #     elif "10-15" in session.start_at:
     #
     #         if session.crawler_id in combined_session_2.keys():
     #             combined_session_2[session.crawler_id] = combined_session_2[

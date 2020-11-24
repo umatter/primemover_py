@@ -1,31 +1,55 @@
-from src.worker.Crawler import *
-from src.GenerateBenignTerms import GenerateBenignTerms
-from src.worker.TimeHandler import Schedule
+from src.worker import Crawler, Tasks, ConfigureProfile
+from src.auxiliary.GenerateBenignTerms import GenerateBenignTerms
+from src.worker.TimeHandler import Schedule, TimeHandler
 from datetime import datetime, timedelta
 import src.worker.api_wrapper as api
+import random as r
+import json
 
 PATH_TERMS = "resources/input_data/insta_top_partisan_hashtags.csv"
 PATH_MEDIA_OUTLETS = "resources/input_data/twitter_stream_top_partisan_domains.csv"
-PATH_BENGING_TERMS = 'resources/other/benign_terms.json'
+PATH_BENIGN_TERMS = 'resources/other/benign_terms.json'
 
-NEUTRAL = ["White House", "Congress", "Mail-in ballot", "Polling station",
-           "Joe Biden", "Donald Trump", "Democrat", "Republican"]
+NEUTRAL_1 = ["White House", "Congress", "Mail-in ballot", "Polling station",
+             "Joe Biden", "Donald Trump", "Democrat", "Republican"]
 
-if __name__ == "__main__":
+NEUTRAL_2 = ["Joe Biden", "Donald Trump", "Nevada", "Pennsylvania", "Georgia",
+             "Arizona", "Wisconsin", "Michigan", "count votes", "stop count",
+             "illegal ballots", "electoral vote", "voter fraud"]
+
+NEUTRAL_3 = ["Georgia", "senate race", "recount", "presidential transition",
+             "president-elect", "electoral vote", "voter fraud",
+             "did my vote count?", "google news"]
+NEUTRAL = ["Georgia recount",
+           "Donald Trump is",
+           "Joe Biden is",
+           "senate race",
+           "presidential transition",
+           "electoral vote",
+           "mask mandate",
+           "curfew",
+           "jobless claims",
+           "Michigan election",
+           "voter fraud",
+           "did my vote count?",
+           "google news"]
+
+
+def single_update(day_delta=0):
     GenerateBenignTerms()
 
     # existing_crawler_path = f'resources/updates/exp_2_{(datetime.now().date()+ timedelta(days=-1)).isoformat()}.json'
     existing_crawler_path = "resources/crawlers/2020-10-23.json"
-    TimeHandler.GLOBAL_SCHEDULE = Schedule(start_at=10 * 60 * 60,
-                                           end_at=(10 + 23) * 60 * 60)
+    TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
+                                           start_at=14 * 60 * 60,
+                                           end_at=(9 + 24) * 60 * 60)
 
-
-    Config.MEDIA_DEFAULT_PATH = PATH_MEDIA_OUTLETS
-    Config.TERM_DEFAULT_PATH = PATH_TERMS
+    ConfigureProfile.Config.MEDIA_DEFAULT_PATH = PATH_MEDIA_OUTLETS
+    ConfigureProfile.Config.TERM_DEFAULT_PATH = PATH_TERMS
 
     with open(existing_crawler_path, 'r') as file:
         raw_crawlers = json.load(file)
-    crawler_list_combined = Crawler.from_list(raw_crawlers)
+    crawler_list_combined = Crawler.Crawler.from_list(raw_crawlers, day_delta=day_delta)
     crawler_list_neutral = []
     crawler_list_political = []
     for crawler in crawler_list_combined:
@@ -35,66 +59,43 @@ if __name__ == "__main__":
             crawler_list_neutral.append(crawler)
 
     neutral = r.choices(NEUTRAL, k=2)
-    with open(PATH_BENGING_TERMS, 'r') as file:
+    with open(PATH_BENIGN_TERMS, 'r') as file:
         benign = json.load(file)
 
     for individual in crawler_list_political:
-        # 3 Twitter, 3 Domain, 3 bigram
-        # 2 Most visited
-        # 1-2 benign
-        # 2 test
-        # 3 Politial, 1 most visited, 1 direct
-        nr_direct = r.choices([0, 1, 2])
-        session_id = individual.add_task(PoliticalSearchNoUtility,
+
+        session_id = individual.add_task(Tasks.BenignGoogleSearch,
                                          to_session=True,
-                                         params={'term_type': 'bigrams'})
+                                         params={'term': r.choice(benign)})
         if r.choice([True, False]):
-            individual.add_task(BenignGoogleSearch, to_session=session_id,
-                                params={'term': r.choice(benign)})
-        individual.add_task(VisitMediaNoUtility, to_session=session_id)
-        individual.add_task(PoliticalSearchNoUtility, to_session=session_id,
-                            params={'term_type': 'instagram'})
-        individual.add_task(VisitMediaGoogleNoUtility, to_session=session_id)
-        individual.add_task(VisitFrequentDirect, to_session=session_id)
-        if nr_direct == 2:
-            nr_direct -= 1
-            individual.add_task(VisitMediaNoUtility, to_session=session_id)
+            individual.add_task(Tasks.PoliticalSearchNoUtility,
+                                to_session=True,
+                                params={'term_type': 'bigrams'})
+        if r.choice([True, False]):
+            individual.add_task(Tasks.PoliticalSearchNoUtility, to_session=session_id,
+                                params={'term_type': 'instagram'})
+        if r.choice([True, False]):
+            individual.add_task(Tasks.VisitMediaGoogleNoUtility,
+                                to_session=session_id)
+        if r.choice([True, False]):
+            individual.add_task(Tasks.VisitMediaNoUtility, to_session=session_id)
+        if r.choice([True, False]):
+            individual.add_task(Tasks.VisitFrequentDirect, to_session=session_id)
 
-        individual.add_task(PoliticalSearchNoUtility, to_session=session_id,
-                            params={'term_type': 'bigrams'})
-        individual.add_task(VisitMediaNoUtility, to_session=session_id)
-        individual.add_task(PoliticalSearchNoUtility, to_session=session_id,
-                            params={'term_type': 'instagram'})
-        individual.add_task(VisitMediaGoogleNoUtility, to_session=session_id)
-        individual.add_task(VisitFrequentDirect, to_session=session_id)
-
-        if nr_direct == 1:
-            individual.add_task(VisitMediaNoUtility, to_session=session_id)
-        individual.add_task(PoliticalSearchNoUtility, to_session=session_id,
-                            params={'term_type': 'bigrams'})
-        individual.add_task(PoliticalSearchNoUtility, to_session=session_id,
-                            params={'term_type': 'instagram'})
-        individual.add_task(VisitMediaGoogleNoUtility, to_session=session_id)
-        individual.add_task(VisitMediaNoUtility, to_session=session_id)
-        individual.add_task(BenignGoogleSearch, to_session=session_id,
-                            params={'term': r.choice(benign)})
-
-        individual.add_task(NeutralGoogleSearch, to_session=session_id,
+        individual.add_task(Tasks.NeutralGoogleSearch, to_session=True,
                             params={'term': neutral[0]})
-        individual.add_task(NeutralGoogleSearch, to_session=session_id,
+        individual.add_task(Tasks.NeutralGoogleSearch, to_session=True,
                             params={'term': neutral[1]})
 
     for individual in crawler_list_neutral:
-        session_id = individual.add_task(VisitFrequentDirect, to_session=True)
+        session_id = individual.add_task(Tasks.BenignGoogleSearch, to_session=True,
+                                         params={'term': r.choice(benign)})
         if r.choice([True, False]):
-            individual.add_task(BenignGoogleSearch, to_session=session_id,
-                                params={'term': r.choice(benign)})
-        individual.add_task(VisitFrequentDirect, to_session=session_id)
-        individual.add_task(BenignGoogleSearch, to_session=session_id,
-                            params={'term': r.choice(benign)})
-        individual.add_task(NeutralGoogleSearch, to_session=session_id,
+            individual.add_task(Tasks.VisitFrequentDirect, to_session=session_id)
+
+        individual.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
                             params={'term': neutral[0]})
-        individual.add_task(NeutralGoogleSearch, to_session=session_id,
+        individual.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
                             params={'term': neutral[1]})
 
     crawler_list = crawler_list_neutral + crawler_list_political
@@ -103,9 +104,19 @@ if __name__ == "__main__":
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
-    return_data = api.push_new(path="resources/examples/test_update_py.json")
-    data_as_dict = json.loads(return_data.text)
-    with open(
-            f'resources/updates/exp_2_{datetime.now().date().isoformat()}.json',
-            'w') as file:
-        json.dump(data_as_dict, file, indent='  ')
+    do = input('push data? (y/n): ')
+    if do == 'y':
+        return_data = api.push_new(
+            path="resources/examples/test_update_py.json")
+        data_as_dict = json.loads(return_data.text)
+        with open(
+                f'resources/updates/exp_2_{(datetime.now().date() + timedelta(days=day_delta)).isoformat()}.json',
+                'w') as file:
+            json.dump(data_as_dict, file, indent='  ')
+
+
+if __name__ == "__main__":
+    # for day in range(13):
+    #     single_update(day_delta=day)
+    #     print((datetime.now().date() + timedelta(days=day)).isoformat())
+    single_update(day_delta=0)

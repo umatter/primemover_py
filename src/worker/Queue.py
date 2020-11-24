@@ -1,8 +1,24 @@
+"""Queue.py defines the base Queue class. This class mirrors the queue object in the API
+and represents a single browser session. It contains all the jobs that are to be conducted in such a
+session and when to begin execution. Queues can be combined
+
+J.L. 11.2020
+"""
+
 import src.worker.Jobs as Jobs
 import random as r
 
 
 class Queue:
+    """Base queue class
+    Public Arguments:
+        - description: string
+        - name: string
+        - start_at: string, ISO format
+        - jobs: list of job objects
+        - delay_min: int, min wait time between appended queues in seconds
+        - delay_max: int, max wait time between appended queues in seconds
+    """
     PASS_CRAWLER = False
 
     def __init__(self,
@@ -12,16 +28,12 @@ class Queue:
                  delay_min=0,
                  delay_max=10,
                  ):
-        self._description = description
-        self._name = name
-        self._start_at = start_at
+        self.description = description
+        self.name = name
+        self.start_at = start_at
         self.jobs = []
         self.delay_min = min(delay_min, delay_min)
         self.delay_max = max(delay_max, delay_min)
-
-    @property
-    def start_at(self):
-        return self._start_at
 
     @property
     def delay_min(self):
@@ -51,20 +63,28 @@ class Queue:
 
     def __str__(self):
         queue_descr = \
-            f'"name": "{self._name}",\n' \
-            f'"description": "{self._description}",\n' \
-            f'"start_at": "{self._start_at}"'
+            f'"name": "{self.name}",\n' \
+            f'"description": "{self.description}",\n' \
+            f'"start_at": "{self.start_at}"'
         formatted = ",\n".join([str(x) for x in self.jobs])
         return f'{{{queue_descr},"jobs": [\n{formatted}]}}'
 
     def as_dict(self):
+        """Create valid dictionary version of queue
+        Returns: dictionary
+        """
         return {
-            "name": self._name,
-            "description": self._description,
-            "start_at": self._start_at,
+            "name": self.name,
+            "description": self.description,
+            "start_at": self.start_at,
             "jobs": [x.as_dict() for x in self.jobs]}
 
     def __add__(self, other):
+        """
+        Combine two queues into one (queue_a + queue_b)
+        other: second queue object
+        """
         delay = r.randint(self.delay_min, self.delay_max)
         self.jobs.append(Jobs.Wait(delay))
         self.jobs = self.jobs + other.jobs
+        return self

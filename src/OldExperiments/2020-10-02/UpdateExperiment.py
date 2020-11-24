@@ -1,8 +1,8 @@
 from src.worker.Crawler import *
-from src.GenerateBenignTerms import GenerateBenignTerms
+from src.auxiliary.GenerateBenignTerms import GenerateBenignTerms
 from src.worker.TimeHandler import Schedule
 from datetime import datetime, timedelta
-from src.worker import gdelt_gkg as gkg
+from src.auxiliary import gdelt_gkg as gkg
 import src.worker.api_wrapper as api
 
 PATH_TERMS = "/Users/johannes/Dropbox/websearch_polarization/data/final/searchterms_pool.csv"

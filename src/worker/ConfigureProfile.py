@@ -1,14 +1,54 @@
-import src.ConfigurationFunctions as C
-from src.worker import api_wrapper
-import os
-import pandas as pd
+"""
+Establishes the Config class, mirroring the configurations object in the primemover api
+any parameters that are not set upon init are generated according to the
+ConfigurationFunctions file.
+
+J.L. 11.2020
+"""
+
+from src import ConfigurationFunctions
 from src.worker.Info import ConfigurationInfo
 import json
-
+import os
+resource_path = os
 
 class Config:
-    MEDIA_DEFAULT_PATH = 'resources/input_data/outlets.json'
-    TERM_DEFAULT_PATH = 'resources/input_data/terms.json'
+    """A configuration object, sets all parameters documented in configurations.
+    Most are standard, though these can be extended through optional parameters.
+    In case this is required, extend the class.
+
+    Public attributes:
+         - name: string, optional but recomended, can be used to store information for processing
+            use some_name/flag to add a flag to the configuration object.
+            (It is part of the name attribute, to ensure availability on api return)
+         - description: string, optional
+         - psi: float in [0,1], individuals persuadability
+            default: set according to ConfigurationFunctions
+         - pi: float political orientation of individual
+            default: set according to ConfigurationFunctions
+         - alpha: float >= 0, shift parameter in media outlet utility
+            default: set according to ConfigurationFunctions
+         - tau: float > 0, "transportation costs" i.e. costs of consuming
+                ideologically distant news outlets
+            default: set according to ConfigurationFunctions
+         - beta:
+            default: set according to ConfigurationFunctions
+         - kappa: binary in {0,1}, indicates whether individual can be persuaded
+            default: set according to ConfigurationFunctions
+         - media: list or dict, media redirect urls for outlets known to individual
+            must be compatible with any tasks the user intends to set!
+            default: set according to ConfigurationFunctions
+         - terms: list or dict, search terms individual may search
+            must be compatible with any tasks the user intends to set!
+            default: set according to ConfigurationFunctions
+         - location: string, must be in "resources/other/geosurf_cities.json"
+            this is required for geosurf compatibility, restriction may be altered
+            in future release
+            default: set according to ConfigurationFunctions
+    Private attributes:
+        - info: should only be set using existing crawlers, via from_dict method.
+    """
+
     with open("resources/other/geosurf_cities.json", 'r') as file:
         LOCATION_LIST = list(json.load(file).keys())
 
@@ -17,8 +57,6 @@ class Config:
                  description=None,
                  psi=None,
                  pi=None,
-                 path_media_outlets=None,
-                 path_terms=None,
                  alpha=None,
                  tau=None,
                  beta=None,
@@ -28,24 +66,12 @@ class Config:
                  location=None,
                  info=None,
                  ):
-        """
-        :param path_media_outlets: path, csv containing media outlet data
-        :param path_terms: path, csv containing search term data
-        :param psi: float in [0,1], individuals persuadability
-        :param pi: political orientation of individual
-        :param alpha: float >= 0, shift parameter in media outlet utility
-        :param tau:  float > 0, "transportation costs" i.e. costs of consuming
-                ideologically distant news outlets
-        :param beta:
-        :param kappa: binary in {0,1}, indicates whether individual can be persuaded
-        :param media: list, media redirect urls for outlets known to individual
-        :param terms: list, search terms individual may search
-        """
-        self._name = name
-        self._description = description
+
+        self.name = name
+        self.description = description
         self._info = info
-        if '/' in self._name:
-            self._flag = self._name.split('/')[1]
+        if '/' in self.name:
+            self._flag = self.name.split('/')[1]
         else:
             self._flag = None
 
@@ -56,12 +82,13 @@ class Config:
 
         self.beta = beta
         self.kappa = kappa
-        self.path_media_outlets = path_media_outlets
-        self.path_terms = path_terms
         self.media = media
         self.terms = terms
         self.location = location
-        self._info = None
+
+    @property
+    def flag(self):
+        return self._flag
 
     @property
     def psi(self):
@@ -70,7 +97,7 @@ class Config:
     @psi.setter
     def psi(self, value):
         if value is None:
-            self._psi = C.Psi()
+            self._psi = ConfigurationFunctions.Psi()
         else:
             self._psi = float(value)
 
@@ -81,7 +108,7 @@ class Config:
     @alpha.setter
     def alpha(self, value):
         if value is None:
-            self._alpha = C.alpha()
+            self._alpha = ConfigurationFunctions.alpha()
         else:
             self._alpha = float(value)
 
@@ -92,7 +119,7 @@ class Config:
     @tau.setter
     def tau(self, value):
         if value is None:
-            self._tau = C.tau()
+            self._tau = ConfigurationFunctions.tau()
         else:
             self._tau = float(value)
 
@@ -103,7 +130,7 @@ class Config:
     @beta.setter
     def beta(self, value):
         if value is None:
-            self._beta = C.beta()
+            self._beta = ConfigurationFunctions.beta()
         else:
             self._beta = float(value)
 
@@ -114,7 +141,7 @@ class Config:
     @kappa.setter
     def kappa(self, value):
         if value is None:
-            self._kappa = C.kappa()
+            self._kappa = ConfigurationFunctions.kappa()
         else:
             self._kappa = float(value)
 
@@ -125,67 +152,9 @@ class Config:
     @pi.setter
     def pi(self, value):
         if value is None:
-            self._pi = C.Pi(self._flag)
+            self._pi = ConfigurationFunctions.Pi(self._flag)
         else:
             self._pi = float(value)
-
-    @property
-    def path_media_outlets(self):
-        return self._path_media_outlets
-
-    @path_media_outlets.setter
-    def path_media_outlets(self, path):
-        if path is None:
-            if Config.MEDIA_DEFAULT_PATH is None:
-                raise ValueError(
-                    f'No media outlet path passed, with no default set')
-            elif os.path.exists(Config.MEDIA_DEFAULT_PATH):
-                self._path_media_outlets = Config.MEDIA_DEFAULT_PATH
-            else:
-                raise ValueError(
-                    f'No media outlet path passed, with an invalid default')
-        elif os.path.exists(path):
-            self._path_media_outlets = path
-        else:
-            outlets = api_wrapper.get_outlets()
-            with open(path, 'w') as file:
-                json.dump(outlets, file, indent='  ')
-            self._path_media_outlets = path
-
-    @property
-    def path_terms(self):
-        return self._path_terms
-
-    @path_terms.setter
-    def path_terms(self, path):
-        if type(path) is list:
-            for p in path:
-                if not os.path.exists(p):
-                    raise ValueError(
-                        f'Invalid path in list')
-            self._path_terms = path
-        elif type(path) is dict:
-            for p in path.values():
-                if not os.path.exists(p):
-                    raise ValueError(
-                        f'Invalid path in list')
-            self._path_terms = path
-        elif path is None:
-            if Config.TERM_DEFAULT_PATH is None:
-                raise ValueError(
-                    f'No terms outlet path passed, with no default set')
-            elif os.path.exists(Config.TERM_DEFAULT_PATH):
-                self._path_terms = Config.TERM_DEFAULT_PATH
-            else:
-                raise ValueError(
-                    f'No terms outlet path passed, with an invalid default')
-        elif os.path.exists(path):
-            self._path_terms = path
-        else:
-            res = api_wrapper.get_terms()
-            with open(path, 'w') as file:
-                json.dump(res, file, indent='  ')
-            self._path_terms = 'resources/input_data/terms.json'
 
     @property
     def media(self):
@@ -194,45 +163,12 @@ class Config:
     @media.setter
     def media(self, media_in):
         if media_in is None:
-            all_media_tbl = pd.read_csv(self.path_media_outlets)
-            self._media = C.SelectMediaOutlets(outlets_twitter=all_media_tbl,
-                                               pi=self._pi)
+            self._media = ConfigurationFunctions.SelectMediaOutlets(pi=self._pi)
         elif type(media_in) in {list, dict}:
             self._media = media_in
         else:
             raise TypeError(
                 f'Media should be a list type object containing unique identifiers of online media outlets')
-            # all_media_tbl = pd.read_csv(self.path_media_outlets, header=0,
-            #             #                             usecols=['redirect_url', 'pi',
-            #             #                                      'avg_reach_permillion'])
-            # with open(self.path_media_outlets, 'r') as file:
-            #     all_media_tbl = pd.DataFrame.from_records(json.load(file),
-            #                                               columns=[
-            #                                                   'redirect_url',
-            #                                                   'pi',
-            #                                                   'avg_reach_permillion',
-            #                                                   'source'])
-            # all_media_tbl = \
-            # all_media_tbl.loc[all_media_tbl['source'] == 'gdelt_gfg'][[
-            #     'redirect_url',
-            #     'pi',
-            #     'avg_reach_permillion']]
-            # all_media_tbl['pi'] = all_media_tbl['pi'].astype(float)
-            # all_media_tbl['avg_reach_permillion'] = all_media_tbl[
-            #     'avg_reach_permillion'].astype(float)
-            #
-            # all_media_tbl.rename(columns={'redirect_url': 'url', 'pi': 'pi',
-            #                               'avg_reach_permillion': 'e^rho'},
-            #                      inplace=True)
-            #
-            # media_selection = C.SelectMediaOutlets(pi_i=self.pi,
-            #                                        alpha_tilde=self.alpha,
-            #                                        url_pi_tbl=all_media_tbl,
-            #                                        tau_tilde_ij=self.tau,
-            #                                        k=10)
-            # self._media = {}
-            # for url, pi, rho in media_selection:
-            #     self._media[url] = {"pi": pi, "rho": rho}
 
     @property
     def terms(self):
@@ -241,26 +177,8 @@ class Config:
     @terms.setter
     def terms(self, term_dict):
         if term_dict is None:
-            instagram = pd.read_csv(self.path_terms['instagram'])
-            bigram = pd.read_csv(self.path_terms['bigrams'])
-            self._terms = C.SelectSearchTerms(bigram, instagram, pi=self._pi)
-            # all_terms_tbl = pd.read_csv(self.path_terms, header=0,
-            #                             usecols=['search_term', 'pi_p'])
-            # with open(self.path_terms, 'r') as file:
-            #     all_terms_tbl = pd.DataFrame.from_records(json.load(file),
-            #                                               columns=[
-            #                                                   'search_term',
-            #                                                   'pi_p'])
-            # all_terms_tbl['pi_p'] = all_terms_tbl['pi_p'].astype(float)
-            #
-            # selected_terms = C.SelectSearchTerms(term_pi_tbl=all_terms_tbl,
-            #                                      k=30,
-            #                                      pi_i=self._pi,
-            #                                      tau_hat_ik=self.tau,
-            #                                      alpha_hat=self.alpha)
-            # self._terms = {}
-            # for term, pi in selected_terms:
-            #     self._terms[term] = pi
+            self._terms = ConfigurationFunctions.SelectSearchTerms(pi=self._pi)
+
         elif type(term_dict) is list:
             self._terms = term_dict
         elif type(term_dict) is dict:
@@ -276,31 +194,21 @@ class Config:
     @location.setter
     def location(self, val):
         if val is None:
-            self._location = C.location()
+            self._location = ConfigurationFunctions.location()
         elif val in Config.LOCATION_LIST:
             self._location = val
         else:
             raise ValueError(
                 f'{val} is not a valid location see geosurf cities')
 
-    def __str__(self):
-        config_discr = \
-            f'"name": "",\n' \
-            f'"description": ""'
-        search_terms = '[\n"' + '",\n"'.join(self.terms) + '"\n]'
-        media_outlets = '[\n"' + '",\n"'.join(self.media) + '"\n]'
-        parameters = \
-            f'"pi": {self.pi},\n' \
-            f'"psi": {self.psi},\n' \
-            f'"search_terms":{search_terms},\n' \
-            f'"media_outlet_urls":{media_outlets}'
-
-        return f'{{{config_discr},\n"parameters":{{\n{parameters}}}}}'
-
     def as_dict(self):
+        """
+        Generate dictionary object from self, matching configurations in primemover api
+        Returns: dict, valid configurations dictionary.
+        """
         return_dict = {
-            "name": self._name,
-            "description": self._description,
+            "name": self.name,
+            "description": self.description,
             "params": [{
                 "pi": self.pi,
                 "psi": self.psi,
@@ -323,13 +231,17 @@ class Config:
 
     def update_config(self, results):
         """
-        (if psi >0)
-        :param results:
-        :return:
+        Update self according to results
         """
 
     @classmethod
     def from_dict(cls, config_dict):
+        """
+        Generate config object from single api return
+        Parameters:
+            config_dict: api return of configurations. Note: media and terms
+            must be json type objects!
+        """
         config_object = cls(name=config_dict.get('name'),
                             description=config_dict.get('description'),
                             psi=config_dict['params'][0].get('psi'),
@@ -346,10 +258,3 @@ class Config:
                             info=ConfigurationInfo.from_dict(config_dict)
                             )
         return config_object
-
-
-if __name__ == "__main__":
-    trial_config = Config(
-        path_media_outlets="/Users/johannes/Dropbox/websearch_polarization/data/final/outlets_pool.csv",
-        path_terms="/Users/johannes/Dropbox/websearch_polarization/data/final/searchterms_pool.csv")
-    print(trial_config.__str__())

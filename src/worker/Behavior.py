@@ -1,18 +1,55 @@
+"""
+Behavior class and subclasses. These classes represent key value pairs, with
+    a created_at and updated_at parameter that is not usually set as well as an optional description.
+    The intent is to mirror the behaviors required by primemover_runner and check
+    parameter validty and output shape.
+
+Available Classes:
+    - Behavior: base class
+    - URL: behavior containing a URL
+    - Text: behavior containing Text (Type Job)
+    - SelectionType: behavior containing the type of html selector to be used
+    - Selector: behavior containing some selector
+    - DecisionType: behavior specifying how a result is selected
+    - ScrollDuration: behavior specifying the time for which to scroll
+    - ScrollDirection: behavior controlling scroll direction
+    - ScrollLength: behavior controlling scroll length as % of website
+    - WaitSecconds: behavior specifying duration of a wait
+    - AppendReturn: behavior determening wheter to hit return in Type Job
+    - TypingMode: behavior controlling how text is entered
+    - TaskBehavior: specifies a macro task that a job is part of
+    - FlagBehavior: some additional parameter with the key: 'flag'
+
+J.L. 11.2020
+"""
+
 from urllib.parse import urlparse
 import math
 
 
 class Behavior:
-    def __init__(self, name, value,
-                 description="Lorem Ipsum", updated_at=None, created_at=None):
+    """A base key value pair of name and value
+    Subclasses check values and assign descriptions
+    Public attributes:
+        - name: required argument, sets the 'key', spaces are converted to underscores
+        - value: any value, must be coercible to string
+        - description: an optional description of the key value pair, useful as the library grows
+        - created_at: unused, set by api
+        - updated_at: unused, set by api
+        - active: unused, in {0,1}, set by api
+    Public methods:
+        as_dict: returns a dictionary representation of the behavior
+    """
+    def __init__(self, name: str, value,
+                 description="Lorem Ipsum", updated_at=None, created_at=None, active=1):
         self.name = name
         self.description = description
         self.value = value
         self.created_at = created_at
         self.updated_at = updated_at
+        self.active = active
 
     def __str__(self):
-
         return \
             f'"name": "{self.name}",\n' \
             f'"description": "{self.description}",\n' \
@@ -37,7 +74,7 @@ class Behavior:
         try:
             self._description = str(desc)
         except:
-            raise TypeError('Description must be convertible to kind string')
+            raise TypeError('Description must be convertible to type string')
 
     @property
     def value(self):
@@ -62,13 +99,23 @@ class Behavior:
             raise ValueError(f'active must be 0 or 1, got {val}')
 
     def as_dict(self):
-
+        """ Represent behavior as a dictionary
+        Returns:
+            dictionary with items name, description and value, other attributes
+            are currently ignored
+        """
         return {"name": self.name,
                 "description": self.description,
                 "value": self.value}
 
 
 class URL(Behavior):
+    """
+    URL behavior key value pair:
+    Public Attributes:
+        - url: string that is parsed to see if it is a structurally sound url
+        - description: a description of the url, default: "URL"
+    """
     def __init__(self, url, description='URL'):
         self.url = url
         super().__init__(name='url', value=self.url, description=description)
@@ -93,10 +140,14 @@ class URL(Behavior):
 
 
 class Text(Behavior):
+    """
+    Text behavior key value pair, this is used for the Type job
+    Public Attributes:
+        - text: some string
+        - description: a description of the url, default: "Text to enter"
+    """
     def __init__(self, text):
-        """
-        :param string: text to type into a field
-        """
+
         self.text = text
         super().__init__(name='text', value=self.text,
                          description=f'Text to enter')
@@ -111,14 +162,18 @@ class Text(Behavior):
             self._text = str(string)
 
         except:
-            raise TypeError('Text must be coercable to kind string')
+            raise TypeError('Text must be coercable to type string')
 
 
 class SelectionType(Behavior):
+    """
+    SelectionType behavior key value pair, used to share what type some selector
+    Public Attributes:
+        - selector_type: string, one of "XPATH|CSS|CLASS|ID"
+        - description: a description of the url, default: "Type of selection"
+    """
     def __init__(self, selector_type):
-        """
-        :param selector_type: string, one of "XPATH|CSS|CLASS|ID"
-        """
+
         self.selector_type = selector_type
         super().__init__(name='selectionType', value=self.selector_type,
                          description=f'Type of selection')
@@ -138,10 +193,13 @@ class SelectionType(Behavior):
 
 
 class Selector(Behavior):
+    """
+    Selector behavior key value pair, used to share a html selector
+    Public Attributes:
+        - selector: string, a valid XPATH|CSS|CLASS|ID selector
+        - kind: string, what is the selector? use to specify purpose or type
+    """
     def __init__(self, selector, kind=""):
-        """
-        :param selector: a valid selector one of "XPATH|CSS|CLASS|ID"
-        """
         self.selector = selector
         self.kind = kind
 
@@ -159,10 +217,12 @@ class Selector(Behavior):
 
 
 class DecisionType(Behavior):
+    """
+    DecisionType behavior key value pair, used to determine how a result is selected
+    Public Attributes:
+        - decision_type: string,  one of "FIRST|LAST|RANDOM"
+    """
     def __init__(self, decision_type):
-        """
-        :param decision_type: string, one of "FIRST|LAST|RANDOM"
-        """
         self.decision_type = decision_type
 
         super().__init__(name='decisionType', value=self.decision_type,
@@ -184,10 +244,13 @@ class DecisionType(Behavior):
 
 
 class ScrollDuration(Behavior):
-    def __init__(self, duration):
-        """
-        :param duration: float >0 time in seconds
-        """
+    """
+    ScrollDuration behavior key value pair, used to determine duration of scroll by time
+    Public Attributes:
+        - duration: int, seconds>0
+    """
+    def __init__(self, duration: int):
+
         self.duration = duration
         super().__init__(name='scrollDuration', value=self.duration,
                          description=f'Scroll for {self.duration} seconds.'
@@ -212,6 +275,11 @@ class ScrollDuration(Behavior):
 
 
 class ScrollDirection(Behavior):
+    """
+    ScrollDirection behavior key value pair, used to determine scroll direction
+    Public Attributes:
+        - direction: string,  one of "UP/U|DOWN/D" (not case sensitive)
+    """
     SCROLL_DESC_DICT = {'UP': 'Scroll up', 'DOWN': 'Scroll down'}
 
     def __init__(self, direction):
@@ -244,10 +312,12 @@ class ScrollDirection(Behavior):
 
 
 class ScrollLength(Behavior):
+    """
+    ScrollLength behavior key value pair, used to determine scroll length as percentage of website length
+    Public Attributes:
+        - percentage: numeric in [0,100]
+    """
     def __init__(self, percentage):
-        """
-        :param percentage: float in [0,100] percentage of window to scroll down
-        """
         self.percentage = percentage
         super().__init__(name='length', value=self.percentage,
                          description=f'Scroll {self.percentage} of window.')
@@ -269,6 +339,11 @@ class ScrollLength(Behavior):
 
 
 class WaitSeconds(Behavior):
+    """
+    Wait behavior key value pair, used to time a wait period in seconds
+    Public Attributes:
+        - duration: int, seconds to wait
+    """
     def __init__(self, duration):
         """
         :param duration: int >0 time in seconds
@@ -296,10 +371,12 @@ class WaitSeconds(Behavior):
 
 
 class AppendReturn(Behavior):
+    """
+    AppendReturn behavior key value pair, used to determine wheter to hit return in type job
+    Public Attributes:
+        - send_return, boolean
+    """
     def __init__(self, send_return=False):
-        """
-        :param send_return: bool or str "true/false"
-        """
         self.send_return = send_return
         super().__init__(name='appendReturn', value=self.send_return,
                          description=f'Optional field: appends a return key after the text given if true.')
@@ -327,14 +404,15 @@ class AppendReturn(Behavior):
 
 
 class TypingMode(Behavior):
+    """Controls the method by which text is typed
+    Public attributes:
+    -mode: str, in {"DIRECT","SIMULATED_KEEPINGTYPOS","SIMULATED_FIXINGTYPOS","SIMULATED_NOTYPOS"}
+            Direct: send keys at once (imagine copy and paste)
+            Simulated_KeepingTypos: Simulate key presses, make typos and keep some of them
+            Simulated_FixingTypos: Simulate key presses, make typos fix all of them
+            Simulated_NoTypos: Simulate key presses, make no mistakes  (default argument)
+    """
     def __init__(self, mode="SIMULATED_NOTYPOS"):
-        """
-        :param mode: str, in {"DIRECT","SIMULATED_KEEPINGTYPOS","SIMULATED_FIXINGTYPOS","SIMULATED_NOTYPOS"}
-        Direct: send keys at once (imagine copy and paste)
-        Simulated_KeepingTypos: Simulate key presses, make typos and keep some of them
-        Simulated_FixingTypos: Simulate key presses, make typos fix all of them
-        Simulated_NoTypos: Simulate key presses, make no mistakes
-        """
         self.mode = mode
         super().__init__(name='typingMode', value=self.mode,
                          description=f'Optional field: How the text is entered into the field')
@@ -359,6 +437,11 @@ class TypingMode(Behavior):
 
 
 class TaskBehavior(Behavior):
+    """
+    TaskBehavior behavior key value pair, used to indicate a larger task that a job is a part off. This is always optional.
+    Public Attributes:
+        - task, task name (determined by primemover_py
+    """
     def __init__(self, task):
         self.task = task
         super().__init__(name='task', value=self.task,
@@ -378,6 +461,11 @@ class TaskBehavior(Behavior):
 
 
 class FlagBehavior(Behavior):
+    """
+    FlagBehavior behavior key value pair, used to indicate additional info about a job. This is always optional.
+    Public Attributes:
+        - flag, some flag to pass
+    """
     def __init__(self, flag):
         self.flag = flag
         super().__init__(name='flag', value=self.flag,

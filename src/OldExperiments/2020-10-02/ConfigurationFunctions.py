@@ -1,5 +1,5 @@
 import random as r
-from src.Preferences import *
+from src.Configuration.Preferences import *
 import json
 
 """

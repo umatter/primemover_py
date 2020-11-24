@@ -1,7 +1,15 @@
-from src.worker.Crawler import *
-from src.worker.TimeHandler import *
-from src.worker.ConfigureProfile import Config
+"""
+Experiment partisan google elections 2020-10-21
+This file generates new crawlers, in particular the required config files
+
+J.L. 11.2020
+"""
+from src.worker.Crawler import Crawler
+from src.worker.TimeHandler import Schedule, TimeHandler
+from src.Configuration.ConfigureProfile import Config
 from src.worker import api_wrapper as api
+import json
+from datetime import datetime
 
 PATH_TERMS = {
     'instagram': "resources/input_data/insta_top_partisan_hashtags.csv",
@@ -28,9 +36,7 @@ if __name__ == "__main__":
 
     # generate left wing crawlers
     config_list_left = [Config(name='Config/left',
-                               location=l, pi=-1,
-                               path_media_outlets=PATH_MEDIA_OUTLETS,
-                               path_terms=PATH_TERMS)
+                               location=l, pi=-1)
                         for l in 2 * LOCATION_LIST]
 
     crawler_list_political = [Crawler(flag='left', configuration=c, experiment_id=2) for c in
@@ -40,9 +46,8 @@ if __name__ == "__main__":
     config_list_right = [
         Config(name='Config/right',
                location=left_config.location,
-               pi=- left_config.pi,
-               path_media_outlets=PATH_MEDIA_OUTLETS,
-               path_terms=PATH_TERMS) for left_config in config_list_left]
+               pi=- left_config.pi)
+        for left_config in config_list_left]
     crawler_list_political += [Crawler(flag='right', configuration=c, experiment_id=2) for c in
                                config_list_right]
 

@@ -4,7 +4,7 @@ import difflib
 import json
 import os
 
-from src.worker.gdelt_url_country import get_country_media
+from src.auxiliary.gdelt_url_country import get_country_media
 
 IN_COUNTRY_MEDIA = ['resources/other/', '_urls.json']
 

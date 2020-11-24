@@ -1,6 +1,7 @@
 """
 Time Handler:
 This file contains the classes Schedule, IndividualSchedule and TimeHandler.
+J.L. 11.2020
 """
 
 import random as r
@@ -283,6 +284,13 @@ class TimeHandler:
             end_at=self._bed_time)
 
     def consecutive_times(self, nr):
+        """
+        Generate nr. of times and order them chronologically
+        Arguments:
+            - nr: int, number of times to generate
+        Returns:
+            list of ISO times
+        """
         self._schedule.update()
         second_list = [self._schedule.new_time() for i in range(0, nr)]
         second_list.sort()
@@ -290,6 +298,10 @@ class TimeHandler:
         return time_list
 
     def new_time(self):
+        """
+        Generate a single time
+        Returns: ISO time
+        """
         self._schedule.update()
         seconds = self._schedule.new_time()
         return self._to_iso_time(seconds)

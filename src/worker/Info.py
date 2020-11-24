@@ -1,13 +1,33 @@
-import json
-import src.ConfigurationFunctions as Config
+"""
+Basic info objects for the major components of primemover_py.
+These contain user and id information. This information is first assigned
+by the primemover API and can then be used by primemover_py for analysis or to
+identify objects on the API.
 
-with open('resources/other/keys.json', 'r') as key_file:
-    keys = json.load(key_file)
-GEOSURF_USERNAME = keys['GEOSURF']['username']
-GEOSURF_PASSWORD = keys['GEOSURF']['password']
+Classes:
+    Info: basic info object
+    BehaviorInfo: Info object for the Behavior class (Behavior.py)
+    JobInfo: Info object for the Job class (Jobs.py)
+    QueueInfo: Info object for the Queue class (Queue.py)
+    CrawlerInfo: Info object for the Crawler class (Crawler.py)
+    ConfigurationInfo: Info object for the Configuration class (ConfigurationProfile.py)
+    AgentInfo: Info object for the Agent class (Agent.py)
+    ProxyInfo: Info object for the Proxy class (Proxy.py)
+
+J.L 11/2020
+"""
+
+import json
 
 
 class Info:
+    """
+    Base class
+    Public Arguments:
+        - active: {0,1}, default: 1
+        - updated_at: timestamp for last update on API
+        - created_at: timestamp for creation on API
+    """
     def __init__(self, user_id=None, active=1, created_at=None,
                  updated_at=None):
         self._user_id = user_id
@@ -17,6 +37,15 @@ class Info:
 
 
 class BehaviorInfo(Info):
+    """
+    Info class for Behavior objects
+    Public Arguments:
+        - job_id: unique job_id, indicates which job the behavior is a part of.
+        - behavior_id
+        - active: {0,1}, default: 1
+        - updated_at: timestamp for last update on AP
+        - created_at: timestamp for creation on API
+    """
     ID = 0
 
     def __init__(self, ID=None, user_id=None, job_id=None, active=1,
@@ -40,6 +69,19 @@ class BehaviorInfo(Info):
 
 
 class JobInfo(Info):
+    """
+    OUTDATED AND NOT IN USE
+    Info class for Job objects
+    Public Arguments:
+        - queue: unique queue id, indicates which queue the job is a part of.
+        - job_id: unique ID of the job
+        - active: {0,1}, default: 1
+        - updated_at: timestamp for last update on AP
+        - created_at: timestamp for creation on API
+        - start_at: Time stamp at which primemover runner began executing the job
+        - success: {1,0} 1=Success
+        - failure: {1,0} 1 = Failure
+    """
     ID = 0
 
     def __init__(self, ID=None, user_id=None, queue_id=None, started_at=0,
@@ -56,6 +98,9 @@ class JobInfo(Info):
                          updated_at=updated_at)
 
     def new_behavior(self):
+        """
+        legacy: generates a new Behavior, id will not match API Ids!!
+        """
         return BehaviorInfo(user_id=self._user_id, job_id=self.job_id)
 
     @property
@@ -87,6 +132,7 @@ class JobInfo(Info):
 
 
 class QueueInfo(Info):
+    """OUTDATED AND NOT IN USE"""
     ID = 0
 
     def __init__(self, ID=None, user_id=None, crawler_id=None, started_at=0,
@@ -135,6 +181,17 @@ class QueueInfo(Info):
 
 
 class CrawlerInfo(Info):
+    """
+    Info class for Crawler objects
+    Public Arguments:
+        - crawler_id: unique crawler ID
+        - configuration_id: identifies the corresponding configuration file
+        - agent_id: identifies the corresponding agent file
+        - proxy_id: identifies the corresponding proxy file
+        - active: {0,1}, default: 1
+        - updated_at: timestamp for last update on AP
+        - created_at: timestamp for creation on API
+    """
     ID = 0
 
     def __init__(self, ID=None, user_id=None, agent_id=None, proxy_id=None,
@@ -263,65 +320,6 @@ class AgentInfo(Info):
         return info_object
 
 
-class Agent:
-    with open("resources/other/geosurf_cities.json", 'r') as file:
-        LOCATION_LIST = list(json.load(file).keys())
-
-    def __init__(self,
-                 location=None,
-                 name='Agent',
-                 description='This is the agent',
-                 identification="MultiLogin",
-                 multilogin_id=None,
-                 multilogin_profile=None,
-                 info=None):
-        self._name = name
-        self._description = description
-        self.location = location
-        self._identification = identification
-        self._multilogin_id = multilogin_id
-        self._multilogin_profile = multilogin_profile
-        self._info = info
-
-    @property
-    def location(self):
-        return self._location
-
-    @location.setter
-    def location(self, val):
-        if val is None:
-            self._location = Config.location()
-        elif val in Agent.LOCATION_LIST:
-            self._location = val
-        else:
-            raise ValueError(
-                f'{val} is not a valid location see geosurf cities')
-
-    def as_dict(self):
-        return_dict = {"name": self._name,
-                       "description": self._description,
-                       "location": self._location,
-                       "identification": self._identification,
-                       "multilogin_id": self._multilogin_id,
-                       "multilogin_profile": self._multilogin_profile}
-        if self._info is not None:
-            for key, value in self._info.as_dict().items():
-                return_dict['key'] = value
-        return return_dict
-
-    @classmethod
-    def from_dict(cls, agent_dict):
-        agent_object = cls(name=agent_dict.get('name'),
-                           description=agent_dict.get('description'),
-                           identification=agent_dict.get('identification'),
-                           multilogin_id=agent_dict.get('multilogin_id'),
-                           multilogin_profile=agent_dict.get(
-                               'multilogin_profile'),
-                           location=agent_dict.get('location'),
-                           info=AgentInfo.from_dict(agent_dict))
-        return agent_object
-
-
 class ProxyInfo(Info):
     ID = 0
 
@@ -355,48 +353,3 @@ class ProxyInfo(Info):
         return info_object
 
 
-class Proxy:
-
-    def __init__(self,
-                 username=GEOSURF_USERNAME,
-                 password=GEOSURF_PASSWORD,
-                 name="Sample Proxy",
-                 description="Proxy",
-                 type="GEOSURF",
-                 hostname="state.geosurf.io",
-                 port=8000,
-                 info=None
-                 ):
-        self._name = name
-        self._description = description
-        self._type = type
-        self._hostname = hostname
-        self._port = port
-        self._username = username
-        self._password = password
-        self._info = info
-
-    def as_dict(self):
-        return_dict = {"name": self._name,
-                       "description": self._description,
-                       "type": self._type,
-                       "hostname": self._hostname,
-                       "port": self._port,
-                       "username": self._username,
-                       "password": self._password}
-        if self._info is not None:
-            for key, value in self._info.as_dict().items():
-                return_dict['key'] = value
-        return return_dict
-
-    @classmethod
-    def from_dict(cls, proxy_dict):
-        proxy_object = cls(name=proxy_dict.get('name'),
-                           description=proxy_dict.get('description'),
-                           username=proxy_dict.get('username'),
-                           password=proxy_dict.get('password'),
-                           type=proxy_dict.get('type'),
-                           hostname=proxy_dict.get('hostname'),
-                           port=proxy_dict.get('port'),
-                           info=ProxyInfo.from_dict(proxy_dict))
-        return proxy_object

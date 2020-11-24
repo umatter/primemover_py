@@ -1,3 +1,8 @@
+"""
+Assortment of usefull functions
+
+J.L. 11.2020
+"""
 import tldextract
 
 
@@ -14,8 +19,11 @@ def EscapeStrings(text):
 
 def new_key(dictionary):
     """
-    :param dictionary: dict,
-    :return key: int, an integer which is not in dict.keys()
+    Generate a new, unique integer key for a dictionary
+    Arguments:
+         dictionary: dict,
+    Returns:
+         key: int, an integer which is not in dict.keys()
     """
     key = len(dictionary)
     while key in dictionary.keys():
@@ -25,8 +33,11 @@ def new_key(dictionary):
 
 def extract_domain(url):
     """
-    :param url:
-    :return: domain
+    extract domain from a full url using tldextract.
+    Arguments:
+        url: string, a valid URL, raises TypeError otherwhise
+    Returns:
+         string, domain
     """
     try:
         split = tldextract.extract(url)
