@@ -1,6 +1,8 @@
-tldextract
-beautifulsoup4
-pytz
-numpy
-requests
-airflow
+numpy~=1.19.1
+beautifulsoup4~=4.9.3
+tldextract~=2.2.0
+requests~=2.24.0
+pytz~=2020.1
+pandas~=1.0.5
+webob~=1.8.6
+airflow~=1.10.12

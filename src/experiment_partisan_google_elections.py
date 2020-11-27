@@ -6,7 +6,7 @@ J.L. 11.2020
 """
 from src.worker.Crawler import Crawler
 from src.worker.TimeHandler import Schedule, TimeHandler
-from src.Configuration.ConfigureProfile import Config
+from src.worker.ConfigureProfile import Config
 from src.worker import api_wrapper as api
 import json
 from datetime import datetime

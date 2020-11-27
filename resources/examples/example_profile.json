@@ -1,0 +1,27 @@
+{
+  "name": "%%AGENTID%%",
+  "os": "win",
+  "browser": "stealthfox",
+  "network": {
+    "proxy": {
+      "type": "%%PROXYTYPE%%",
+      "host": "%%PROXYHOST",
+      "port": "%%PROXYPORT%%",
+      "username": "%%PROXYUSERNAME%%",
+      "password": "%%PROXYPASSWORD%%"
+    },
+    "dns": []
+  },
+  "navigator": {
+    "doNotTrack": 0
+  },
+  "geolocation": {
+    "mode": "ALLOW"
+  },
+  "canvas": {
+    "mode": "NOISE"
+  },
+  "storage": {
+    "serviceWorkerCache": true
+  }
+}
