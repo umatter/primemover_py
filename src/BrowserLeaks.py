@@ -7,6 +7,7 @@ from src.worker.TimeHandler import Schedule
 from datetime import datetime, timedelta
 import src.worker.api_wrapper as api
 from src.worker.Tasks import BrowserLeaks
+import json
 
 
 def single_update(day_delta=0):

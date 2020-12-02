@@ -185,3 +185,6 @@ def get_terms():
     """
     r = requests.get(DOMAIN + 'terms')
     return r.json()['data']
+
+if __name__ == "__main__":
+    fetch_results()

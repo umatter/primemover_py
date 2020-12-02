@@ -10,7 +10,9 @@ from src import ConfigurationFunctions
 from src.worker.Info import ConfigurationInfo
 import json
 import os
+
 resource_path = os
+
 
 class Config:
     """A configuration object, sets all parameters documented in configurations.
@@ -166,6 +168,8 @@ class Config:
             self._media = ConfigurationFunctions.SelectMediaOutlets(pi=self._pi)
         elif type(media_in) in {list, dict}:
             self._media = media_in
+        elif media_in == "":
+            self._media = ""
         else:
             raise TypeError(
                 f'Media should be a list type object containing unique identifiers of online media outlets')
@@ -183,6 +187,8 @@ class Config:
             self._terms = term_dict
         elif type(term_dict) is dict:
             self._terms = term_dict
+        elif term_dict == "":
+            self._terms = ""
         else:
             raise TypeError(
                 f'terms should be a dict type object containing search terms')

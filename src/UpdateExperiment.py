@@ -20,19 +20,25 @@ NEUTRAL_2 = ["Joe Biden", "Donald Trump", "Nevada", "Pennsylvania", "Georgia",
 NEUTRAL_3 = ["Georgia", "senate race", "recount", "presidential transition",
              "president-elect", "electoral vote", "voter fraud",
              "did my vote count?", "google news"]
-NEUTRAL = ["Georgia recount",
-           "Donald Trump is",
-           "Joe Biden is",
-           "senate race",
-           "presidential transition",
-           "electoral vote",
-           "mask mandate",
-           "curfew",
-           "jobless claims",
-           "Michigan election",
-           "voter fraud",
-           "did my vote count?",
-           "google news"]
+NEUTRAL_4 = ["Georgia recount",
+             "Donald Trump is",
+             "Joe Biden is",
+             "senate race",
+             "presidential transition",
+             "electoral vote",
+             "mask mandate",
+             "curfew",
+             "jobless claims",
+             "Michigan election",
+             "voter fraud",
+             "did my vote count?",
+             "google news"]
+
+NEUTRAL = ["Sidney Powell", "Donald Trump is", "Joe Biden is", "covid vaccine",
+           "presidential transition", "mask mandate", "curfew",
+           "has michigan certified the election",
+           "has pennsylvania certified the election", "voter fraud",
+           "election results 2020", "news"]
 
 
 def single_update(day_delta=0):
@@ -49,7 +55,8 @@ def single_update(day_delta=0):
 
     with open(existing_crawler_path, 'r') as file:
         raw_crawlers = json.load(file)
-    crawler_list_combined = Crawler.Crawler.from_list(raw_crawlers, day_delta=day_delta)
+    crawler_list_combined = Crawler.Crawler.from_list(raw_crawlers,
+                                                      day_delta=day_delta)
     crawler_list_neutral = []
     crawler_list_political = []
     for crawler in crawler_list_combined:
@@ -72,15 +79,18 @@ def single_update(day_delta=0):
                                 to_session=True,
                                 params={'term_type': 'bigrams'})
         if r.choice([True, False]):
-            individual.add_task(Tasks.PoliticalSearchNoUtility, to_session=session_id,
+            individual.add_task(Tasks.PoliticalSearchNoUtility,
+                                to_session=session_id,
                                 params={'term_type': 'instagram'})
         if r.choice([True, False]):
             individual.add_task(Tasks.VisitMediaGoogleNoUtility,
                                 to_session=session_id)
         if r.choice([True, False]):
-            individual.add_task(Tasks.VisitMediaNoUtility, to_session=session_id)
+            individual.add_task(Tasks.VisitMediaNoUtility,
+                                to_session=session_id)
         if r.choice([True, False]):
-            individual.add_task(Tasks.VisitFrequentDirect, to_session=session_id)
+            individual.add_task(Tasks.VisitFrequentDirect,
+                                to_session=session_id)
 
         individual.add_task(Tasks.NeutralGoogleSearch, to_session=True,
                             params={'term': neutral[0]})
@@ -88,10 +98,12 @@ def single_update(day_delta=0):
                             params={'term': neutral[1]})
 
     for individual in crawler_list_neutral:
-        session_id = individual.add_task(Tasks.BenignGoogleSearch, to_session=True,
+        session_id = individual.add_task(Tasks.BenignGoogleSearch,
+                                         to_session=True,
                                          params={'term': r.choice(benign)})
         if r.choice([True, False]):
-            individual.add_task(Tasks.VisitFrequentDirect, to_session=session_id)
+            individual.add_task(Tasks.VisitFrequentDirect,
+                                to_session=session_id)
 
         individual.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
                             params={'term': neutral[0]})

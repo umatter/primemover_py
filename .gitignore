@@ -11,3 +11,4 @@ Dockerfile
 /resources/election_experiment
 /resources/examples/test_update_py_old.json
 /new proxy text
+/venv/

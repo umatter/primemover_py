@@ -5,21 +5,27 @@ J.L. - 11/2020
 
 from webob import acceptparse
 import json
-
+import warnings
+import re
 
 class Profile:
     def __init__(self,
                  name="%%AGENTID%%",
                  os='win',
-                 browser='stealthfox',
+                 browser='mimic',
                  language="en-us",
+                 resolution='DEFAULT',
                  geolocation='DEFAULT',
                  do_not_track='DEFAULT',
                  hardware_canvas='DEFAULT',
                  local_storage='DEFAULT',
-                 service_worker_cache='DEFAULT'):
+                 service_worker_cache='DEFAULT',
+                 user_agent='DEFAULT',
+                 platform='DEFAULT',
+                 hardware_concurrency='DEFAULT'
+                 ):
         """
-        Arguments
+        ArgumentsTo
             - name: some string, defaults to placeholder for agent_id
             - os:  an os, must be in {'win', 'mac', 'linux', 'android'}
             - browser: must be in {'mimic', 'stealthfox', 'mimic_mobile'}
@@ -39,11 +45,13 @@ class Profile:
         self.name = name
         self.browser = browser
         self.language = language
+        self._fill_based_on_external_ip = None
         self.geolocation = geolocation
         self.do_not_track = do_not_track
         self.hardware_canvas = hardware_canvas
         self.local_storage = local_storage
         self.service_worker_cache = service_worker_cache
+        self.resolution = resolution
 
     @property
     def os(self):
@@ -132,7 +140,13 @@ class Profile:
             self._geolocation = None
         elif string in valid_settings:
             self._geolocation = string
+            if string == 'ALLOW':
+                self._fill_based_on_external_ip = True
+                print(self._fill_based_on_external_ip)
+            else:
+                self._fill_based_on_external_ip = None
         else:
+            self._fill_based_on_external_ip = None
             raise ValueError(
                 f'os must be one off {valid_settings}, received {string}')
 
@@ -184,19 +198,21 @@ class Profile:
             value = value.strip().lower()
             if value == 'true':
                 self._service_worker_cache = True
-                if self._local_storage is False:
-                    raise Exception(
-                        'Attempting to set serviceWorkerCache True, while local storage is False')
+                if self._local_storage in {False, None}:
+                    self._local_storage = True
+                    warnings.warn(
+                        'Attempting to set serviceWorkerCache True, while local storage is False or not set. This will be overwritten')
+
             elif value == 'false':
-                self._local_storage = False
+                # self._local_storage = False
                 self._service_worker_cache = False
         elif value:
             self._service_worker_cache = value
-            if self._local_storage is False:
-                raise Exception(
-                    'Attempting to set serviceWorkerCache True, while local storage is False')
+            if self._local_storage in {False, None}:
+                self._local_storage = True
+                warnings.warn('Attempting to set serviceWorkerCache True, while local storage is False or not set. This will be overwritten')
         elif not value:
-            self._local_storage = False
+            # self._local_storage = False
             self._service_worker_cache = False
         else:
             raise ValueError('Invalid serviceWorkerCache value')
@@ -216,6 +232,20 @@ class Profile:
             else:
                 raise ValueError(
                     f'Invalid hardware_canvas setting, should be one of REAL,BLOCK, NOISE')
+    @property
+    def resolution(self):
+        return self._resolution
+
+    @resolution.setter
+    def resolution(self, value):
+        if value == 'DEFAULT':
+            self._resolution = None
+        elif re.fullmatch("^[0-9]+x[0-9]+", value.strip().lower()) is not None:
+            value = value.strip().lower()
+            self._resolution = value
+        else:
+            raise ValueError(
+                f'Invalid hardware_canvas setting, should be one of REAL,BLOCK, NOISE')
 
     def as_dict(self):
         base_dict = {
@@ -239,28 +269,38 @@ class Profile:
             base_dict['navigator'] = {'doNotTrack': self.do_not_track}
         if self.geolocation is not None:
             base_dict['geolocation'] = {'mode': self.geolocation}
+        if self._fill_based_on_external_ip is not None:
+            base_dict['geolocation']['fillBasedOnExternalIp'] = self._fill_based_on_external_ip
         if self.hardware_canvas is not None:
             base_dict['canvas'] = {'mode': self.hardware_canvas}
         if self.local_storage is not None:
             base_dict['storage'] = {'local': self.local_storage}
         if self.service_worker_cache is not None:
-            base_dict['storage'] = {
-                'serviceWorkerCache': self.service_worker_cache}
+            if 'storage' in base_dict:
+                base_dict['storage']['serviceWorkerCache'] = self.service_worker_cache
+            else:
+                base_dict['storage'] = {
+                    'serviceWorkerCache': self.service_worker_cache}
 
         return base_dict
 
 
 if __name__ == '__main__':
-    profile_base = Profile()
+    profile_base = Profile(language="en-us;q=1.0, en-uk;q=1.0, it;q=0.1",
+                           geolocation='BLOCK',
+                           do_not_track=1,
+                           hardware_canvas='REAL',
+                           local_storage=False,
+                           service_worker_cache=True)
 
-    with open('resources/examples/example_profile.json', 'w') as file:
+    with open('resources/examples/example_profile_0.json', 'w') as file:
         json.dump(profile_base.as_dict(), file, indent='  ')
 
     profile_full = Profile(language="en-us;q=0.6, en-uk;q=0.3, it;q=0.1",
                            geolocation='ALLOW',
                            do_not_track=0,
-                           hardware_canvas='NOISE',
-                           local_storage=True,
-                           service_worker_cache=True)
-    with open('resources/examples/example_profile.json', 'w') as file:
+                           hardware_canvas='BLOCK',
+                           local_storage=True
+                           )
+    with open('resources/examples/example_profile_1.json', 'w') as file:
         json.dump(profile_full.as_dict(), file, indent='  ')

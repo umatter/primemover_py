@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     # generate neutral crawlers
     config_list_neutral = [
-        Config(name='Config/neutral', location=l, pi=0, media={}, terms={}) for
+        Config(name='Config/neutral', location=l, pi=0, media="", terms="") for
         l in 2 * LOCATION_LIST]
     crawler_list_neutral = [Crawler(flag='neutral', configuration=c, experiment_id=2) for c in
                             config_list_neutral]
