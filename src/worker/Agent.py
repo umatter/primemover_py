@@ -1,9 +1,14 @@
 import json
 from src.worker.Info import AgentInfo
+import json
+import pathlib
+
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 
 class Agent:
-    with open("resources/other/geosurf_cities.json", 'r') as file:
+    with open(PRIMEMOVER_PATH + "/resources/other/geosurf_cities.json",
+              'r') as file:
         LOCATION_LIST = list(json.load(file).keys())
 
     def __init__(self,

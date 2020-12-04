@@ -10,6 +10,9 @@ from datetime import timedelta
 import pytz
 import time
 import json
+import pathlib
+
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 
 class Schedule:
@@ -250,7 +253,7 @@ class IndividualSchedule(Schedule):
 
 class TimeHandler:
     GLOBAL_SCHEDULE = Schedule()
-    with open("resources/other/geosurf_cities.json", 'r') as file:
+    with open(PRIMEMOVER_PATH + "/resources/other/geosurf_cities.json", 'r') as file:
         LOC_TIMEZONE_DICT = json.load(file)
 
     def __init__(self,

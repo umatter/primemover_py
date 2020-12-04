@@ -14,7 +14,6 @@ from src.worker.TimeHandler import TimeHandler
 import src.worker.Utilities as Util
 import src.worker.Tasks as Tasks
 
-
 class Crawler:
     """ Crawler combines all relevant information about an individual bot. It contains
     configuration, proxy, agent, queue (task) data and the necessary information

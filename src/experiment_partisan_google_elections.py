@@ -10,14 +10,17 @@ from src.worker.ConfigureProfile import Config
 from src.worker import api_wrapper as api
 import json
 from datetime import datetime
+import pathlib
+
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
 
 PATH_TERMS = {
-    'instagram': "resources/input_data/insta_top_partisan_hashtags.csv",
-    'bigrams': "resources/input_data/most_partisan_searchterms_pool.csv"}
-PATH_MEDIA_OUTLETS = "resources/input_data/twitter_stream_top_partisan_domains.csv"
-PATH_BENIGN_TERMS = 'resources/other/benign_terms.json'
+    'instagram':PRIMEMOVER_PATH + "/resources/input_data/insta_top_partisan_hashtags.csv",
+    'bigrams': PRIMEMOVER_PATH + "/resources/input_data/most_partisan_searchterms_pool.csv"}
+PATH_MEDIA_OUTLETS = PRIMEMOVER_PATH + "/resources/input_data/twitter_stream_top_partisan_domains.csv"
+PATH_BENIGN_TERMS = PRIMEMOVER_PATH + '/resources/other/benign_terms.json'
 
-with open("resources/other/partisan_election_hometowns.json", 'r') as file:
+with open(PRIMEMOVER_PATH + "/resources/other/partisan_election_hometowns.json", 'r') as file:
     LOCATION_LIST = json.load(file)
 
 if __name__ == "__main__":
@@ -52,14 +55,14 @@ if __name__ == "__main__":
                                config_list_right]
 
     crawler_list = crawler_list_neutral + crawler_list_political
-    with open("resources/election_experiment/election_crawler_py.json", 'w') as file:
+    with open(PRIMEMOVER_PATH + "/resources/election_experiment/election_crawler_py.json", 'w') as file:
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
-    return_data = api.push_new(path="resources/election_experiment/election_crawler_py.json")
+    return_data = api.push_new(path=PRIMEMOVER_PATH + "/resources/election_experiment/election_crawler_py.json")
     data_as_dict = json.loads(return_data.text)
 
     with open(
-            f'resources/crawlers/exp_2_{datetime.now().date().isoformat()}.json',
+            f'{PRIMEMOVER_PATH}/resources/crawlers/exp_2_{datetime.now().date().isoformat()}.json',
             'w') as file:
         json.dump(data_as_dict, file, indent='  ')

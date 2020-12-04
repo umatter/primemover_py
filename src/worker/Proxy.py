@@ -1,6 +1,10 @@
 from src.worker.Info import ProxyInfo
 import json
-with open('resources/other/keys.json', 'r') as key_file:
+import pathlib
+
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
+
+with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as key_file:
     keys = json.load(key_file)
 GEOSURF_USERNAME = keys['GEOSURF']['username']
 GEOSURF_PASSWORD = keys['GEOSURF']['password']

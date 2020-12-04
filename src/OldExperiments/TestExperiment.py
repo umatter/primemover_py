@@ -3,11 +3,14 @@ from src.auxiliary.GenerateBenignTerms import GenerateBenignTerms
 from src.worker.TimeHandler import Schedule
 from datetime import datetime
 import src.worker.api_wrapper as api
+import pathlib
+import json
 
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 PATH_TERMS = "/Users/johannes/Dropbox/websearch_polarization/data/final/searchterms_pool.csv"
 PATH_MEDIA_OUTLETS = "/Users/johannes/Dropbox/websearch_polarization/data/final/outlets_pool.csv"
-PATH_INDIVIDUAL_ORG = 'resources/other/individuals.json'
-PATH_BENGING_TERMS = 'resources/other/benign_terms.json'
+PATH_INDIVIDUAL_ORG = PRIMEMOVER_PATH + '/resources/other/individuals.json'
+PATH_BENGING_TERMS = PRIMEMOVER_PATH + '/resources/other/benign_terms.json'
 # gkg.main(50)
 GenerateBenignTerms()
 
@@ -43,11 +46,11 @@ if __name__ == "__main__":
         individual.add_task(GoogleSearch, to_session=session_id,
                             params={'term': neutral})
 
-    with open("resources/examples/test_crawler_py.json", 'w') as file:
+    with open(PRIMEMOVER_PATH + "/resources/examples/test_crawler_py.json", 'w') as file:
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
     return_data = api.push_new(path="resources/examples/test_crawler_py.json")
     #
-    with open(f'resources/crawlers/existing_{datetime.now().date().isoformat()}.json', 'w') as file:
+    with open(f'{PRIMEMOVER_PATH}/resources/crawlers/existing_{datetime.now().date().isoformat()}.json', 'w') as file:
         json.dump(return_data.text, file, indent='  ')

@@ -9,9 +9,10 @@ J.L. 11.2020
 from src import ConfigurationFunctions
 from src.worker.Info import ConfigurationInfo
 import json
-import os
+import pathlib
 
-resource_path = os
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
+
 
 
 class Config:
@@ -51,7 +52,7 @@ class Config:
         - info: should only be set using existing crawlers, via from_dict method.
     """
 
-    with open("resources/other/geosurf_cities.json", 'r') as file:
+    with open(PRIMEMOVER_PATH + "/resources/other/geosurf_cities.json", 'r') as file:
         LOCATION_LIST = list(json.load(file).keys())
 
     def __init__(self,

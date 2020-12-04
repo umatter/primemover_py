@@ -4,8 +4,10 @@ define a parser function. Store all function names in a dictionary, with keys th
 Task name as specified in a TaskBehavior.
 """
 from bs4 import BeautifulSoup
+from lxml import etree
 from src.worker.Utilities import extract_domain
 ParserDict = {}
+htmlparser = etree.HTMLParser()
 
 
 def GoogleParser(behaviors, raw_html):

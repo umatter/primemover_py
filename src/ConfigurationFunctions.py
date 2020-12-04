@@ -6,6 +6,9 @@ J.L. 11.2020
 
 import random as r
 import pandas as pd
+import pathlib
+
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
 
 
 def Psi():
@@ -43,8 +46,8 @@ def SelectSearchTerms(pi):
         - pi: political orientation of individual
     Returns: dictionary of term lists with keys 'instagram' and 'bigrams' denoting the source of each list.
     """
-    path_terms_instagram = 'resources/input_data/insta_top_partisan_hashtags.csv'
-    path_terms_bigrams = 'resources/input_data/most_partisan_searchterms_pool.csv'
+    path_terms_instagram = PRIMEMOVER_PATH + '/resources/input_data/insta_top_partisan_hashtags.csv'
+    path_terms_bigrams = PRIMEMOVER_PATH + '/resources/input_data/most_partisan_searchterms_pool.csv'
     terms_instagram = pd.read_csv(path_terms_instagram)
     terms_bigrams = pd.read_csv(path_terms_bigrams)
     if pi == -1:
@@ -70,7 +73,7 @@ def SelectMediaOutlets(pi=0):
         - pi: political orientation of individual
     Returns: dictionary of outlets with domains as keys and urls as values
     """
-    PATH_MEDIA_OUTLETS = 'resources/input_data/twitter_stream_top_partisan_domains.csv'
+    PATH_MEDIA_OUTLETS = PRIMEMOVER_PATH + '/resources/input_data/twitter_stream_top_partisan_domains.csv'
     outlets_twitter = pd.read_csv(PATH_MEDIA_OUTLETS)
 
     outlets = {}

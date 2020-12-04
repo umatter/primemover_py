@@ -7,6 +7,9 @@ import src.Preferences as Pref
 from src.ConfigurationFunctions import NoiseUtility
 import numpy as np
 import json
+import pathlib
+
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 
 class GoogleSearch(Queue):
@@ -42,8 +45,8 @@ class GoogleSearch(Queue):
         # Add Job to select a result randomly
         if select_result:
             self.jobs.append(
-                Jobs.SingleSelect(selector="#rso > div > div > div.yuRUbf > a",
-                                  selector_type='CSS',
+                Jobs.SingleSelect(selector='.//*[@class="yuRUbf"]/a',
+                                  selector_type='XPATH',
                                   decision_type="FIRST"
                                   )
             )
@@ -200,7 +203,7 @@ class BenignGoogleSearch(GoogleSearch):
 
 
 class VisitFrequentDirect(VisitDirect):
-    def __init__(self, start_at, file_path='resources/other/most_visited.json'):
+    def __init__(self, start_at, file_path = PRIMEMOVER_PATH + '/resources/other/most_visited.json'):
         with open(file_path, 'r') as file:
             urls = json.load(file)
         url = r.choice(urls)

@@ -7,6 +7,9 @@ from src.worker import api_wrapper
 import json
 from datetime import datetime, timedelta
 from src.worker.Crawler import Crawler
+import pathlib
+
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
 
 
 class JobResult:
@@ -16,7 +19,7 @@ class JobResult:
     def __init__(self, crawler_id=None, started_at=None,
                  status_code=None, status_message=None,
                  created_at=None, updated_at=None, finished_at=None,
-                 behaviors=None, reports=None):
+                 behaviors=None, reports=None, flag_list=None):
         self._crawler_id = crawler_id
         self._started_at = started_at
         self._status_message = status_message
@@ -31,6 +34,8 @@ class JobResult:
         self._behaviors = behaviors
         self._extract_flags()
         self._reports = reports
+
+        self._flag_list = flag_list
 
         # Check if flag in parser dict, if yes, parse
         if self._task in ParserDict.keys():
@@ -174,9 +179,9 @@ class SessionResult:
 
 
 def export_results(results, date=datetime.today().date().isoformat()):
-    # existing_crawler_path = f'resources/updates/exp_2_{(datetime.now().date() + timedelta(days=-1)).isoformat()}.json'
-    existing_crawler_path = 'resources/updates/exp_2_2020-11-08.json'
-    out_path = f'resources/cleaned_data/with_crawler_{date}.json'
+    # existing_crawler_path = f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date() + timedelta(days=-1)).isoformat()}.json'
+    existing_crawler_path = PRIMEMOVER_PATH +'/resources/updates/exp_2_2020-11-08.json'
+    out_path = f'{PRIMEMOVER_PATH}/resources/cleaned_data/with_crawler_{date}.json'
     with open(existing_crawler_path, 'r') as file:
         crawlers = Crawler.from_dict(json.load(file))
     combined = []
@@ -191,7 +196,7 @@ def export_results(results, date=datetime.today().date().isoformat()):
 
 if __name__ == "__main__":
     api_wrapper.fetch_results()
-    path = f'resources/raw_data/{(datetime.now().date() + timedelta(days=0)).isoformat()}.json'
+    path = f'{PRIMEMOVER_PATH}/resources/raw_data/{(datetime.now().date() + timedelta(days=0)).isoformat()}.json'
 
     with open(path, 'r') as file:
         raw_data = json.load(file)
@@ -206,7 +211,7 @@ if __name__ == "__main__":
             combined_sessions[session.crawler_id] = session.results
 
     with open(
-            f'resources/cleaned_data/{datetime.today().date().isoformat()}.json',
+            f'{PRIMEMOVER_PATH}/resources/cleaned_data/{datetime.today().date().isoformat()}.json',
             'w') as file:
         json.dump(combined_sessions, file, indent='  ')
 

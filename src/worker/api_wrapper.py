@@ -20,11 +20,13 @@ from datetime import datetime
 import os
 import io
 import zipfile
+import pathlib
 
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 DOMAIN = "https://siaw.qlick.ch/api/v1/"
 
 
-def push_new(path='resources/examples/test_crawler_py.json'):
+def push_new(path=PRIMEMOVER_PATH + '/resources/examples/test_crawler_py.json'):
     """
     Wrapper for the primemover load function. Use to post json like data from path.
     Args:
@@ -39,7 +41,7 @@ def push_new(path='resources/examples/test_crawler_py.json'):
 
 
 def fetch_results(
-        path=f'resources/raw_data/{datetime.today().date().isoformat()}.json'):
+        path=f'{PRIMEMOVER_PATH}/resources/raw_data/{datetime.today().date().isoformat()}.json'):
     """
     Wrapper for the queues-unreviewed method of the primemover api. These are all
     processed, unreviewed queues.
@@ -60,7 +62,7 @@ def fetch_results(
 
 
 def fetch_reviewed(
-        path=f'resources/raw_data/reviewed_{datetime.today().date().isoformat()}.json'):
+        path=f'{PRIMEMOVER_PATH}/resources/raw_data/reviewed_{datetime.today().date().isoformat()}.json'):
     """
     Wrapper for the queues-reviewed method of the primemover api. This contains all previously
         reviewed queues (reviewed is not set automaticaly, use set_reviewed())
@@ -80,7 +82,7 @@ def fetch_reviewed(
 
 
 def fetch_unprocessed(
-        path=f'resources/raw_data/unprocessed_{datetime.today().date().isoformat()}.json'):
+        path=f'{PRIMEMOVER_PATH}/resources/raw_data/unprocessed_{datetime.today().date().isoformat()}.json'):
     """
     Wrapper for the queues-unprocessed method of the primemover api. This contains all queues not
         yet processed by the runner. This includes inactive queues.
@@ -100,7 +102,7 @@ def fetch_unprocessed(
 
 
 def fetch_all_crawlers(
-        path=f'resources/crawlers/{datetime.today().date().isoformat()}.json'):
+        path=f'{PRIMEMOVER_PATH}/resources/crawlers/{datetime.today().date().isoformat()}.json'):
     """
     Wrapper for the crawlers method of the primemover api. This contains all active crawlers.
 

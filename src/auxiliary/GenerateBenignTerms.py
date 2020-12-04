@@ -6,14 +6,16 @@ J.L. 11.2020
 
 import json
 import random
+import pathlib
 
-IN_PATH = 'resources/other/Raw_Media_Headers.csv'
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
+IN_PATH = PRIMEMOVER_PATH + '/resources/other/Raw_Media_Headers.csv'
 COL_NAMES = ['term_params',
              'date_scraped',
              'source',
              'domain'
              'political_orientation']
-OUT_PATH = {'benign': 'resources/other/benign_terms.json'}
+OUT_PATH = {'benign': PRIMEMOVER_PATH + '/resources/other/benign_terms.json'}
 
 
 def conversion():
@@ -44,11 +46,11 @@ def equation():
 
 
 def GenerateBenignTerms():
-    with open('resources/other/common.json', 'r') as file:
+    with open(PRIMEMOVER_PATH + '/resources/other/common.json', 'r') as file:
         common_terms = json.load(file)
     file.close()
 
-    with open('resources/other/countries.json', 'r') as file:
+    with open(PRIMEMOVER_PATH + '/resources/other/countries.json', 'r') as file:
         countries = json.load(file)
     file.close()
 

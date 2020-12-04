@@ -32,4 +32,3 @@ if __name__ == "__main__":
             json.dump(src.worker.api_wrapper.get_outlets(), file)
 
 
-

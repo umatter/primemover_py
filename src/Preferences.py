@@ -43,7 +43,7 @@ def political_orientation_pi_i_t(psi_i, kappa_j_t_prev, pi_i_prev,
     """
     :param psi_i: float in [0,1], individuals persuadability
     :param kappa_j_t_prev: binary {0,1}, indicates  whether ind. can be persuaded
-        in period t-1
+        in period t-1 by media outlet j
     :param pi_i_prev: political orientation of individual i in period t-1
     :param pi_tilde_j_prev: political orientation of outlet j in period t-1
     :return: pi_i_new: political orientation of individual i in period t, i.e. updated

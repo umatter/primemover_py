@@ -5,10 +5,14 @@ from datetime import datetime, timedelta
 import src.worker.api_wrapper as api
 import random as r
 import json
+import pathlib
 
-PATH_TERMS = "resources/input_data/insta_top_partisan_hashtags.csv"
-PATH_MEDIA_OUTLETS = "resources/input_data/twitter_stream_top_partisan_domains.csv"
-PATH_BENIGN_TERMS = 'resources/other/benign_terms.json'
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
+
+
+PATH_TERMS = PRIMEMOVER_PATH + "/resources/input_data/insta_top_partisan_hashtags.csv"
+PATH_MEDIA_OUTLETS = PRIMEMOVER_PATH + "/resources/input_data/twitter_stream_top_partisan_domains.csv"
+PATH_BENIGN_TERMS = PRIMEMOVER_PATH + '/resources/other/benign_terms.json'
 
 NEUTRAL_1 = ["White House", "Congress", "Mail-in ballot", "Polling station",
              "Joe Biden", "Donald Trump", "Democrat", "Republican"]
@@ -44,8 +48,8 @@ NEUTRAL = ["Sidney Powell", "Donald Trump is", "Joe Biden is", "covid vaccine",
 def single_update(day_delta=0):
     GenerateBenignTerms()
 
-    # existing_crawler_path = f'resources/updates/exp_2_{(datetime.now().date()+ timedelta(days=-1)).isoformat()}.json'
-    existing_crawler_path = "resources/crawlers/2020-10-23.json"
+    # existing_crawler_path = f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date()+ timedelta(days=-1)).isoformat()}.json'
+    existing_crawler_path = PRIMEMOVER_PATH + "/resources/crawlers/2020-10-23.json"
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
@@ -112,17 +116,17 @@ def single_update(day_delta=0):
 
     crawler_list = crawler_list_neutral + crawler_list_political
 
-    with open("resources/examples/test_update_py.json", 'w') as file:
+    with open(PRIMEMOVER_PATH + "/resources/examples/test_update_py.json", 'w') as file:
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
     do = input('push data? (y/n): ')
     if do == 'y':
         return_data = api.push_new(
-            path="resources/examples/test_update_py.json")
+            path=PRIMEMOVER_PATH + "/resources/examples/test_update_py.json")
         data_as_dict = json.loads(return_data.text)
         with open(
-                f'resources/updates/exp_2_{(datetime.now().date() + timedelta(days=day_delta)).isoformat()}.json',
+                f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date() + timedelta(days=day_delta)).isoformat()}.json',
                 'w') as file:
             json.dump(data_as_dict, file, indent='  ')
 

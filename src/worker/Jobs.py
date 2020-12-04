@@ -10,7 +10,6 @@ Classes:
 
 import src.worker.Behavior as Behavior
 
-
 class Job:
     """
     Base class

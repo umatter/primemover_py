@@ -5,4 +5,4 @@ requests~=2.25.0
 pytz~=2020.4
 pandas~=1.1.4
 webob~=1.8.6
-# apache-airflow~=1.10.13
+apache-airflow~=1.10.13

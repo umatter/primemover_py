@@ -7,6 +7,10 @@ from webob import acceptparse
 import json
 import warnings
 import re
+import pathlib
+
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
+
 
 class Profile:
     def __init__(self,
@@ -293,7 +297,7 @@ if __name__ == '__main__':
                            local_storage=False,
                            service_worker_cache=True)
 
-    with open('resources/examples/example_profile_0.json', 'w') as file:
+    with open(PRIMEMOVER_PATH + '/resources/examples/example_profile_0.json', 'w') as file:
         json.dump(profile_base.as_dict(), file, indent='  ')
 
     profile_full = Profile(language="en-us;q=0.6, en-uk;q=0.3, it;q=0.1",
@@ -302,5 +306,5 @@ if __name__ == '__main__':
                            hardware_canvas='BLOCK',
                            local_storage=True
                            )
-    with open('resources/examples/example_profile_1.json', 'w') as file:
+    with open(PRIMEMOVER_PATH + '/resources/examples/example_profile_1.json', 'w') as file:
         json.dump(profile_full.as_dict(), file, indent='  ')

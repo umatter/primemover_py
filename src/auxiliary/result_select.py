@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 from src.worker import api_wrapper
 import pandas as pd
 import json
+from lxml import etree
 
 
 def remove_path(url):
@@ -56,20 +57,23 @@ def result_utility_w_i_j_t(r_j, known=0, d_tilde_i_j_t=0, rho_j=0.0,
     return w
 
 
-def find_results(google_html, selector, attribute='href'):
+def find_results(google_html, selector, attribute='a.href'):
     """
     :param attribute: href
     :param google_html: google results html file
     :param selector: CSS/XPATH/... In this case selector will be "\"#rso > div > div > div.yuRUbf > a\""
     :return:
     """
-    soup = bs4.BeautifulSoup(google_html, "html.parser")
-    raw_results = soup.select(selector)
+    htmlparser = etree.HTMLParser()
+    tree = etree.fromstring(google_html, htmlparser)
+    # soup = bs4.BeautifulSoup(google_html, "html.parser")
+    # raw_results = soup.find_all(xpath=".//div[@class = 'yuRUbf'/a")
+    raw_results = tree.xpath('.//div[@class="yuRUbf"]/a')
     clean_results = []
-
+    attribute = 'href'
     i = 1
     for result in raw_results:
-        full_url = result.get(attribute)
+        full_url = result.attrib[attribute]
         url = remove_path(full_url)
         rank = i
         i += 1
@@ -112,23 +116,28 @@ def choose_result(raw_html,
             # if the url is known to the individual (found in config) set known = 1
             known = 1
             # subtract pi from crawler config and the pi of the media outlet corresponding to the url
-            outlet_data = \
-                all_outlets.loc[
-                    all_outlets['redirect_url'] == result['url']].iloc[
-                    0]
-            d_tilde_i_j_t = abs(
-                pi - float(outlet_data['pi']))
-            exp_rho = float(outlet_data['avg_reach_permillion'])
+            try:
+                outlet_data = \
+                    all_outlets.loc[
+                        all_outlets['redirect_url'] == result['url']].iloc[
+                        0]
+                d_tilde_i_j_t = abs(
+                    pi - float(outlet_data['pi']))
+                exp_rho = float(outlet_data['avg_reach_permillion'])
 
-            # HIER IST DIE VERÄNDERUNG#
-            rho = math.log(exp_rho + math.e)
-            # calculate utility of the result
-            u = result_utility_w_i_j_t(r_j=result['rank'],
-                                       known=known, d_tilde_i_j_t=d_tilde_i_j_t,
-                                       rho_j=rho,
-                                       alpha_tilde=alpha_tilde,
-                                       tau_tilde=tau_tilde,
-                                       beta_i=beta_i)
+                # HIER IST DIE VERÄNDERUNG#
+                rho = math.log(exp_rho + math.e)
+                # calculate utility of the result
+                u = result_utility_w_i_j_t(r_j=result['rank'],
+                                           known=known,
+                                           d_tilde_i_j_t=d_tilde_i_j_t,
+                                           rho_j=rho,
+                                           alpha_tilde=alpha_tilde,
+                                           tau_tilde=tau_tilde,
+                                           beta_i=beta_i)
+            except:
+                u = result_utility_w_i_j_t(result['rank'])
+
         else:
             u = result_utility_w_i_j_t(result['rank'])
         # epsilon = random.uniform(0,1)  # noise parameter
