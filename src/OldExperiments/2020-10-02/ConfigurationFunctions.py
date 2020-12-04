@@ -92,7 +92,7 @@ def beta():
     """
     :return beta: scale parameter in utilities ?
     """
-    return random.uniform(0, 1)
+    return r.uniform(0, 1)
 
 
 def tau():

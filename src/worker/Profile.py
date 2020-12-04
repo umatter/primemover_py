@@ -56,6 +56,9 @@ class Profile:
         self.local_storage = local_storage
         self.service_worker_cache = service_worker_cache
         self.resolution = resolution
+        self.user_agent = user_agent
+        self.hardware_concurrency = hardware_concurrency
+        self.platform = platform
 
     @property
     def os(self):
@@ -104,6 +107,7 @@ class Profile:
         else:
             raise ValueError(
                 f'os must be one off {non_mobile} or android, received {string}')
+
 
     @property
     def language(self):
@@ -267,10 +271,20 @@ class Profile:
                 "dns": []
             }
         }
-        if self.language is not None:
-            base_dict['navigator'] = {'language': self.language}
-        if self.do_not_track is not None:
-            base_dict['navigator'] = {'doNotTrack': self.do_not_track}
+        navigator = not(self.language is None and self.do_not_track is None and self.user_agent is None and self.hardware_concurrency is None and self.platform is None)
+        if navigator:
+            base_dict['navigator'] = {}
+            if self.language is not None:
+                base_dict['navigator']['language'] = self.language
+            if self.do_not_track is not None:
+                base_dict['navigator']['doNotTrack'] = self.do_not_track
+            if self.user_agent is not None:
+                base_dict['navigator']['user_agent'] = self.user_agent
+            if self.hardware_concurrency is not None:
+                base_dict['navigator']['hardware_concurrency'] = self.hardware_concurrency
+            if self.platform is not None:
+                base_dict['navigator']['platform'] = self.platform
+
         if self.geolocation is not None:
             base_dict['geolocation'] = {'mode': self.geolocation}
         if self._fill_based_on_external_ip is not None:

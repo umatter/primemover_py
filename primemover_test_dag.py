@@ -23,8 +23,7 @@ default_args = {
     'email_on_failure': True,
     'email_on_retry': False,
     'retries': 1,
-    'retry_delay': timedelta(minutes=15),
-    'catchup': False,
+    'retry_delay': timedelta(minutes=5),
     # 'queue': 'bash_queue',
     # 'pool': 'backfill',
     # 'priority_weight': 10,
@@ -40,19 +39,25 @@ default_args = {
     # 'trigger_rule': 'all_success'
 }
 dag = DAG(
-    'update',
+    'test_1',
     default_args=default_args,
-    description='update crawler config and tasks',
-    schedule_interval="0 10 * * *",
+    description='A first test schedule',
+    schedule_interval="5 * * * *",
 )
 
 # t1, t2 and t3 are examples of tasks created by instantiating operators
 
 t1 = PythonOperator(
-    task_id='update_crawlers',
+    task_id='benign_terms',
     python_callable=src.auxiliary.GenerateBenignTerms.GenerateBenignTerms,
     dag=dag,
 )
 
+t2 = BashOperator(
+    task_id='say',
+    bash_command='echo "evereything worked!"',
+    dag=dag,
+)
 
+t1 >> t2
 
