@@ -194,13 +194,12 @@ def export_results(results, date=datetime.today().date().isoformat()):
         json.dump(combined, file, indent='  ')
 
 
-if __name__ == "__main__":
-    api_wrapper.fetch_results()
+def process_results(set_reviewed= True):
     path = f'{PRIMEMOVER_PATH}/resources/raw_data/{(datetime.now().date() + timedelta(days=0)).isoformat()}.json'
 
     with open(path, 'r') as file:
         raw_data = json.load(file)
-    session_data = SessionResult.from_list(raw_data['data'], set_reviewed=True)
+    session_data = SessionResult.from_list(raw_data['data'], set_reviewed=set_reviewed)
 
     combined_sessions = {}
     for session in session_data:
@@ -216,6 +215,12 @@ if __name__ == "__main__":
         json.dump(combined_sessions, file, indent='  ')
 
     export_results(combined_sessions)
+    return 'success'
+
+
+if __name__ == "__main__":
+    api_wrapper.fetch_results()
+    process_results(set_reviewed=True)
 
     # combined_session_1 = {}
     # combined_session_2 = {}

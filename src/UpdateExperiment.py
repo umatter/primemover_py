@@ -9,9 +9,6 @@ import pathlib
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
 
-
-PATH_TERMS = PRIMEMOVER_PATH + "/resources/input_data/insta_top_partisan_hashtags.csv"
-PATH_MEDIA_OUTLETS = PRIMEMOVER_PATH + "/resources/input_data/twitter_stream_top_partisan_domains.csv"
 PATH_BENIGN_TERMS = PRIMEMOVER_PATH + '/resources/other/benign_terms.json'
 
 NEUTRAL_1 = ["White House", "Congress", "Mail-in ballot", "Polling station",
@@ -53,9 +50,6 @@ def single_update(day_delta=0):
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
-
-    ConfigureProfile.Config.MEDIA_DEFAULT_PATH = PATH_MEDIA_OUTLETS
-    ConfigureProfile.Config.TERM_DEFAULT_PATH = PATH_TERMS
 
     with open(existing_crawler_path, 'r') as file:
         raw_crawlers = json.load(file)
@@ -116,10 +110,10 @@ def single_update(day_delta=0):
 
     crawler_list = crawler_list_neutral + crawler_list_political
 
-    with open(PRIMEMOVER_PATH + "/resources/examples/test_update_py.json", 'w') as file:
+    with open(PRIMEMOVER_PATH + "/resources/examples/test_update_py.json",
+              'w') as file:
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
-
 
     return_data = api.push_new(
         path=PRIMEMOVER_PATH + "/resources/examples/test_update_py.json")

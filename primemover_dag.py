@@ -56,8 +56,8 @@ t1 = PythonOperator(
 )
 
 t2 = BashOperator(
-    task_id='confitm',
-    bash_command='echo "evereything worked!"',
+    task_id='confirm',
+    bash_command='echo "everything worked!"',
     dag=dag,
 )
 

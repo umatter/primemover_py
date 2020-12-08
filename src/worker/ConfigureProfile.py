@@ -14,7 +14,6 @@ import pathlib
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 
-
 class Config:
     """A configuration object, sets all parameters documented in configurations.
     Most are standard, though these can be extended through optional parameters.

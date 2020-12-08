@@ -2,4 +2,5 @@ import src
 
 
 if __name__ == "__main__":
-    src.UpdateExperiment.single_update(day_delta=0)
+    src.worker.api_wrapper.fetch_results()
+    src.Results.process_results(set_reviewed=False)
