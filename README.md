@@ -11,6 +11,13 @@ Overall, this part of the primemover application contains most the economic deta
 
 
 ## Docker Image
+If your primemover_py package is a raw copy of the github repository, run
+```
+Python Makefile.py
+```
+You may also wish to copy any relevant input data into the corresponding folders.
+In particular any data necessary for updating must be present.
+
 Steps to launch, navigate to primemover_py using the terminal and run 
 ```
 docker build -t "primemover_py" .  
@@ -27,10 +34,7 @@ Activate the python enviornment
 cd primemover_py
 . primemover_env/bin/activate
 ```
-If your primemover_py package is a raw copy of the github repository, run
-```
-Makefile.py
-```
+
 Run the following code to launch airflow:
 ```
 airflow scheduler &
