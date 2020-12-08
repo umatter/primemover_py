@@ -6,6 +6,7 @@ J.L. 11.2020
 
 import random as r
 import pandas as pd
+from numpy.random import gumbel
 import pathlib
 from src.NewExperiment.Preferences import search_utility_v_ik
 
@@ -25,19 +26,15 @@ def Pi(flag=None):
     Determine political orientation
     Returns pi: political orientation of individual i
     """
-    if flag is None or flag == 'political' or flag == 'none':
-        return 0
-    elif flag == 'left':
-        return -1
-    elif flag == 'right':
-        return 1
+    pi = (-1, 1)
+    return pi
 
 
 def NoiseUtility():
     """
     Returns: epsilon: float, noise parameter when determining utility
     """
-    return r.normalvariate(0, 1)
+    return gumbel()
 
 
 def SelectSearchTerms(pi, alpha_hat, tau_hat_ik):

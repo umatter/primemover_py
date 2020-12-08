@@ -72,7 +72,7 @@ def GenerateBenignTerms():
 
     with open(OUT_PATH['benign'], 'w') as jar:
         json.dump(terms, jar)
-
+    return 'success'
 
 if __name__ == "__main__":
     GenerateBenignTerms()

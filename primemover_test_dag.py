@@ -18,16 +18,17 @@ import src
 default_args = {
     'owner': 'johannesl',
     'depends_on_past': False,
-    'start_date': days_ago(0),
+    'start_date': days_ago(1),
     'email': ['johannesl@me.com'],
-    'email_on_failure': True,
+    'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
     'retry_delay': timedelta(minutes=5),
+    'catchup': False,
     # 'queue': 'bash_queue',
     # 'pool': 'backfill',
     # 'priority_weight': 10,
-    # 'end_date': datetime(2020, 1, 1),
+    # 'end_ date': datetime(2020, 1, 1),
     # 'wait_for_downstream': False,
     # 'dag': dag,
     # 'sla': timedelta(hours=2),
@@ -42,7 +43,8 @@ dag = DAG(
     'test_1',
     default_args=default_args,
     description='A first test schedule',
-    schedule_interval="5 * * * *",
+    schedule_interval="36 * * * *",
+    catchup=False
 )
 
 # t1, t2 and t3 are examples of tasks created by instantiating operators

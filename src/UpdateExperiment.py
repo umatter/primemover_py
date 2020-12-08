@@ -120,19 +120,20 @@ def single_update(day_delta=0):
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
-    do = input('push data? (y/n): ')
-    if do == 'y':
-        return_data = api.push_new(
-            path=PRIMEMOVER_PATH + "/resources/examples/test_update_py.json")
-        data_as_dict = json.loads(return_data.text)
-        with open(
-                f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date() + timedelta(days=day_delta)).isoformat()}.json',
-                'w') as file:
-            json.dump(data_as_dict, file, indent='  ')
+
+    return_data = api.push_new(
+        path=PRIMEMOVER_PATH + "/resources/examples/test_update_py.json")
+    # data_as_dict = json.loads(return_data.text)
+    # with open(
+    #         f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date() + timedelta(days=day_delta)).isoformat()}.json',
+    #         'w') as file:
+    #     json.dump(data_as_dict, file, indent='  ')
 
 
 if __name__ == "__main__":
     # for day in range(13):
     #     single_update(day_delta=day)
     #     print((datetime.now().date() + timedelta(days=day)).isoformat())
-    single_update(day_delta=0)
+    do = input('push data? (y/n): ')
+    if do == 'y':
+        single_update(day_delta=0)

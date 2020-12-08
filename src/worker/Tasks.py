@@ -45,7 +45,7 @@ class GoogleSearch(Queue):
         # Add Job to select a result randomly
         if select_result:
             self.jobs.append(
-                Jobs.SingleSelect(selector='.//*[@class="yuRUbf"]/a',
+                Jobs.SingleSelect(selector='.//div[@class="yuRUbf"]/a',
                                   selector_type='XPATH',
                                   decision_type="FIRST"
                                   )
@@ -100,8 +100,8 @@ class VisitViaGoogle(Queue):
                          )
 
         # Add Job to select the first result
-        self.jobs.append(Jobs.SingleSelect(selector="LC20lb.DKV0Md",
-                                           selector_type='CLASS',
+        self.jobs.append(Jobs.SingleSelect(selector='.//div[@class="yuRUbf"]/a',
+                                           selector_type='XPATH',
                                            decision_type="FIRST"
                                            )
                          )
@@ -203,7 +203,8 @@ class BenignGoogleSearch(GoogleSearch):
 
 
 class VisitFrequentDirect(VisitDirect):
-    def __init__(self, start_at, file_path = PRIMEMOVER_PATH + '/resources/other/most_visited.json'):
+    def __init__(self, start_at,
+                 file_path=PRIMEMOVER_PATH + '/resources/other/most_visited.json'):
         with open(file_path, 'r') as file:
             urls = json.load(file)
         url = r.choice(urls)

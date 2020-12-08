@@ -10,3 +10,30 @@ The [primemover_ui](https://github.com/umatter/primemover_ui/) offers a REST API
 Overall, this part of the primemover application contains most the economic details/specifications guiding the bot's decisions/behavior.
 
 
+## Docker Image
+Steps to launch, navigate to primemover_py using the terminal and run 
+```
+docker build -t "primemover_py" .  
+```
+The docker image is created with tag 'latest'
+run 
+```
+docker run -it -p 8080:<PORT>  --name <NAME> primemover_py  
+```
+this creates the docker container and connects the airflow port to <PORT>.
+You are placed in the container. 
+Activate the python enviornment
+```
+cd primemover_py
+. primemover_env/bin/activate
+```
+If your primemover_py package is a raw copy of the github repository, run
+```
+Makefile.py
+```
+Run the following code to launch airflow:
+```
+airflow scheduler &
+airflow webserver
+```
+The airflow ui is now accessible at localhost:<PORT>
