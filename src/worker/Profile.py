@@ -8,6 +8,7 @@ import json
 import warnings
 import re
 import pathlib
+import src.ConfigurationFunctions as Config
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
@@ -17,16 +18,16 @@ class Profile:
                  name="%%AGENTID%%",
                  os='win',
                  browser='mimic',
-                 language="en-us",
-                 resolution='DEFAULT',
-                 geolocation='DEFAULT',
-                 do_not_track='DEFAULT',
-                 hardware_canvas='DEFAULT',
-                 local_storage='DEFAULT',
-                 service_worker_cache='DEFAULT',
-                 user_agent='DEFAULT',
-                 platform='DEFAULT',
-                 hardware_concurrency='DEFAULT'
+                 language="PyDefault",
+                 resolution='MultiloginDefault',
+                 geolocation='PyDefault',
+                 do_not_track='PyDefault',
+                 hardware_canvas='PyDefault',
+                 local_storage='PyDefault',
+                 service_worker_cache='MultiloginDefault',
+                 user_agent='MultiloginDefault',
+                 platform='MultiloginDefault',
+                 hardware_concurrency='MultiloginDefault'
                  ):
         """
         ArgumentsTo
@@ -37,27 +38,44 @@ class Profile:
             - language: string containing language and if desired preference for language
                 e.g. 'en-US;q=0.8, it;q=0.1, fr-CA;q=0.1' (<language>-<region>;<preference>)
                 only <language> is required e.g. ('en, it'). Websites should adjust according
-                to these preferences. 'DEFAULT' will allow multilogin to set
+                to these preferences. 'MultiloginDefault' will allow multilogin to set
             - geolocation: string in { PROMPT, BLOCK, ALLOW }, Note, Prompt is perhaps undesirable
-                since it requires additional browser automation to accept. 'DEFAULT' will allow multilogin to set (default: 'DEFAULT')
-            - do_not_track: 1,0 if 1, doNotTrack is on, else off. 'DEFAULT' will allow multilogin to set
-            - hardware_canvas: one of [ REAL, BLOCK, NOISE ]. 'DEFAULT' will allow multilogin to set
-            - local_storage: boolean, default:'DEFAULT' will allow multilogin to set. If local_storage is False, service_worker_cache is set to False
-            - service_worker_cache: boolean, default: 'DEFAULT' will allow multilogin to set. If local_storage is False, service_worker_cache can not be set to True
+                since it requires additional browser automation to accept. 'MultiloginDefault' will allow multilogin to set (default: 'MultiloginDefault')
+            - do_not_track: 1,0 if 1, doNotTrack is on, else off. 'MultiloginDefault' will allow multilogin to set
+            - hardware_canvas: one of [ REAL, BLOCK, NOISE ]. 'MultiloginDefault' will allow multilogin to set
+            - local_storage: boolean, default:'MultiloginDefault' will allow multilogin to set. If local_storage is False, service_worker_cache is set to False
+            - service_worker_cache: boolean, default: 'MultiloginDefault' will allow multilogin to set. If local_storage is False, service_worker_cache can not be set to True
         """
         self.os = os
         self.name = name
         self.browser = browser
-        self.language = language
+        if language == 'PyDefault':
+            self.language = Config.language()
+        else:
+            self.language = language
         self._fill_based_on_external_ip = None
-        self.geolocation = geolocation
-        self.do_not_track = do_not_track
-        self.hardware_canvas = hardware_canvas
-        self.local_storage = local_storage
+        if geolocation == 'PyDefault':
+            self.geolocation = Config.geolocation()
+        else:
+            self.geolocation = geolocation
+        if do_not_track == 'PyDefault':
+            self.do_not_track = Config.do_not_track()
+        else:
+            self.do_not_track = do_not_track
+        if hardware_canvas == 'PyDefault':
+            self.hardware_canvas = Config.hardware_canvas()
+        else:
+            self.hardware_canvas = hardware_canvas
+
+        if local_storage == 'PyDefault':
+            self.local_storage = Config.local_storage()
+        else:
+            self.local_storage = local_storage
+
+        self.hardware_concurrency = hardware_concurrency
         self.service_worker_cache = service_worker_cache
         self.resolution = resolution
         self.user_agent = user_agent
-        self.hardware_concurrency = hardware_concurrency
         self.platform = platform
 
     @property
@@ -119,7 +137,7 @@ class Profile:
         language_string: string containing language and if desired preference for different languages
                 e.g. 'en-US;q=0.8, it;q=0.1, fr-CA;q=0.1' (<language>-<region>;<preference>)
                 only <language> is required e.g. ('en, it')"""
-        if language_string == 'DEFAULT':
+        if language_string == 'MultiloginDefault':
             self._language = None
         else:
             accept_header = acceptparse.create_accept_language_header(language_string)
@@ -137,14 +155,14 @@ class Profile:
         """
         Check validity of geolocation setting and set self._geolocation
         Arguments:
-            - string: desired setting {PROMPT, BLOCK, ALLOW, DEFAULT}
-                DEFAULT -> NONE
+            - string: desired setting {PROMPT, BLOCK, ALLOW, MultiloginDefault}
+                MultiloginDefault -> NONE
         Exceptions:
             - ValueError: raises a value error when string is not a setting accepted by MultiLogin
         """
         string = string.strip().upper()
         valid_settings = {'PROMPT', 'BLOCK', 'ALLOW'}
-        if string == 'DEFAULT':
+        if string == 'MultiloginDefault':
             self._geolocation = None
         elif string in valid_settings:
             self._geolocation = string
@@ -164,7 +182,7 @@ class Profile:
 
     @do_not_track.setter
     def do_not_track(self, value: int):
-        if value == 'DEFAULT':
+        if value == 'MultiloginDefault':
             self._do_not_track = None
         elif value in {1, 0}:
             self._do_not_track = value
@@ -177,7 +195,7 @@ class Profile:
 
     @local_storage.setter
     def local_storage(self, value):
-        if value == 'DEFAULT':
+        if value == 'MultiloginDefault':
             self._local_storage = None
         elif type(value) is str:
             value = value.strip().lower()
@@ -200,7 +218,7 @@ class Profile:
 
     @service_worker_cache.setter
     def service_worker_cache(self, value):
-        if value == 'DEFAULT':
+        if value == 'MultiloginDefault':
             self._service_worker_cache = None
         elif type(value) is str:
             value = value.strip().lower()
@@ -231,7 +249,7 @@ class Profile:
 
     @hardware_canvas.setter
     def hardware_canvas(self, value):
-        if value == 'DEFAULT':
+        if value == 'MultiloginDefault':
             self._hardware_canvas = None
         else:
             value = value.strip().upper()
@@ -246,7 +264,7 @@ class Profile:
 
     @resolution.setter
     def resolution(self, value):
-        if value == 'DEFAULT':
+        if value == 'MultiloginDefault':
             self._resolution = None
         elif re.fullmatch("^[0-9]+x[0-9]+", value.strip().lower()) is not None:
             value = value.strip().lower()
@@ -274,26 +292,26 @@ class Profile:
         navigator = not(self.language is None and self.do_not_track is None and self.user_agent is None and self.hardware_concurrency is None and self.platform is None)
         if navigator:
             base_dict['navigator'] = {}
-            if self.language is not None:
+            if  self.language not in [None, 'MultiloginDefault']:
                 base_dict['navigator']['language'] = self.language
-            if self.do_not_track is not None:
+            if self.do_not_track  not in [None, 'MultiloginDefault']:
                 base_dict['navigator']['doNotTrack'] = self.do_not_track
-            if self.user_agent is not None:
+            if self.user_agent  not in [None, 'MultiloginDefault']:
                 base_dict['navigator']['user_agent'] = self.user_agent
-            if self.hardware_concurrency is not None:
+            if self.hardware_concurrency  not in [None, 'MultiloginDefault']:
                 base_dict['navigator']['hardware_concurrency'] = self.hardware_concurrency
-            if self.platform is not None:
+            if self.platform  not in [None, 'MultiloginDefault']:
                 base_dict['navigator']['platform'] = self.platform
 
-        if self.geolocation is not None:
+        if self.geolocation  not in [None, 'MultiloginDefault']:
             base_dict['geolocation'] = {'mode': self.geolocation}
-        if self._fill_based_on_external_ip is not None:
+        if self._fill_based_on_external_ip  not in [None, 'MultiloginDefault']:
             base_dict['geolocation']['fillBasedOnExternalIp'] = self._fill_based_on_external_ip
-        if self.hardware_canvas is not None:
+        if self.hardware_canvas not in [None, 'MultiloginDefault']:
             base_dict['canvas'] = {'mode': self.hardware_canvas}
-        if self.local_storage is not None:
+        if self.local_storage not in [None, 'MultiloginDefault']:
             base_dict['storage'] = {'local': self.local_storage}
-        if self.service_worker_cache is not None:
+        if self.service_worker_cache  not in [None, 'MultiloginDefault']:
             if 'storage' in base_dict:
                 base_dict['storage']['serviceWorkerCache'] = self.service_worker_cache
             else:

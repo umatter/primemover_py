@@ -15,6 +15,7 @@ Available Functions:
 J.L. 11.2020
 """
 import requests
+from requests_oauthlib import OAuth2Session
 import json
 from datetime import datetime
 import os
@@ -23,10 +24,24 @@ import zipfile
 import pathlib
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
-DOMAIN = "https://siaw.qlick.ch/api/v1/"
+DOMAIN = " https://primemover.wimando.ch/api/v1/"
 
 
-def push_new(path=PRIMEMOVER_PATH + '/resources/examples/test_crawler_py.json'):
+def get_access(e_mail, password):
+    """
+    Wrapper for the primemover login function. Use to post json like data from path.
+
+    Returns:
+        access_token
+    """
+
+    params = {'email': e_mail, 'password': password}
+    post_login = requests.post(DOMAIN + 'login', params=params)
+    return post_login.json()['access_token']
+
+
+def push_new(access_token,
+             path=PRIMEMOVER_PATH + '/resources/examples/test_crawler_py.json'):
     """
     Wrapper for the primemover load function. Use to post json like data from path.
     Args:
@@ -36,12 +51,14 @@ def push_new(path=PRIMEMOVER_PATH + '/resources/examples/test_crawler_py.json'):
     """
     with open(path, 'r') as f:
         data_crawlers = json.load(f)
-    post_crawlers = requests.post(DOMAIN + 'load', json=data_crawlers)
+    post_crawlers = requests.post(DOMAIN + 'load', json=data_crawlers, headers={
+        'Authorization': 'Bearer ' + access_token})
+
     return post_crawlers
 
 
-def fetch_results(
-        path=f'{PRIMEMOVER_PATH}/resources/raw_data/{datetime.today().date().isoformat()}.json'):
+def fetch_results(access_token,
+                  path=f'{PRIMEMOVER_PATH}/resources/raw_data/{datetime.today().date().isoformat()}.json'):
     """
     Wrapper for the queues-unreviewed method of the primemover api. These are all
     processed, unreviewed queues.
@@ -54,15 +71,16 @@ def fetch_results(
     """
     if os.path.exists(path):
         raise Exception('file already exists')
-    raw_data = requests.get(DOMAIN + 'queues-unreviewed')
+    raw_data = requests.get(DOMAIN + 'queues-unreviewed',
+                            headers={'Authorization': 'Bearer ' + access_token})
     raw_dict = raw_data.json()
     with open(path, 'w') as f:
         json.dump(raw_dict, f, indent='  ')
     return raw_dict
 
 
-def fetch_reviewed(
-        path=f'{PRIMEMOVER_PATH}/resources/raw_data/reviewed_{datetime.today().date().isoformat()}.json'):
+def fetch_reviewed(access_token,
+                   path=f'{PRIMEMOVER_PATH}/resources/raw_data/reviewed_{datetime.today().date().isoformat()}.json'):
     """
     Wrapper for the queues-reviewed method of the primemover api. This contains all previously
         reviewed queues (reviewed is not set automaticaly, use set_reviewed())
@@ -74,15 +92,16 @@ def fetch_reviewed(
     """
     if os.path.exists(path):
         raise Exception('file already exists')
-    raw_data = requests.get(DOMAIN + 'queues-reviewed')
+    raw_data = requests.get(DOMAIN + 'queues-reviewed',
+                            headers={'Authorization': f'Bearer {access_token}'})
     raw_dict = raw_data.json()
     with open(path, 'w') as f:
         json.dump(raw_dict, f, indent='  ')
     return raw_dict
 
 
-def fetch_unprocessed(
-        path=f'{PRIMEMOVER_PATH}/resources/raw_data/unprocessed_{datetime.today().date().isoformat()}.json'):
+def fetch_unprocessed(access_token,
+                      path=f'{PRIMEMOVER_PATH}/resources/raw_data/unprocessed_{datetime.today().date().isoformat()}.json'):
     """
     Wrapper for the queues-unprocessed method of the primemover api. This contains all queues not
         yet processed by the runner. This includes inactive queues.
@@ -94,15 +113,16 @@ def fetch_unprocessed(
     """
     if os.path.exists(path):
         raise Exception('file already exists')
-    raw_data = requests.get(DOMAIN + 'queues-unprocessed')
+    raw_data = requests.get(DOMAIN + 'queues-unprocessed',
+                            headers={'Authorization': f'Bearer {access_token}'})
     raw_dict = raw_data.json()
     with open(path, 'w') as f:
         json.dump(raw_dict, f, indent='  ')
     return raw_dict
 
 
-def fetch_all_crawlers(
-        path=f'{PRIMEMOVER_PATH}/resources/crawlers/{datetime.today().date().isoformat()}.json'):
+def fetch_all_crawlers(access_token,
+                       path=f'{PRIMEMOVER_PATH}/resources/crawlers/{datetime.today().date().isoformat()}.json'):
     """
     Wrapper for the crawlers method of the primemover api. This contains all active crawlers.
 
@@ -112,14 +132,15 @@ def fetch_all_crawlers(
     Returns:
         dictionary response from api
     """
-    raw_data = requests.get(DOMAIN + 'crawlers')
+    raw_data = requests.get(DOMAIN + 'crawlers',
+                            headers={'Authorization': f'Bearer {access_token}'})
     raw_dict = raw_data.json()
     with open(path, 'w') as f:
         json.dump(raw_dict, f, indent='  ')
     return raw_dict
 
 
-def fetch_html(url):
+def fetch_html(access_token, url):
     """
     Wrapper function to fetch html data from report urls
     Args:
@@ -127,7 +148,7 @@ def fetch_html(url):
     Returns:
         html as text
     """
-    r = requests.get(url)
+    r = requests.get(url, headers={'Authorization': f'Bearer {access_token}'})
     zipdata = io.BytesIO(r.content)
     as_zipfile = zipfile.ZipFile(zipdata)
     name = None
@@ -139,7 +160,7 @@ def fetch_html(url):
     return raw_html
 
 
-def set_reviewed(queue_id: int):
+def set_reviewed(access_token, queue_id: int):
     """
     Wrapper function to set queue status to reviewed.
     Args:
@@ -147,14 +168,15 @@ def set_reviewed(queue_id: int):
     Returns:
         'sucess' if status code 200, else raises ConnectionError with response status code
     """
-    r = requests.put(DOMAIN + f'queues/{queue_id}', data={'reviewed': 1})
+    r = requests.put(DOMAIN + f'queues/{queue_id}', data={'reviewed': 1},
+                     headers={'Authorization': f'Bearer {access_token}'})
     if r.status_code == 200:
         return 'success'
     else:
         raise ConnectionError(f'status code {r.status_code}')
 
 
-def set_inactive(queue_id):
+def set_inactive(access_token, queue_id):
     """
     Wrapper function set queue status to active = 0
     Args:
@@ -162,31 +184,31 @@ def set_inactive(queue_id):
     Returns:
         'sucess' if status code 200, else raises ConnectionError with response status code
     """
-    r = requests.put(DOMAIN + f'queues/{queue_id}', data={'active': 0})
+    r = requests.put(DOMAIN + f'queues/{queue_id}', data={'active': 0},
+                     headers={'Authorization': f'Bearer {access_token}'})
     if r.status_code == 200:
         return 'success'
     else:
         raise ConnectionError(f'status code {r.status_code}')
 
 
-def get_outlets():
+def get_outlets(access_token):
     """
     Wrapper function to retrive media outlets from primemover api
     Returns:
         contents of response json at key 'data'
     """
-    r = requests.get(DOMAIN + 'outlets')
+    r = requests.get(DOMAIN + 'outlets',
+                     headers={'Authorization': f'Bearer {access_token}'})
     return r.json()['data']
 
 
-def get_terms():
+def get_terms(access_token):
     """
     Wrapper function to retrive search terms from primemover api
     Returns:
         contents of response json at key 'data'
     """
-    r = requests.get(DOMAIN + 'terms')
-    return r.json()['data']
-
-if __name__ == "__main__":
-    fetch_results()
+    r = requests.get(DOMAIN + 'terms',
+                     headers={'Authorization': f'Bearer {access_token}'})
+    return r

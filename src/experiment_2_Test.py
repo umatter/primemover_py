@@ -9,19 +9,17 @@ from src.worker.TimeHandler import Schedule, TimeHandler
 from src.worker.ConfigureProfile import Config
 from src.worker import api_wrapper as api
 import json
+import time
 from datetime import datetime
 import pathlib
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
 
-PATH_TERMS = {
-    'instagram':PRIMEMOVER_PATH + "/resources/input_data/insta_top_partisan_hashtags.csv",
-    'bigrams': PRIMEMOVER_PATH + "/resources/input_data/most_partisan_searchterms_pool.csv"}
-PATH_MEDIA_OUTLETS = PRIMEMOVER_PATH + "/resources/input_data/twitter_stream_top_partisan_domains.csv"
+
 PATH_BENIGN_TERMS = PRIMEMOVER_PATH + '/resources/other/benign_terms.json'
 
 with open(PRIMEMOVER_PATH + "/resources/other/partisan_election_hometowns.json", 'r') as file:
-    LOCATION_LIST = json.load(file)
+    LOCATION_LIST = json.load(file)[0:2]
 
 if __name__ == "__main__":
 
@@ -33,16 +31,16 @@ if __name__ == "__main__":
     # generate neutral crawlers
     config_list_neutral = [
         Config(name='Config/neutral', location=l, pi=0, media="", terms="") for
-        l in 2 * LOCATION_LIST]
-    crawler_list_neutral = [Crawler(flag='neutral', configuration=c, experiment_id=2) for c in
+        l in  LOCATION_LIST]
+    crawler_list_neutral = [Crawler(flag='neutral', configuration=c, experiment_id=1) for c in
                             config_list_neutral]
 
     # generate left wing crawlers
     config_list_left = [Config(name='Config/left',
-                               location=l, pi=-1)
-                        for l in 2 * LOCATION_LIST]
+                               location=l)
+                        for l in LOCATION_LIST]
 
-    crawler_list_political = [Crawler(flag='left', configuration=c, experiment_id=2) for c in
+    crawler_list_political = [Crawler(flag='left', configuration=c, experiment_id=1) for c in
                               config_list_left]
 
     # generate right wing crawlers
@@ -55,14 +53,14 @@ if __name__ == "__main__":
                                config_list_right]
 
     crawler_list = crawler_list_neutral + crawler_list_political
-    with open(PRIMEMOVER_PATH + "/resources/election_experiment/election_crawler_py.json", 'w') as file:
-        json.dump([crawler.as_dict() for crawler in crawler_list], file,
+    with open(PRIMEMOVER_PATH + "/resources/crawlers/test_1.json", 'w') as file:
+        json.dump([crawler.as_dict() for crawler in crawler_list][4:5], file,
                   indent='  ')
-
-    return_data = api.push_new(path=PRIMEMOVER_PATH + "/resources/election_experiment/election_crawler_py.json")
+    key = api.get_access('p@wimando.ch', 'And#Qom5F20')
+    return_data = api.push_new(access_token=key, path=PRIMEMOVER_PATH + "/resources/crawlers/test_1.json")
     data_as_dict = json.loads(return_data.text)
 
     with open(
-            f'{PRIMEMOVER_PATH}/resources/crawlers/exp_2_{datetime.now().date().isoformat()}.json',
+            f'{PRIMEMOVER_PATH}/resources/crawlers/test_1_{datetime.now().date().isoformat()}.json',
             'w') as file:
         json.dump(data_as_dict, file, indent='  ')

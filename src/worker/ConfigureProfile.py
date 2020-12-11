@@ -10,9 +10,9 @@ from src import ConfigurationFunctions
 from src.worker.Info import ConfigurationInfo
 import json
 import pathlib
+import src.Preferences
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
-
 
 
 class Config:
@@ -52,7 +52,8 @@ class Config:
         - info: should only be set using existing crawlers, via from_dict method.
     """
 
-    with open(PRIMEMOVER_PATH + "/resources/other/geosurf_cities.json", 'r') as file:
+    with open(PRIMEMOVER_PATH + "/resources/other/geosurf_cities.json",
+              'r') as file:
         LOCATION_LIST = list(json.load(file).keys())
 
     def __init__(self,
@@ -85,9 +86,12 @@ class Config:
 
         self.beta = beta
         self.kappa = kappa
+
+        self._state = None
+        self.location = location
+
         self.media = media
         self.terms = terms
-        self.location = location
 
     @property
     def flag(self):
@@ -166,7 +170,11 @@ class Config:
     @media.setter
     def media(self, media_in):
         if media_in is None:
-            self._media = ConfigurationFunctions.SelectMediaOutlets(pi=self._pi)
+            self._media = ConfigurationFunctions.SelectMediaOutlets(pi=self._pi,
+                                                                    alpha_tilde=self.alpha,
+                                                                    tau_tilde_ij=self.tau,
+                                                                    state=self._state,
+                                                                    k=10)
         elif type(media_in) in {list, dict}:
             self._media = media_in
         elif media_in == "":
@@ -182,7 +190,10 @@ class Config:
     @terms.setter
     def terms(self, term_dict):
         if term_dict is None:
-            self._terms = ConfigurationFunctions.SelectSearchTerms(pi=self._pi)
+            self._terms = ConfigurationFunctions.SelectSearchTerms(pi=self.pi,
+                                                                   alpha_hat=self.alpha,
+                                                                   tau_hat_ik=self.tau,
+                                                                   k=40)
 
         elif type(term_dict) is list:
             self._terms = term_dict
@@ -207,6 +218,11 @@ class Config:
         else:
             raise ValueError(
                 f'{val} is not a valid location see geosurf cities')
+        segments = val.split('-')
+        if type(segments) is list and len(segments) == 3:
+            self._state = segments[0] + '-' + segments[1]
+        else:
+            self._state = None
 
     def as_dict(self):
         """
@@ -240,6 +256,19 @@ class Config:
         """
         Update self according to results
         """
+        kappa_j_t = self.kappa
+        for outlet in results:
+            if self.kappa == 2:
+                if not outlet['known']:
+                    kappa_j_t = 1
+                else:
+                    kappa_j_t = 0
+            self.pi = src.Preferences.political_orientation_pi_i_t(
+                psi_i=self.psi, kappa_j_t_prev=kappa_j_t,
+                pi_tilde_j_prev=outlet['pi'], pi_i_prev=self.pi)
+        self.media = ConfigurationFunctions.update_media_outlets(
+            outlets=self.media + results, alpha_tilde=self.alpha, pi=self.pi,
+            tau_tilde_ij=self.tau, k=10)
 
     @classmethod
     def from_dict(cls, config_dict):

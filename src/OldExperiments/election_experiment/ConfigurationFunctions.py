@@ -6,9 +6,7 @@ J.L. 11.2020
 
 import random as r
 import pandas as pd
-from numpy.random import gumbel
 import pathlib
-from src.NewExperiment.Preferences import search_utility_v_ik
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
 
@@ -26,41 +24,45 @@ def Pi(flag=None):
     Determine political orientation
     Returns pi: political orientation of individual i
     """
-    pi = (-1, 1)
-    return pi
+    if flag is None or flag == 'political' or flag == 'none':
+        return 0
+    elif flag == 'left':
+        return -1
+    elif flag == 'right':
+        return 1
 
 
 def NoiseUtility():
     """
     Returns: epsilon: float, noise parameter when determining utility
     """
-    return gumbel()
+    return r.normalvariate(0, 1)
 
 
-def SelectSearchTerms(pi, alpha_hat, tau_hat_ik):
+def SelectSearchTerms(pi):
     """
     Select a subset of all search terms. Terms come from two sepparate pools of terms.
     Arguments:
         - pi: political orientation of individual
     Returns: dictionary of term lists with keys 'instagram' and 'bigrams' denoting the source of each list.
     """
-    path_terms = PRIMEMOVER_PATH + '/resources/input_data/terms.csv'
-    terms = pd.read_csv(path_terms, columns=['search_term', 'pi_p'])
-    terms['pi_p'] = terms['pi_p'].astype(float)
-
-    utilities = []
-    for row in terms.index:
-        term_k, pi_hat_k = terms.loc[row]
-        # epsilon_ik = NoiseUtility()
-        utilities.append((search_utility_v_ik(pi_i=pi,
-                                              pi_hat_k=pi_hat_k,
-                                              epsilon_ik=0,
-                                              alpha_hat=alpha_hat,
-                                              tau_hat_ik=tau_hat_ik), term_k,
-                          pi_hat_k))
-    utilities.sort()
-    max_K = utilities[-k:]
-    terms = [(b, c) for a, b, c in max_K]
+    path_terms_instagram = PRIMEMOVER_PATH + '/resources/input_data/insta_top_partisan_hashtags.csv'
+    path_terms_bigrams = PRIMEMOVER_PATH + '/resources/input_data/most_partisan_searchterms_pool.csv'
+    terms_instagram = pd.read_csv(path_terms_instagram)
+    terms_bigrams = pd.read_csv(path_terms_bigrams)
+    if pi == -1:
+        terms_instagram = terms_instagram.loc[terms_instagram['party'] == 'D']
+        terms_bigrams = terms_bigrams.loc[terms_bigrams['party'] == 'D']
+    elif pi == 1:
+        terms_instagram = terms_instagram.loc[terms_instagram['party'] == 'R']
+        terms_bigrams = terms_bigrams.loc[terms_bigrams['party'] == 'R']
+    else:
+        return {'bigrams': [], 'instagram': []}
+    indexes_bigram = r.choices(terms_bigrams.index, k=10)
+    indexes_insta = r.choices(terms_instagram.index, k=10)
+    terms = {
+        'bigrams': terms_bigrams.loc[indexes_bigram]['search_term'].tolist(),
+        'instagram': terms_instagram.loc[indexes_insta]['hashtag'].tolist()}
     return terms
 
 

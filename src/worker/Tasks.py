@@ -188,7 +188,8 @@ class VisitMedia(VisitDirect):
 
 class NeutralGoogleSearch(GoogleSearch):
     def __init__(self, term, start_at):
-        super().__init__(term=term, name='search_google_neutral',
+        super().__init__(term=term,
+                         name='search_google_neutral',
                          start_at=start_at,
                          search_type='neutral',
                          select_result=True)

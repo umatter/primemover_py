@@ -1,4 +1,4 @@
-import json
+from src.worker.Profile import Profile
 from src.worker.Info import AgentInfo
 import json
 import pathlib
@@ -24,7 +24,7 @@ class Agent:
         self.location = location
         self._identification = identification
         self._multilogin_id = multilogin_id
-        self._multilogin_profile = multilogin_profile
+        self.multilogin_profile = multilogin_profile
         self._info = info
 
     @property
@@ -39,13 +39,32 @@ class Agent:
             raise ValueError(
                 f'{val} is not a valid location see geosurf cities')
 
+    @property
+    def multilogin_profile(self):
+        return self._multilogin_profile
+
+    @multilogin_profile.setter
+    def multilogin_profile(self, val):
+        if val is None:
+            self._multilogin_profile = Profile()
+        elif type(val) is Profile:
+            self._multilogin_profile = val
+        elif type(val) is str:
+            self._multilogin_profile = val
+        else:
+            raise TypeError(f'multilogin profile must be of type Profile got {type(val)} instead')
+
     def as_dict(self):
+
         return_dict = {"name": self._name,
                        "description": self._description,
                        "location": self._location,
                        "identification": self._identification,
                        "multilogin_id": self._multilogin_id,
                        "multilogin_profile": self._multilogin_profile}
+        if type(self._multilogin_profile) is Profile:
+            return_dict["multilogin_profile"] = (self._multilogin_profile.as_dict())
+
         if self._info is not None:
             for key, value in self._info.as_dict().items():
                 return_dict['key'] = value

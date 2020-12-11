@@ -170,9 +170,9 @@ class Crawler:
             # return_dict['configuration_id'] = self.configuration.id
             # return_dict['proxy_id'] = self.proxy.id
         else:
-            return_dict["configuration"] = [self._configuration.as_dict()]
-            return_dict["agent"] = [self.agent.as_dict()]
-            return_dict["proxy"] = [self.proxy.as_dict()]
+            return_dict["configuration"] = self._configuration.as_dict()
+            return_dict["agent"] = self.agent.as_dict()
+            return_dict["proxy"] = self.proxy.as_dict()
         return_dict["queues"] = [x.as_dict() for x in self.queues.values()]
         return return_dict
 

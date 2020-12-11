@@ -6,10 +6,8 @@
 /resources/raw_html
 /resources/updates
 /resources/input_data
-Dockerfile
 /resources/keys
 /resources/election_experiment
 /resources/examples/test_update_py_old.json
 /new proxy text
 /venv/
-airflow.cfg

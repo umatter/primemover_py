@@ -2,7 +2,7 @@
 Process results returned from primemover runner via the API
 """
 
-from src.worker.Parser import *
+import src.worker.Parser as Parser
 from src.worker import api_wrapper
 import json
 from datetime import datetime, timedelta
@@ -19,7 +19,7 @@ class JobResult:
     def __init__(self, crawler_id=None, started_at=None,
                  status_code=None, status_message=None,
                  created_at=None, updated_at=None, finished_at=None,
-                 behaviors=None, reports=None, flag_list=None):
+                 behaviors=None, reports=None, flag_list=None, parser_dict=Parser.ParserDict):
         self._crawler_id = crawler_id
         self._started_at = started_at
         self._status_message = status_message
@@ -36,17 +36,17 @@ class JobResult:
         self._reports = reports
 
         self._flag_list = flag_list
-
+        self._parser_dict = parser_dict
         # Check if flag in parser dict, if yes, parse
-        if self._task in ParserDict.keys():
+        if self._task in self._parser_dict.keys():
             if len(self._reports) > 0:
-                if ParserDict[self._task]['data'] == 'html':
+                if parser_dict[self._task]['data'] == 'html':
                     raw_data = self._download_html()
-                elif ParserDict[self._task]['data'] == 'reports':
+                elif parser_dict[self._task]['data'] == 'reports':
                     raw_data = self._reports
                 else:
                     raw_data = None
-                self._parsed_data = ParserDict[self._task]['method'](
+                self._parsed_data = self._parser_dict[self._task]['method'](
                     self._behaviors,
                     raw_data)
                 self.results = {'finished_at': self._finished_at,
@@ -78,14 +78,14 @@ class JobResult:
                     continue
 
     @classmethod
-    def from_list(cls, result_list):
+    def from_list(cls, result_list, parser_dict=Parser.ParserDict):
 
-        job_results = [cls.from_dict(ind_job) for ind_job in result_list]
+        job_results = [cls.from_dict(ind_job, parser_dict) for ind_job in result_list]
 
         return job_results
 
     @classmethod
-    def from_dict(cls, result_dict):
+    def from_dict(cls, result_dict, parser_dict=Parser.ParserDict):
         job_result_object = cls(crawler_id=result_dict.get('crawler_id'),
                                 started_at=result_dict.get('started_at'),
                                 status_message=result_dict.get(
@@ -95,7 +95,8 @@ class JobResult:
                                 updated_at=result_dict.get('updated_at'),
                                 finished_at=result_dict.get('finished_at'),
                                 behaviors=result_dict.get('behaviors'),
-                                reports=result_dict.get('reports'))
+                                reports=result_dict.get('reports'),
+                                parser_dict=parser_dict)
 
         return job_result_object
 
@@ -118,6 +119,7 @@ class SessionResult:
                  finished_at=None,
                  user_id=None,
                  jobs=None,
+                 parser_dict=Parser.ParserDict,
                  ):
         self.crawler_id = crawler_id
         self._started_at = started_at
@@ -136,6 +138,7 @@ class SessionResult:
         self._updated_at = updated_at
         self._user_id = user_id
         self._jobs = jobs
+        self._parser_dict=parser_dict
 
         temp_results = [j.results for j in self._jobs]
         self.results = []
@@ -154,7 +157,7 @@ class SessionResult:
         return session_results
 
     @classmethod
-    def from_dict(cls, result_dict):
+    def from_dict(cls, result_dict, parser_dict=Parser.ParserDict):
         session_result_object = cls(crawler_id=result_dict.get("crawler_id"),
                                     started_at=result_dict.get("started_at"),
                                     queue_id=result_dict.get("id"),
@@ -194,13 +197,12 @@ def export_results(results, date=datetime.today().date().isoformat()):
         json.dump(combined, file, indent='  ')
 
 
-if __name__ == "__main__":
-    api_wrapper.fetch_results()
+def process_results(set_reviewed=True):
     path = f'{PRIMEMOVER_PATH}/resources/raw_data/{(datetime.now().date() + timedelta(days=0)).isoformat()}.json'
 
     with open(path, 'r') as file:
         raw_data = json.load(file)
-    session_data = SessionResult.from_list(raw_data['data'], set_reviewed=True)
+    session_data = SessionResult.from_list(raw_data['data'], set_reviewed=set_reviewed)
 
     combined_sessions = {}
     for session in session_data:
@@ -216,6 +218,10 @@ if __name__ == "__main__":
         json.dump(combined_sessions, file, indent='  ')
 
     export_results(combined_sessions)
+    return 'sucess'
+if __name__ == "__main__":
+    api_wrapper.fetch_results()
+    process_results(set_reviewed=True)
 
     # combined_session_1 = {}
     # combined_session_2 = {}

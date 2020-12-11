@@ -6,8 +6,11 @@ Task name as specified in a TaskBehavior.
 from bs4 import BeautifulSoup
 from lxml import etree
 from src.worker.Utilities import extract_domain
+
 ParserDict = {}
 htmlparser = etree.HTMLParser()
+
+UpdateParser = {}
 
 
 def GoogleParser(behaviors, raw_html):
@@ -26,12 +29,15 @@ def GoogleParser(behaviors, raw_html):
         url = result.find('a').get('href')
         domain = extract_domain(url)
         title = result.find('h3').text
-        try: body = result.find(class_='IsZvec').text
+        try:
+            body = result.find(class_='IsZvec').text
         except:
             body = ''
 
-        parsed_data.append({'rank':rank, 'term': term, 'title': title, 'url': url, 'body': body,
-                            'domain': domain})
+        parsed_data.append(
+            {'rank': rank, 'term': term, 'title': title, 'url': url,
+             'body': body,
+             'domain': domain})
 
     return parsed_data
 
@@ -39,17 +45,27 @@ def GoogleParser(behaviors, raw_html):
 def BrowserLeaksParser(behaviors, reports):
     parsed_data = []
     for report in reports:
-            parsed_data.append(report['path'])
+        parsed_data.append(report['path'])
     if len(parsed_data) == 0:
         parsed_data = parsed_data[0]
     return parsed_data
 
 
+def SelectionParser(behaviors, reports):
+    for report in reports:
+        if 'dynamic_jobdata' in report
+            api_wrapper.fetch_report()
+    for result in dynamic_data['items']:
+        if result['selected']:
+            parsed_data = result['url']
+
 ParserDict['GoogleSearch'] = {'method': GoogleParser, 'data': 'html'}
 ParserDict['search_google_political'] = {'method': GoogleParser, 'data': 'html'}
-ParserDict['search_google_political_media_no_utility'] = {'method': GoogleParser, 'data': 'html'}
-ParserDict['search_google_political_no_utility'] = {'method': GoogleParser, 'data': 'html'}
+ParserDict['search_google_political_media_no_utility'] = {
+    'method': GoogleParser, 'data': 'html'}
+ParserDict['search_google_political_no_utility'] = {'method': GoogleParser,
+                                                    'data': 'html'}
 ParserDict['search_google_neutral'] = {'method': GoogleParser, 'data': 'html'}
 ParserDict['BrowserLeaks'] = {'method': BrowserLeaksParser, 'data': 'reports'}
 
-
+UpdateParser['search_google_neutral_select'] = {'method':SelectionParser, 'data':'reports'}

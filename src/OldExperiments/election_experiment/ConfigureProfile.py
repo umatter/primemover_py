@@ -6,12 +6,13 @@ ConfigurationFunctions file.
 J.L. 11.2020
 """
 
-from src.NewExperiment import ConfigurationFunctions
+from src import ConfigurationFunctions
 from src.worker.Info import ConfigurationInfo
 import json
 import pathlib
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
+
 
 
 class Config:
@@ -51,8 +52,7 @@ class Config:
         - info: should only be set using existing crawlers, via from_dict method.
     """
 
-    with open(PRIMEMOVER_PATH + "/resources/other/geosurf_cities.json",
-              'r') as file:
+    with open(PRIMEMOVER_PATH + "/resources/other/geosurf_cities.json", 'r') as file:
         LOCATION_LIST = list(json.load(file).keys())
 
     def __init__(self,
@@ -182,9 +182,7 @@ class Config:
     @terms.setter
     def terms(self, term_dict):
         if term_dict is None:
-            self._terms = ConfigurationFunctions.SelectSearchTerms(pi=self.pi,
-                                                                   alpha_hat=self.alpha,
-                                                                   tau_hat_ik=self.tau)
+            self._terms = ConfigurationFunctions.SelectSearchTerms(pi=self._pi)
 
         elif type(term_dict) is list:
             self._terms = term_dict

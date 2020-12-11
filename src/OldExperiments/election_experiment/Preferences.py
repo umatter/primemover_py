@@ -18,8 +18,8 @@ def media_utility_u_ij(pi_i, pi_tilde_j, rho_j, epsilon_ij, alpha_tilde,
         ideologicaly distant news
     :return u: float > 0, utility  derived by individual i when consuming news from outlet j
     """
-    d_tilde_ij = (pi_i-pi_tilde_j) ** 2
-    u = alpha_tilde - tau_tilde_ij * d_tilde_ij + epsilon_ij
+    d_tilde_ij = abs(pi_i-pi_tilde_j)
+    u = alpha_tilde - tau_tilde_ij * d_tilde_ij + rho_j + epsilon_ij
     return u
 
 
@@ -49,7 +49,8 @@ def political_orientation_pi_i_t(psi_i, kappa_j_t_prev, pi_i_prev,
     :return: pi_i_new: political orientation of individual i in period t, i.e. updated
         political preferences.
     """
-    pi_i_new = (1 - psi_i * kappa_j_t_prev) * pi_i_prev + psi_i * kappa_j_t_prev * pi_tilde_j_prev
+    pi_i_new = (
+                       1 - psi_i * kappa_j_t_prev) * pi_i_prev + psi_i * kappa_j_t_prev * pi_tilde_j_prev
     return pi_i_new
 
 
@@ -93,7 +94,47 @@ def result_utility_w_i_j_t(r_j, known=0, d_tilde_i_j_t=0, rho_j=0, alpha_tilde=1
     :return:
     """
     w = (1 - beta_i * (
-                r_j - 1)) + known * (alpha_tilde - tau_tilde * d_tilde_i_j_t)
+                r_j - 1)) + known * (alpha_tilde - tau_tilde * d_tilde_i_j_t + rho_j)
 
     return w
 
+
+def choose_result(results, outlets, pi):
+    """
+    :param pi: pi_i  political orientation of the individual
+    :param nr_results: int, nr. of results to view
+    :param results: list of shape: [{rank:int, result_url, x_path...}, {rank:int, result_url,...}]
+                assume no missing ranks and first result has rank = 1
+    :param outlets: list containing outlets of shape: outlet_prob": [{
+      "outlet": "1011now.com",
+      "p": 0.4436
+      "ro": 0.2
+    },
+    {
+      "outlet": "10news.com",
+      "p": 0.3788
+      "ro": 0.4
+    },
+    :return: single result item from results list that is to be clicked
+    """
+    # reformat outlets data to reflect unique 'outlet' and allow better access
+    outlets_dict = {}
+    for url, p, rho in outlets.items():
+        outlets_dict[url] = {'p': p, 'rho': rho}
+
+    # calculate utility of each result
+    utilities = []
+    for rank, result_url in results.items():
+        if result_url in outlets_dict.keys():
+            d_tilde_i_j_t = abs(pi - outlets_dict[result_url]['p'])
+            u = result_utility_w_i_j_t(rank, 1, d_tilde_i_j_t, outlets_dict[result_url]['rho'])
+        else:
+            u = result_utility_w_i_j_t(rank)
+        epsilon = random.uniform(0, 1) # noise parameter
+        utilities.append(u + epsilon)
+    # convert utilities to probabilites of selecting
+    probabilities = prob_i(utilities)
+    # conduct experiment_id to select single result
+    results_idx = np.random.multinomial(1, probabilities).argmax()
+
+    return results[results_idx]
