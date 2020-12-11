@@ -6,6 +6,7 @@ Task name as specified in a TaskBehavior.
 from bs4 import BeautifulSoup
 from lxml import etree
 from src.worker.Utilities import extract_domain
+import pandas as pd
 
 ParserDict = {}
 htmlparser = etree.HTMLParser()
@@ -53,10 +54,11 @@ def BrowserLeaksParser(behaviors, reports):
 
 def SelectionParser(behaviors, reports):
     for report in reports:
-        if 'dynamic_jobdata' in report
+        if 'dynamic_jobdata' in report:
             api_wrapper.fetch_report()
     for result in dynamic_data['items']:
         if result['selected']:
+            if result['']
             parsed_data = result['url']
 
 ParserDict['GoogleSearch'] = {'method': GoogleParser, 'data': 'html'}

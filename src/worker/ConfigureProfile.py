@@ -52,7 +52,7 @@ class Config:
         - info: should only be set using existing crawlers, via from_dict method.
     """
 
-    with open(PRIMEMOVER_PATH + "/resources/other/geosurf_cities.json",
+    with open(PRIMEMOVER_PATH + "/resources/other/valid_cities.json",
               'r') as file:
         LOCATION_LIST = list(json.load(file).keys())
 

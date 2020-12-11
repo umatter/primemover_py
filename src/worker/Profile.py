@@ -126,7 +126,6 @@ class Profile:
             raise ValueError(
                 f'os must be one off {non_mobile} or android, received {string}')
 
-
     @property
     def language(self):
         return self._language
@@ -140,7 +139,8 @@ class Profile:
         if language_string == 'MultiloginDefault':
             self._language = None
         else:
-            accept_header = acceptparse.create_accept_language_header(language_string)
+            accept_header = acceptparse.create_accept_language_header(
+                language_string)
             if type(accept_header) is acceptparse.AcceptLanguageValidHeader:
                 self._language = language_string
             else:
@@ -236,7 +236,8 @@ class Profile:
             self._service_worker_cache = value
             if self._local_storage in {False, None}:
                 self._local_storage = True
-                warnings.warn('Attempting to set serviceWorkerCache True, while local storage is False or not set. This will be overwritten')
+                warnings.warn(
+                    'Attempting to set serviceWorkerCache True, while local storage is False or not set. This will be overwritten')
         elif not value:
             # self._local_storage = False
             self._service_worker_cache = False
@@ -258,6 +259,7 @@ class Profile:
             else:
                 raise ValueError(
                     f'Invalid hardware_canvas setting, should be one of REAL,BLOCK, NOISE')
+
     @property
     def resolution(self):
         return self._resolution
@@ -289,31 +291,35 @@ class Profile:
                 "dns": []
             }
         }
-        navigator = not(self.language is None and self.do_not_track is None and self.user_agent is None and self.hardware_concurrency is None and self.platform is None)
+        navigator = not (
+                    self.language is None and self.do_not_track is None and self.user_agent is None and self.hardware_concurrency is None and self.platform is None)
         if navigator:
             base_dict['navigator'] = {}
-            if  self.language not in [None, 'MultiloginDefault']:
+            if self.language not in [None, 'MultiloginDefault']:
                 base_dict['navigator']['language'] = self.language
-            if self.do_not_track  not in [None, 'MultiloginDefault']:
+            if self.do_not_track not in [None, 'MultiloginDefault']:
                 base_dict['navigator']['doNotTrack'] = self.do_not_track
-            if self.user_agent  not in [None, 'MultiloginDefault']:
+            if self.user_agent not in [None, 'MultiloginDefault']:
                 base_dict['navigator']['user_agent'] = self.user_agent
-            if self.hardware_concurrency  not in [None, 'MultiloginDefault']:
-                base_dict['navigator']['hardware_concurrency'] = self.hardware_concurrency
-            if self.platform  not in [None, 'MultiloginDefault']:
+            if self.hardware_concurrency not in [None, 'MultiloginDefault']:
+                base_dict['navigator'][
+                    'hardware_concurrency'] = self.hardware_concurrency
+            if self.platform not in [None, 'MultiloginDefault']:
                 base_dict['navigator']['platform'] = self.platform
 
-        if self.geolocation  not in [None, 'MultiloginDefault']:
+        if self.geolocation not in [None, 'MultiloginDefault']:
             base_dict['geolocation'] = {'mode': self.geolocation}
-        if self._fill_based_on_external_ip  not in [None, 'MultiloginDefault']:
-            base_dict['geolocation']['fillBasedOnExternalIp'] = self._fill_based_on_external_ip
+        if self._fill_based_on_external_ip not in [None, 'MultiloginDefault']:
+            base_dict['geolocation'][
+                'fillBasedOnExternalIp'] = self._fill_based_on_external_ip
         if self.hardware_canvas not in [None, 'MultiloginDefault']:
             base_dict['canvas'] = {'mode': self.hardware_canvas}
         if self.local_storage not in [None, 'MultiloginDefault']:
             base_dict['storage'] = {'local': self.local_storage}
-        if self.service_worker_cache  not in [None, 'MultiloginDefault']:
+        if self.service_worker_cache not in [None, 'MultiloginDefault']:
             if 'storage' in base_dict:
-                base_dict['storage']['serviceWorkerCache'] = self.service_worker_cache
+                base_dict['storage'][
+                    'serviceWorkerCache'] = self.service_worker_cache
             else:
                 base_dict['storage'] = {
                     'serviceWorkerCache': self.service_worker_cache}
@@ -329,7 +335,8 @@ if __name__ == '__main__':
                            local_storage=False,
                            service_worker_cache=True)
 
-    with open(PRIMEMOVER_PATH + '/resources/examples/example_profile_0.json', 'w') as file:
+    with open(PRIMEMOVER_PATH + '/resources/examples/example_profile_0.json',
+              'w') as file:
         json.dump(profile_base.as_dict(), file, indent='  ')
 
     profile_full = Profile(language="en-us;q=0.6, en-uk;q=0.3, it;q=0.1",
@@ -338,5 +345,6 @@ if __name__ == '__main__':
                            hardware_canvas='BLOCK',
                            local_storage=True
                            )
-    with open(PRIMEMOVER_PATH + '/resources/examples/example_profile_1.json', 'w') as file:
+    with open(PRIMEMOVER_PATH + '/resources/examples/example_profile_1.json',
+              'w') as file:
         json.dump(profile_full.as_dict(), file, indent='  ')

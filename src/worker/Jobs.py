@@ -36,14 +36,6 @@ class Job:
         if flag is not None:
             self.behaviors.append(Behavior.FlagBehavior(flag))
 
-    def __str__(self):
-        job_descr = \
-            f'"name": "{self._name or ""}",\n' \
-            f'"type":"{self.type or ""}",\n' \
-            f'"description": "{self._description or ""}"'
-        formatted = ",\n".join([str(x) for x in self.behaviors])
-        return f'{{{job_descr},"behaviors": [\n{formatted}]}}'
-
     def as_dict(self):
         """
         Convert to API compatible dict

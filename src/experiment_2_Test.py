@@ -12,6 +12,7 @@ import json
 import time
 from datetime import datetime
 import pathlib
+from src.worker.Proxy import Proxy
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
 
@@ -27,11 +28,10 @@ if __name__ == "__main__":
                                            end_at=(10 + 23) * 60 * 60,
                                            interval=600,
                                            )
-
     # generate neutral crawlers
     config_list_neutral = [
         Config(name='Config/neutral', location=l, pi=0, media="", terms="") for
-        l in  LOCATION_LIST]
+        l in LOCATION_LIST]
     crawler_list_neutral = [Crawler(flag='neutral', configuration=c, experiment_id=1) for c in
                             config_list_neutral]
 

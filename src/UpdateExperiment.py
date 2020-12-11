@@ -63,6 +63,7 @@ def single_update(day_delta=0):
         else:
             crawler_list_neutral.append(crawler)
 
+
     neutral = r.choices(NEUTRAL, k=2)
     with open(PATH_BENIGN_TERMS, 'r') as file:
         benign = json.load(file)
@@ -74,7 +75,7 @@ def single_update(day_delta=0):
                                          params={'term': r.choice(benign)})
         if r.choice([True, False]):
             individual.add_task(Tasks.PoliticalSearchNoUtility,
-                                to_session=True,
+                                to_session=session_id,
                                 params={'term_type': 'bigrams'})
         if r.choice([True, False]):
             individual.add_task(Tasks.PoliticalSearchNoUtility,
