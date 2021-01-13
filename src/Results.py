@@ -16,6 +16,7 @@ class JobResult:
     """
     Stores and processes the returned data for a single job
     """
+
     def __init__(self, crawler_id=None, started_at=None,
                  status_code=None, status_message=None,
                  created_at=None, updated_at=None, finished_at=None,
@@ -50,14 +51,18 @@ class JobResult:
                     self._behaviors,
                     raw_data)
                 self.results = {'finished_at': self._finished_at,
+                                'created_at': self._created_at,
                                 'status_code': self._status_code,
                                 'status_message': self._status_message,
                                 'flag': self._flag, 'data': self._parsed_data}
             else:
+                self._parsed_data = ParserDict[self._task]['method'](
+                    self._behaviors, None)
                 self.results = {'finished_at': self._finished_at,
                                 'status_code': self._status_code,
                                 'status_message': self._status_message,
-                                'flag': self._flag, 'data': None}
+                                'flag': self._flag, 'data': self._parsed_data}
+
         else:
             self.results = None
 
@@ -180,7 +185,7 @@ class SessionResult:
 
 def export_results(results, date=datetime.today().date().isoformat()):
     # existing_crawler_path = f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date() + timedelta(days=-1)).isoformat()}.json'
-    existing_crawler_path = PRIMEMOVER_PATH +'/resources/updates/exp_2_2020-11-08.json'
+    existing_crawler_path = PRIMEMOVER_PATH + '/resources/updates/exp_2_2020-11-08.json'
     out_path = f'{PRIMEMOVER_PATH}/resources/cleaned_data/with_crawler_{date}.json'
     with open(existing_crawler_path, 'r') as file:
         crawlers = Crawler.from_dict(json.load(file))
@@ -194,12 +199,13 @@ def export_results(results, date=datetime.today().date().isoformat()):
         json.dump(combined, file, indent='  ')
 
 
-def process_results(set_reviewed= True):
-    path = f'{PRIMEMOVER_PATH}/resources/raw_data/{(datetime.now().date() + timedelta(days=0)).isoformat()}.json'
+def process_results(set_reviewed=True, date=(datetime.now().date() + timedelta(days=0)).isoformat()):
 
+    path = f'{PRIMEMOVER_PATH}/resources/raw_data/{date}.json'
     with open(path, 'r') as file:
         raw_data = json.load(file)
-    session_data = SessionResult.from_list(raw_data['data'], set_reviewed=set_reviewed)
+    session_data = SessionResult.from_list(raw_data['data'],
+                                           set_reviewed=set_reviewed)
 
     combined_sessions = {}
     for session in session_data:
@@ -210,44 +216,19 @@ def process_results(set_reviewed= True):
             combined_sessions[session.crawler_id] = session.results
 
     with open(
-            f'{PRIMEMOVER_PATH}/resources/cleaned_data/{datetime.today().date().isoformat()}.json',
+            f'{PRIMEMOVER_PATH}/resources/cleaned_data/{date}.json',
             'w') as file:
         json.dump(combined_sessions, file, indent='  ')
 
-    export_results(combined_sessions)
+    export_results(combined_sessions, date=date)
     return 'success'
 
 
 if __name__ == "__main__":
     api_wrapper.fetch_results()
-    process_results(set_reviewed=True)
+    date = datetime.now().date().isoformat()
+    process_results(set_reviewed=False, date=date)
 
-    # combined_session_1 = {}
-    # combined_session_2 = {}
-    # for session in session_data:
-    #     if "10-14" in session.start_at:
-    #
-    #         if session.crawler_id in combined_session_1.keys():
-    #             combined_session_1[session.crawler_id] = combined_session_1[
-    #                                                         session.crawler_id] + session.results
-    #         else:
-    #             combined_session_1[session.crawler_id] = session.results
-    #     elif "10-15" in session.start_at:
-    #
-    #         if session.crawler_id in combined_session_2.keys():
-    #             combined_session_2[session.crawler_id] = combined_session_2[
-    #                                                         session.crawler_id] + session.results
-    #         else:
-    #             combined_session_2[session.crawler_id] = session.results
-    #
-    # with open(
-    #         f'resources/cleaned_data/2020-10-15.json',
-    #         'w') as file:
-    #     json.dump(combined_session_1, file, indent='  ')
-    # export_results(combined_session_1, '2020-10-1')
-    #
-    # with open(
-    #         f'resources/cleaned_data/2020-10-16.json',
-    #         'w') as file:
-    #     json.dump(combined_session_2, file, indent='  ')
-    # export_results(combined_session_2, date='2020-10-16')
+    for days_ago in range(0,60):
+        date = (datetime.now().date() + timedelta(days=-days_ago)).isoformat()
+        process_results(set_reviewed=False, date=date)

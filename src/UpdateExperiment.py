@@ -9,6 +9,8 @@ import pathlib
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
 
+PATH_TERMS = PRIMEMOVER_PATH + "/resources/input_data/insta_top_partisan_hashtags.csv"
+PATH_MEDIA_OUTLETS = PRIMEMOVER_PATH + "/resources/input_data/twitter_stream_top_partisan_domains.csv"
 PATH_BENIGN_TERMS = PRIMEMOVER_PATH + '/resources/other/benign_terms.json'
 
 NEUTRAL_1 = ["White House", "Congress", "Mail-in ballot", "Polling station",
@@ -35,11 +37,27 @@ NEUTRAL_4 = ["Georgia recount",
              "did my vote count?",
              "google news"]
 
-NEUTRAL = ["Sidney Powell", "Donald Trump is", "Joe Biden is", "covid vaccine",
-           "presidential transition", "mask mandate", "curfew",
-           "has michigan certified the election",
-           "has pennsylvania certified the election", "voter fraud",
-           "election results 2020", "news"]
+NEUTRAL_5 = ["Sidney Powell", "Donald Trump is", "Joe Biden is",
+             "covid vaccine",
+             "presidential transition", "mask mandate", "curfew",
+             "has michigan certified the election",
+             "has pennsylvania certified the election", "voter fraud",
+             "election results 2020", "news"]
+
+NEUTRAL = [
+    "president elect",
+    "capitol washington dc",
+    "capitol building",
+    "riot capitol hill",
+    "who won senate 2021",
+    "hyde smith",
+    "senate results georgia",
+    "curfew",
+    "trump supporters dc",
+    "electoral college",
+    "election certification",
+    "trump supporters",
+    "news"]
 
 
 def single_update(day_delta=0):
@@ -50,6 +68,9 @@ def single_update(day_delta=0):
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
+
+    ConfigureProfile.Config.MEDIA_DEFAULT_PATH = PATH_MEDIA_OUTLETS
+    ConfigureProfile.Config.TERM_DEFAULT_PATH = PATH_TERMS
 
     with open(existing_crawler_path, 'r') as file:
         raw_crawlers = json.load(file)
@@ -74,7 +95,7 @@ def single_update(day_delta=0):
                                          params={'term': r.choice(benign)})
         if r.choice([True, False]):
             individual.add_task(Tasks.PoliticalSearchNoUtility,
-                                to_session=True,
+                                to_session=session_id,
                                 params={'term_type': 'bigrams'})
         if r.choice([True, False]):
             individual.add_task(Tasks.PoliticalSearchNoUtility,
@@ -90,9 +111,9 @@ def single_update(day_delta=0):
             individual.add_task(Tasks.VisitFrequentDirect,
                                 to_session=session_id)
 
-        individual.add_task(Tasks.NeutralGoogleSearch, to_session=True,
+        individual.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
                             params={'term': neutral[0]})
-        individual.add_task(Tasks.NeutralGoogleSearch, to_session=True,
+        individual.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
                             params={'term': neutral[1]})
 
     for individual in crawler_list_neutral:
@@ -115,8 +136,8 @@ def single_update(day_delta=0):
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
-    return_data = api.push_new(
-        path=PRIMEMOVER_PATH + "/resources/examples/test_update_py.json")
+    # return_data = api.push_new(
+    #     path=PRIMEMOVER_PATH + "/resources/examples/test_update_py.json")
     # data_as_dict = json.loads(return_data.text)
     # with open(
     #         f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date() + timedelta(days=day_delta)).isoformat()}.json',
