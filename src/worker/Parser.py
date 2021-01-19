@@ -41,11 +41,11 @@ def GoogleParser(behaviors, raw_html):
         try: title = result.find('h3').text
         except:
             title = ''
-            print('Title is missing')
+            # print('Title is missing')
         try:
             body = result.find(class_='IsZvec').text
         except:
-            print('Body is missing')
+            # print('Body is missing')
             body = ''
 
         parsed_data.append(

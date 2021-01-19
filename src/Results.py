@@ -8,6 +8,7 @@ import json
 from datetime import datetime, timedelta
 from src.worker.Crawler import Crawler
 import pathlib
+import os
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
 
@@ -203,8 +204,8 @@ def export_results(results, date=datetime.today().date().isoformat()):
         json.dump(combined, file, indent='  ')
 
 
-def process_results(set_reviewed=True, date=(datetime.now().date() + timedelta(days=0)).isoformat()):
-
+def process_results(set_reviewed=True, date=(
+        datetime.now().date() + timedelta(days=0)).isoformat()):
     path = f'{PRIMEMOVER_PATH}/resources/raw_data/{date}.json'
     with open(path, 'r') as file:
         raw_data = json.load(file)
@@ -228,11 +229,43 @@ def process_results(set_reviewed=True, date=(datetime.now().date() + timedelta(d
     return 'success'
 
 
+def results_interactive():
+    y_n = input('Fetch new Data?: (y/n) ')
+    if y_n == 'y':
+        api_wrapper.fetch_results()
+        date = (datetime.now().date() + timedelta(days=0)).isoformat()
+        y_n = input('Set reviewed?: (y/n) ')
+        process_results(set_reviewed=y_n == 'y', date=date)
+
+    y_n = input(
+        'Re-process existing files from scratch? This WILL overwrite cleaned Files: (y/n) ')
+    if y_n == 'y':
+        nr_days = int(input(
+            'How many days back would you like to process? (More is not an issue): '))
+        for days_ago in range(0, nr_days):
+            date = (datetime.now().date() + timedelta(
+                days=-days_ago)).isoformat()
+            print(f'Now processing data for the {date}')
+
+            if os.path.exists(
+                    f'{PRIMEMOVER_PATH}/resources/raw_data/{date}.json'):
+                process_results(set_reviewed=False, date=date)
+
+    y_n = input(
+        'Prrocess existing raw data for which no cleaned file exists? This WILL NOT overwrite cleaned Files: (y/n) ')
+    if y_n == 'y':
+        nr_days = int(input(
+            'How many days back would you like to process? (More is not an issue): '))
+        for days_ago in range(0, nr_days):
+            date = (datetime.now().date() + timedelta(
+                days=-days_ago)).isoformat()
+            print(f'Now processing data for the {date}')
+            if not os.path.exists(
+                    f'{PRIMEMOVER_PATH}/resources/raw_data/{date}.json'):
+                continue
+            if not os.path.exists(f'{PRIMEMOVER_PATH}/resources/cleaned_data/{date}.json'):
+                process_results(set_reviewed=False, date=date)
+
+
 if __name__ == "__main__":
-    # api_wrapper.fetch_results()
-    date = (datetime.now().date() + timedelta(days=-1)).isoformat()
-    process_results(set_reviewed=False, date=date)
-    #
-    # for days_ago in range(0,60):
-    #     date = (datetime.now().date() + timedelta(days=-days_ago)).isoformat()
-    #     process_results(set_reviewed=False, date=date)
+    results_interactive()
