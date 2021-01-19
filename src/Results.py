@@ -54,14 +54,18 @@ class JobResult:
                                 'created_at': self._created_at,
                                 'status_code': self._status_code,
                                 'status_message': self._status_message,
-                                'flag': self._flag, 'data': self._parsed_data}
+                                'flag': self._flag,
+                                'data': self._parsed_data,
+                                'reports': self._reports}
             else:
                 self._parsed_data = ParserDict[self._task]['method'](
                     self._behaviors, None)
                 self.results = {'finished_at': self._finished_at,
                                 'status_code': self._status_code,
                                 'status_message': self._status_message,
-                                'flag': self._flag, 'data': self._parsed_data}
+                                'flag': self._flag,
+                                'data': self._parsed_data,
+                                'reports': self._reports}
 
         else:
             self.results = None
@@ -225,10 +229,10 @@ def process_results(set_reviewed=True, date=(datetime.now().date() + timedelta(d
 
 
 if __name__ == "__main__":
-    api_wrapper.fetch_results()
-    date = datetime.now().date().isoformat()
+    # api_wrapper.fetch_results()
+    date = (datetime.now().date() + timedelta(days=-1)).isoformat()
     process_results(set_reviewed=False, date=date)
-
-    for days_ago in range(0,60):
-        date = (datetime.now().date() + timedelta(days=-days_ago)).isoformat()
-        process_results(set_reviewed=False, date=date)
+    #
+    # for days_ago in range(0,60):
+    #     date = (datetime.now().date() + timedelta(days=-days_ago)).isoformat()
+    #     process_results(set_reviewed=False, date=date)

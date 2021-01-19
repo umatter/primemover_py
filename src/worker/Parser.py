@@ -24,15 +24,28 @@ def GoogleParser(behaviors, raw_html):
         return {'issue': 'Captcha', 'term': term}
 
     soup = BeautifulSoup(raw_html[0], "html.parser")
-    results_in = soup.find_all(class_='rc')
+    results_in = soup.find_all(class_='g')
+    if len(results_in) ==0:
+        results_in = soup.find_all(class_='rc')
+
     parsed_data = []
     for rank, result in enumerate(results_in):
-        url = result.find('a').get('href')
-        domain = extract_domain(url)
-        title = result.find('h3').text
+        try: url = result.find('a').get('href')
+        except:
+            url = ''
+            print('URL is missing')
+        try: domain = extract_domain(url)
+        except:
+            domain = ''
+
+        try: title = result.find('h3').text
+        except:
+            title = ''
+            print('Title is missing')
         try:
             body = result.find(class_='IsZvec').text
         except:
+            print('Body is missing')
             body = ''
 
         parsed_data.append(

@@ -44,7 +44,7 @@ NEUTRAL_5 = ["Sidney Powell", "Donald Trump is", "Joe Biden is",
              "has pennsylvania certified the election", "voter fraud",
              "election results 2020", "news"]
 
-NEUTRAL = [
+NEUTRAL_6 = [
     "president elect",
     "capitol washington dc",
     "capitol building",
@@ -58,6 +58,13 @@ NEUTRAL = [
     "election certification",
     "trump supporters",
     "news"]
+
+NEUTRAL = ["riot capitol hill", "house impeachment",
+           "joint chiefs of staff letter", "national guard in capitol",
+           "capitol police officer dies", "election certification",
+           "trump supporters", "inaguration day threats",
+           "capitol reconnaissance"
+           ]
 
 
 def single_update(day_delta=0):
@@ -136,8 +143,8 @@ def single_update(day_delta=0):
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
-    # return_data = api.push_new(
-    #     path=PRIMEMOVER_PATH + "/resources/examples/test_update_py.json")
+    return_data = api.push_new(
+        path=PRIMEMOVER_PATH + "/resources/examples/test_update_py.json")
     # data_as_dict = json.loads(return_data.text)
     # with open(
     #         f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date() + timedelta(days=day_delta)).isoformat()}.json',
@@ -148,7 +155,7 @@ def single_update(day_delta=0):
 if __name__ == "__main__":
     # for day in range(13):
     #     single_update(day_delta=day)
-    #     print((datetime.now().date() + timedelta(days=day)).isoformat())
+    #     print((datetime.now().date() + timedelta(days=dasy)).isoformat())
     do = input('push data? (y/n): ')
     if do == 'y':
         single_update(day_delta=0)
