@@ -168,7 +168,6 @@ class Profile:
             self._geolocation = string
             if string == 'ALLOW':
                 self._fill_based_on_external_ip = True
-                print(self._fill_based_on_external_ip)
             else:
                 self._fill_based_on_external_ip = None
         else:
@@ -283,7 +282,7 @@ class Profile:
             "network": {
                 "proxy": {
                     "type": "%%PROXYTYPE%%",
-                    "host": "%%PROXYHOST",
+                    "host": "%%PROXYHOST%%",
                     "port": "%%PROXYPORT%%",
                     "username": "%%PROXYUSERNAME%%",
                     "password": "%%PROXYPASSWORD%%"
@@ -325,6 +324,7 @@ class Profile:
                     'serviceWorkerCache': self.service_worker_cache}
 
         return base_dict
+
 
 
 if __name__ == '__main__':

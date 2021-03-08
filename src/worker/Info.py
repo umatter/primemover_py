@@ -28,6 +28,7 @@ class Info:
         - updated_at: timestamp for last update on API
         - created_at: timestamp for creation on API
     """
+
     def __init__(self, user_id=None, active=1, created_at=None,
                  updated_at=None):
         self._user_id = user_id
@@ -175,7 +176,7 @@ class QueueInfo(Info):
                           created_at=info_dict.get('created_at'),
                           updated_at=info_dict.get('updated_at'),
                           active=info_dict.get('active'),
-                          finished_at = info_dict.get('finished_at')
+                          finished_at=info_dict.get('finished_at')
                           )
         return info_object
 
@@ -221,10 +222,7 @@ class CrawlerInfo(Info):
     def as_dict(self):
         return {
             'id': self._crawler_id,
-            'user_id': self._user_id,
-            'proxy_id':self._proxy_id,
-            'agent_id': self._agent_id,
-            'configuration_id': self._configuration_id
+            'user_id': self._user_id
         }
 
     def new_queue(self):
@@ -298,6 +296,12 @@ class AgentInfo(Info):
                          created_at=created_at,
                          updated_at=updated_at)
 
+    def as_dict(self):
+        return {
+            'id': self._agent_id,
+            'user_id': self._user_id,
+        }
+
     @property
     def agent_id(self):
         return self._agent_id
@@ -331,6 +335,12 @@ class ProxyInfo(Info):
                          created_at=created_at,
                          updated_at=updated_at)
 
+    def as_dict(self):
+        return {
+            'id': self._proxy_id,
+            'user_id': self._user_id,
+        }
+
     @property
     def proxy_id(self):
         return self._proxy_id
@@ -351,5 +361,3 @@ class ProxyInfo(Info):
                           updated_at=info_dict.get('updated_at'),
                           active=info_dict.get('active'))
         return info_object
-
-

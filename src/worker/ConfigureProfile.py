@@ -6,6 +6,7 @@ ConfigurationFunctions file.
 J.L. 11.2020
 """
 
+from datetime import datetime, timedelta
 from src import ConfigurationFunctions
 from src.worker.Info import ConfigurationInfo
 import json
@@ -92,6 +93,11 @@ class Config:
 
         self.media = media
         self.terms = terms
+        self._history = None
+
+    @property
+    def info(self):
+        return self._info
 
     @property
     def flag(self):
@@ -150,7 +156,7 @@ class Config:
         if value is None:
             self._kappa = ConfigurationFunctions.kappa()
         else:
-            self._kappa = float(value)
+            self._kappa = int(value)
 
     @property
     def pi(self):
@@ -224,7 +230,7 @@ class Config:
         else:
             self._state = None
 
-    def as_dict(self):
+    def as_dict(self, send_info= False):
         """
         Generate dictionary object from self, matching configurations in primemover api
         Returns: dict, valid configurations dictionary.
@@ -240,29 +246,43 @@ class Config:
                 "kappa": self.kappa,
                 "beta": self.beta,
                 "search_terms": self.terms,
-                "media_outlet_urls": self.media}]
+                "media_outlet_urls": self.media
+                # "preferences": [{
+                #     'name': 'location',
+                #     'value': self.location
+                # },
+                #     {'name': 'history',
+                #      'value': self._history}
+                # ]
+            }]
         }
-        if self._info is not None:
+        if send_info and self._info is not None:
             for key, value in self._info.as_dict().items():
-                return_dict['key'] = value
-            return_dict['params'][0]['user_id'] = self._info.as_dict()[
-                'user_id']
-            return_dict['params'][0]['configuration_id'] = self._info.as_dict()[
-                'id']
+                return_dict[key] = value
 
         return return_dict
 
-    def update_config(self, results):
+    def update_config(self, results, new_location):
         """
         Update self according to results
         """
+        if self._history is None:
+            self._history = {}
+        self._history[
+            (datetime.now().date() + timedelta(days=-1)).isoformat()] = {
+            'pi': self.pi, 'media': self.media, 'terms': self.terms,
+            'location': self.location}
+        if new_location is not None:
+            self.location = new_location
         kappa_j_t = self.kappa
+
         for outlet in results:
             if self.kappa == 2:
                 if not outlet['known']:
                     kappa_j_t = 1
                 else:
                     kappa_j_t = 0
+
             self.pi = src.Preferences.political_orientation_pi_i_t(
                 psi_i=self.psi, kappa_j_t_prev=kappa_j_t,
                 pi_tilde_j_prev=outlet['pi'], pi_i_prev=self.pi)
@@ -271,7 +291,7 @@ class Config:
             tau_tilde_ij=self.tau, k=10)
 
     @classmethod
-    def from_dict(cls, config_dict):
+    def from_dict(cls, config_dict, location):
         """
         Generate config object from single api return
         Parameters:
@@ -290,7 +310,7 @@ class Config:
                                 'media_outlet_urls')),
                             terms=json.loads(
                                 config_dict['params'][0].get('search_terms')),
-                            location=config_dict['params'][0].get('location'),
-                            info=ConfigurationInfo.from_dict(config_dict)
+                            info=ConfigurationInfo.from_dict(config_dict),
+                            location=location
                             )
         return config_object

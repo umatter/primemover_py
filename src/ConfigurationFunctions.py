@@ -18,7 +18,7 @@ def Psi():
     Determine persuadeability parameter
     Returns: float in [0,1], individuals persuadability
     """
-    return r.uniform(0, 1)
+    return r.uniform(0, 0.2)
 
 
 def Pi(flag=None):
@@ -26,7 +26,7 @@ def Pi(flag=None):
     Determine political orientation
     Returns pi: political orientation of individual i
     """
-    pi = r.uniform(-1, 1)
+    pi = r.uniform(-1, 0)
     return pi
 
 
@@ -34,7 +34,7 @@ def NoiseUtility():
     """
     Returns: epsilon: float, noise parameter when determining utility
     """
-    return gumbel(-0.4557735, 0.793006, 1)[0]
+    return float(gumbel(-0.4557735, 0.793006, 1)[0])
 
 
 def SelectSearchTerms(pi, alpha_hat, tau_hat_ik, k=10):
@@ -131,7 +131,7 @@ def update_media_outlets(outlets, pi, alpha_tilde, tau_tilde_ij, k=10):
                                               tau_tilde_ij=tau_tilde_ij),
                            outlet['domain'],
                            outlet['url'],
-                           outlets['pi'])))
+                           outlet['pi'])))
     utilities.sort()
     max_K = utilities[-k:]
     outlets = [{'domain': domain, 'url': url, 'pi': pi} for
@@ -143,14 +143,14 @@ def alpha():
     """ Determine alpha, a shift parameter.
     Returns: alpha_hat: float = 0, shift parameter in search term utility
     """
-    return 0
+    return r.uniform(0.2, 0.5)
 
 
 def beta():
     """ Determine beta
     Returns: beta: scale parameter in utilities ?
     """
-    return r.uniform(0, 1)
+    return r.uniform(0, 0.5)
 
 
 def tau():
@@ -165,7 +165,7 @@ def kappa():
     """Determine kappa, a persuadability indicator
     Returns: kappa: binary {0,1,2}, indicates  whether ind. can be persuaded
     """
-    return r.choices([0, 1, 2], [0.25, 0.25, 0.5])
+    return r.choices([0, 1, 2], [0.25, 0.25, 0.5])[0]
 
 
 def location():
@@ -187,27 +187,27 @@ def language():
     returns: One of the two language strings above
     """
     languages = ["en-US,en;q=0.5", "es-MX,es;q=0.8,en-US;q=0.5,en;q=0.3"]
-    choice = r.choices(languages, [0.75, 0.25])
+    choice = r.choices(languages, [0.75, 0.25])[0]
     return choice
 
 
 def geolocation():
-    choice = r.choices(['BLOCK', 'ALLOW'], [0.2, 0.8])
+    choice = r.choices(['BLOCK', 'ALLOW'], [0.2, 0.8])[0]
     return choice
 
 
 def do_not_track():
-    choice = r.choices([0, 1], [0.8, 0.2])
+    choice = r.choices([0, 1], [0.8, 0.2])[0]
     return choice
 
 
 def hardware_canvas():
-    choice = r.choices(['BLOCK', 'NOISE'], [0.2, 0.8])
+    choice = r.choices(['BLOCK', 'NOISE'], [0.2, 0.8])[0]
     return choice
 
 
 def local_storage():
-    choice = r.choices([True, False], [0.8, 0.2])
+    choice = r.choices([True, False], [0.8, 0.2])[0]
     return choice
 
 

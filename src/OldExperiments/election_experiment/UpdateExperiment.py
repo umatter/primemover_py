@@ -74,13 +74,12 @@ def single_update(day_delta=0):
         benign = json.load(file)
 
     for individual in crawler_list_political:
-
         session_id = individual.add_task(Tasks.BenignGoogleSearch,
                                          to_session=True,
                                          params={'term': r.choice(benign)})
         if r.choice([True, False]):
             individual.add_task(Tasks.PoliticalSearchNoUtility,
-                                to_session=True,
+                                to_session=session_id,
                                 params={'term_type': 'bigrams'})
         if r.choice([True, False]):
             individual.add_task(Tasks.PoliticalSearchNoUtility,
@@ -96,9 +95,9 @@ def single_update(day_delta=0):
             individual.add_task(Tasks.VisitFrequentDirect,
                                 to_session=session_id)
 
-        individual.add_task(Tasks.NeutralGoogleSearch, to_session=True,
+        individual.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
                             params={'term': neutral[0]})
-        individual.add_task(Tasks.NeutralGoogleSearch, to_session=True,
+        individual.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
                             params={'term': neutral[1]})
 
     for individual in crawler_list_neutral:

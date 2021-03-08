@@ -1,6 +1,16 @@
+"""
+Proxy Class
+matches the proxy object on the primemover_api
+TODO Secure passwords
+TODO check with Ueli if update format is correct, seems to be missing a :
+"""
+
+
 from src.worker.Info import ProxyInfo
 import json
 import pathlib
+import pandas as pd
+
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
@@ -8,6 +18,8 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as key_file:
     keys = json.load(key_file)
 GEOSURF_USERNAME = keys['GEOSURF']['username']
 GEOSURF_PASSWORD = keys['GEOSURF']['password']
+
+PROXYPATHS = ['/resources/proxies/rotating_proxies.csv', '/resources/proxies/private_proxies.csv']
 
 
 class Proxy:
@@ -31,7 +43,42 @@ class Proxy:
         self._password = password
         self._info = info
 
-    def as_dict(self):
+    def _check_location_non_geosurf(self):
+        """
+        type: private
+        params: self
+        Updates location for non geosurf proxies, when a proxy is changed.
+        Allways call after update_proxy
+        """
+        for path in PROXYPATHS:
+            proxies = pd.read_csv(PRIMEMOVER_PATH + path)
+            proxies['gateway_ip_port'] = proxies[
+                'gateway_ip_port'].astype(str)
+            proxies = proxies.loc[proxies['gateway_ip'] == self._hostname]
+            proxies = proxies.loc[proxies['gateway_ip_port'] == self._port]
+            if len(proxies) >=1:
+                return proxies.iloc[0]['loc_id']
+        raise LookupError('Cant match the hostname and port in the existing proxy files. Check if these are up to date.')
+
+    def update_proxy(self, update_dict):
+        """
+        input: update_dict, keys <hostname>:<port>, value  <hostname>:<port>
+        input dict, assigns new proxies to existing ones. If change occours,
+        _check_location_nong_geosurf is called.
+        """
+        existing = f'{self._hostname}:{self._port}'
+        new_host_port = update_dict.get(existing)
+        if new_host_port is not None:
+            self._hostname, self._port = new_host_port.split(':')
+            return self._check_location_non_geosurf()
+        else:
+            return 'not updated'
+
+    @property
+    def info(self):
+        return self._info
+
+    def as_dict(self, send_info=False):
         return_dict = {"name": self._name,
                        "description": self._description,
                        "type": self._type,
@@ -39,9 +86,9 @@ class Proxy:
                        "port": self._port,
                        "username": self._username,
                        "password": self._password}
-        if self._info is not None:
+        if send_info and self._info is not None:
             for key, value in self._info.as_dict().items():
-                return_dict['key'] = value
+                return_dict[key] = value
         return return_dict
 
     @classmethod

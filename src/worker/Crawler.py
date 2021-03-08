@@ -14,6 +14,7 @@ from src.worker.TimeHandler import TimeHandler
 import src.worker.Utilities as Util
 import src.worker.Tasks as Tasks
 
+
 class Crawler:
     """ Crawler combines all relevant information about an individual bot. It contains
     configuration, proxy, agent, queue (task) data and the necessary information
@@ -88,7 +89,7 @@ class Crawler:
             self._schedule = TimeHandler(self.agent.location,
                                          interval=120,
                                          wake_time=9 * 60 * 60,
-                                         bed_time=16 * 60 * 60,
+                                         bed_time=9.75 * 60 * 60,
                                          day_delta=day_delta)
         else:
             self._schedule = schedule
@@ -98,6 +99,7 @@ class Crawler:
         self._testing = testing
         self._crawler_info = crawler_info
         self.experiment_id = experiment_id
+        self._send_agent = True
 
     @property
     def schedule(self):
@@ -152,7 +154,7 @@ class Crawler:
             raise TypeError(
                 f'proxies must be a list of or a single Proxy object')
 
-    def as_dict(self):
+    def as_dict(self, object_ids=False):
         """
         Returns:
             - dictionary version of object, valid format for primemover_api
@@ -162,71 +164,24 @@ class Crawler:
             "description": self._description,
             "active": self.active,
             "testing": self._testing,
-            "experiment_id": self.experiment_id}
+            "configuration": [self.configuration.as_dict()],
+            "proxy": [self.proxy.as_dict()],
+        }
+        if self.experiment_id is not None:
+            return_dict["experiment_id"] = self.experiment_id
+        if self._send_agent:
+            return_dict["agent"] = [self.agent.as_dict()]
         if self._crawler_info is not None:
-            for key, value in self._crawler_info.as_dict().items():
-                return_dict[key] = value
-            # return_dict['agent_id'] = self.agent.id
-            # return_dict['configuration_id'] = self.configuration.id
-            # return_dict['proxy_id'] = self.proxy.id
-        else:
-            return_dict["configuration"] = self._configuration.as_dict()
-            return_dict["agent"] = self.agent.as_dict()
-            return_dict["proxy"] = self.proxy.as_dict()
+            return_dict['id'] = self._crawler_info.crawler_id
+        if object_ids:
+            return_dict['agent_id'] = self.agent._info.agent_id
+            # return_dict[
+            #     'configuration_id'] = self.configuration._info.configuration_id
+            # return_dict['proxy_id'] = self.proxy._info.proxy_id
+
         return_dict["queues"] = [x.as_dict() for x in self.queues.values()]
+
         return return_dict
-
-    @classmethod
-    def from_list(cls, crawler_list, day_delta=0):
-        """
-        Initialize crawler objects from list of crawlers in dictionary format
-        Arguments:
-            crawler_list: list of dictionaries
-            day_delta: day delta for crawler TimeHandler
-                default: 0
-        Returns:
-            list of crawlers
-        """
-        crawlers = [cls._single_crawler(ind_crawler, day_delta) for
-                    ind_crawler in crawler_list]
-        return crawlers
-
-    @classmethod
-    def from_dict(cls, crawler_dict, day_delta=0):
-        """
-        Initialize crawler objects from dictionary of crawlers in dictionary format by checking
-            for two plausible keys.
-        Arguments:
-            crawler_dict: list of dictionaries
-            day_delta: day delta for crawler TimeHandler
-                default: 0
-        Returns:
-            list of crawlers
-        """
-        if 'crawlers' in crawler_dict.keys():
-            crawlers = [cls._single_crawler(ind_crawler, day_delta) for
-                        ind_crawler in crawler_dict['crawlers']]
-        elif 'data' in crawler_dict.keys():
-            crawlers = [cls._single_crawler(ind_crawler, day_delta) for
-                        ind_crawler in crawler_dict['data']]
-        else:
-            crawlers = [cls._single_crawler(crawler_dict, day_delta)]
-        return crawlers
-
-    @classmethod
-    def _single_crawler(cls, crawler_dict, day_delta=0):
-        crawler_object = cls(name=crawler_dict.get('name'),
-                             description=crawler_dict.get('description'),
-                             configuration=Config.from_dict(
-                                 crawler_dict.get('configuration')),
-                             agent=Agent.from_dict(crawler_dict.get('agent')),
-                             proxy=Proxy.from_dict(crawler_dict.get('proxy')),
-                             crawler_info=CrawlerInfo.from_dict(crawler_dict),
-                             experiment_id=crawler_dict.get('experiment_id'),
-                             day_delta=day_delta
-                             )
-
-        return crawler_object
 
     def add_task(self, cls, to_session=None, params=None, start_at=None):
         """
@@ -273,7 +228,8 @@ class Crawler:
             self.queues[to_session] = new_queue_object
         return to_session
 
-    def add_tasks(self, cls, nr: int, to_session, params=None, consecutive=False,
+    def add_tasks(self, cls, nr: int, to_session, params=None,
+                  consecutive=False,
                   time_list=None):
         """
         Arguments:
@@ -311,5 +267,88 @@ class Crawler:
                                            params=params)
         return to_session
 
+    @classmethod
+    def from_list(cls, crawler_list, day_delta=0):
+        """
+        Initialize crawler objects from list of crawlers in dictionary format
+        Arguments:
+            crawler_list: list of dictionaries
+            day_delta: day delta for crawler TimeHandler
+                default: 0
+        Returns:
+            list of crawlers
+        """
+        crawlers = [cls._single_crawler(ind_crawler, day_delta) for
+                    ind_crawler in crawler_list]
+        return crawlers
+
+    @classmethod
+    def from_dict(cls, crawler_dict, day_delta=0):
+        """
+        Initialize crawler objects from dictionary of crawlers in dictionary format by checking
+            for two plausible keys.
+        Arguments:
+            crawler_dict: list of dictionaries
+            day_delta: day delta for crawler TimeHandler
+                default: 0
+        Returns:
+            list of crawlers
+        """
+        if 'crawlers' in crawler_dict.keys():
+            crawlers = [cls._single_crawler(ind_crawler, day_delta) for
+                        ind_crawler in crawler_dict['crawlers']]
+        elif 'data' in crawler_dict.keys():
+            crawlers = [cls._single_crawler(ind_crawler, day_delta) for
+                        ind_crawler in crawler_dict['data']]
+        else:
+            crawlers = [cls._single_crawler(crawler_dict, day_delta)]
+        return crawlers
+
+    @classmethod
+    def _single_crawler(cls, crawler_dict, day_delta=0):
+        agent = Agent.from_dict(crawler_dict.get('agent'))
+        crawler_object = cls(name=crawler_dict.get('name'),
+                             description=crawler_dict.get('description'),
+                             configuration=Config.from_dict(
+                                 crawler_dict.get('configuration'),
+                                 location=agent.location),
+                             agent=agent,
+                             proxy=Proxy.from_dict(crawler_dict.get('proxy')),
+                             crawler_info=CrawlerInfo.from_dict(crawler_dict),
+                             experiment_id=crawler_dict.get('experiment_id'),
+                             day_delta=day_delta
+                             )
+
+        return crawler_object
+
     def clear_day(self):
-        self.queues = {}
+        self.queues = []
+
+    def update_crawler(self, results=None, proxy_update=None, update_agent=False):
+        update_location = None
+        if proxy_update is not None:
+            update_location = self.proxy.update_proxy(proxy_update)
+            if update_location == 'not updated':
+                update_location = None
+
+        if update_location is not None:
+            self.agent.location = update_location
+        if results is not None:
+            relevant_results = results.get(str(self._crawler_info.crawler_id),
+                                           'skip')
+            if relevant_results == 'skip':
+                return self
+            results_selected = [result.get('data') for result in relevant_results]
+
+            results_selected = list(filter(None, results_selected))
+            results_valid = []
+            for res in results_selected:
+                if res.get('pi') is not None:
+                    results_valid.append(res)
+            self.configuration.update_config(results_valid, update_location)
+        if update_agent:
+            self._send_agent = True
+        else:
+            self._send_agent = False
+
+        return self

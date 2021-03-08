@@ -220,7 +220,7 @@ class DecisionType(Behavior):
     """
     DecisionType behavior key value pair, used to determine how a result is selected
     Public Attributes:
-        - decision_type: string,  one of "FIRST|LAST|RANDOM"
+        - decision_type: string,  one of "FIRST|LAST|RANDOM|CALCULATED"
     """
     def __init__(self, decision_type):
         self.decision_type = decision_type
@@ -236,11 +236,11 @@ class DecisionType(Behavior):
     @decision_type.setter
     def decision_type(self, value):
         value = value.upper().strip()
-        if value in {'FIRST', 'LAST', 'RANDOM'}:
+        if value in {'FIRST', 'LAST', 'RANDOM', 'CALCULATED'}:
             self._decision_type = value
         else:
             raise ValueError(
-                f'decision type must be in {{"FIRST", "LAST, "RANDOM"}} got {value} instead.')
+                f'decision type must be in {{"FIRST", "LAST, "RANDOM","CLACULATED"}} got {value} instead.')
 
 
 class ScrollDuration(Behavior):

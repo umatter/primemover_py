@@ -1,5 +1,8 @@
 """Use this file to define your own Tasks, as queue objects.
- Use help(Jobs) to see available job types."""
+ Use help(Jobs) to see available job types.
+ TODO re-structure tasks into a folder system for different tasks. Perhaps a base folder for reoccouring tasks and separate folders for different experiments.
+ J.L. 03/2021
+ """
 from src.worker.Queue import Queue
 from src.worker import Jobs
 import random as r
@@ -42,18 +45,25 @@ class GoogleSearch(Queue):
                                         task=name),
 
                          )
-        # Add Job to select a result randomly
+        #Add Job to scroll to bottom
+        self.jobs.append(Jobs.Scroll(direction='DOWN',
+                                     duration=5))
+        self.jobs.append(Jobs.Scroll(direction='UP',
+                                     percentage=100))   # Add Job to select a result randomly
         if select_result:
             self.jobs.append(
                 Jobs.SingleSelect(selector='.//div[@class="yuRUbf"]/a',
                                   selector_type='XPATH',
-                                  decision_type="FIRST"
+                                  decision_type="CALCULATED",
+                                  flag=search_type,
+                                  task=name
                                   )
             )
 
             # Add Job to scroll down 80% of the visited page
             self.jobs.append(Jobs.Scroll(direction='DOWN',
                                          percentage=80))
+
 
 
 class VisitDirect(Queue):
@@ -127,7 +137,9 @@ class PoliticalSearch(GoogleSearch):
 
         utilities = []
         ordered_terms = []
-        for term_k, pi_hat_k in terms.items():
+        for term in terms:
+            term_k = term.get('term')
+            pi_hat_k = term.get('pi')
             epsilon_ik = NoiseUtility()
             utilities.append(Pref.search_utility_v_ik(
                 pi_i=pi_i,
@@ -164,15 +176,14 @@ class VisitMedia(VisitDirect):
 
         utilities = []
         ordered_outlets = []
-        for url, vals in media.items():
-            pi_tilde_j = vals['pi']
-            rho_j = vals['rho']
+        for outlet in media:
+            url = outlet['url']
+            pi_tilde_j = outlet['pi']
             epsilon_ik = NoiseUtility()
             utilities.append(Pref.media_utility_u_ij(pi_i=pi_i,
                                                      pi_tilde_j=pi_tilde_j,
                                                      epsilon_ij=epsilon_ik,
                                                      alpha_tilde=alpha_tilde,
-                                                     rho_j=rho_j,
                                                      tau_tilde_ij=tau_tilde_ij))
             ordered_outlets.append(url)
 

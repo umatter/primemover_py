@@ -2,6 +2,9 @@
 Time Handler:
 This file contains the classes Schedule, IndividualSchedule and TimeHandler.
 J.L. 11.2020
+
+TODO extend possibilities for time generation. In particular add option to get time in range to individual schedule
+
 """
 
 import random as r
@@ -253,7 +256,7 @@ class IndividualSchedule(Schedule):
 
 class TimeHandler:
     GLOBAL_SCHEDULE = Schedule()
-    with open(PRIMEMOVER_PATH + "/resources/other/geosurf_cities.json", 'r') as file:
+    with open(PRIMEMOVER_PATH + "/resources/other/valid_cities.json", 'r') as file:
         LOC_TIMEZONE_DICT = json.load(file)
 
     def __init__(self,
@@ -266,7 +269,7 @@ class TimeHandler:
                  day_delta=0):
         """
         :param global_schedule:
-        :param location: geosurf proxy location
+        :param location: proxy location
         :param wake_time: time in seconds when bot is to wake up e.g. 8:00 = 28800
         :param bed_time: time in seconds when bot is to sleep e.g. 8:00 = 28800
         """

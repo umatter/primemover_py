@@ -22,9 +22,10 @@ import os
 import io
 import zipfile
 import pathlib
+from src.worker.Crawler import Crawler
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
-DOMAIN = " https://primemover.wimando.ch/api/v1/"
+DOMAIN = "https://primemover.wimando.ch/api/v1/"
 
 
 def get_access(e_mail, password):
@@ -52,9 +53,42 @@ def push_new(access_token,
     with open(path, 'r') as f:
         data_crawlers = json.load(f)
     post_crawlers = requests.post(DOMAIN + 'load', json=data_crawlers, headers={
-        'Authorization': 'Bearer ' + access_token})
+        'authorization': 'Bearer ' + access_token})
 
     return post_crawlers
+
+
+# def update_crawlers(access_token, crawler_objects=None,
+#                     ):
+#     """
+#     Wrapper for the primemover load function. Use to post json like data from path.
+#     Args:
+#         path: valid path to a json document
+#     Returns:
+#         response from primemover api
+#     """
+#     queue_load = [crawler.as_dict(queues_only=True) for crawler in
+#                   crawler_objects]
+#
+#     agent_put = [crawler.agent.as_dict() for crawler in crawler_objects]
+#     for agent in agent_put:
+#         response = requests.put(f'{DOMAIN}agents/{agent.get("id")}', json=agent, headers={
+#             'authorization': 'Bearer ' + access_token})
+#     proxy_put = [crawler.proxy.as_dict() for crawler in crawler_objects]
+#     for proxy in proxy_put:
+#         response = requests.put(f'{DOMAIN}proxies/{proxy.get("id")}', json=proxy, headers={
+#             'authorization': 'Bearer ' + access_token})
+#     configurations_put = [crawler.configuration.as_dict() for crawler in
+#                           crawler_objects]
+#     for config in configurations_put:
+#         response = requests.put(f'{DOMAIN}configurations/{config.get("id")}', json=config,
+#                      headers={
+#                          'authorization': 'Bearer ' + access_token})
+#
+#     post_crawlers = requests.post(DOMAIN + 'load', json=queue_load, headers={
+#         'authorization': 'Bearer ' + access_token})
+#
+#     return post_crawlers
 
 
 def fetch_results(access_token,
@@ -72,7 +106,7 @@ def fetch_results(access_token,
     if os.path.exists(path):
         raise Exception('file already exists')
     raw_data = requests.get(DOMAIN + 'queues-unreviewed',
-                            headers={'Authorization': 'Bearer ' + access_token})
+                            headers={'authorization': 'Bearer ' + access_token})
     raw_dict = raw_data.json()
     with open(path, 'w') as f:
         json.dump(raw_dict, f, indent='  ')
@@ -93,7 +127,7 @@ def fetch_reviewed(access_token,
     if os.path.exists(path):
         raise Exception('file already exists')
     raw_data = requests.get(DOMAIN + 'queues-reviewed',
-                            headers={'Authorization': f'Bearer {access_token}'})
+                            headers={'authorization': f'Bearer {access_token}'})
     raw_dict = raw_data.json()
     with open(path, 'w') as f:
         json.dump(raw_dict, f, indent='  ')
@@ -114,7 +148,7 @@ def fetch_unprocessed(access_token,
     if os.path.exists(path):
         raise Exception('file already exists')
     raw_data = requests.get(DOMAIN + 'queues-unprocessed',
-                            headers={'Authorization': f'Bearer {access_token}'})
+                            headers={'authorization': f'Bearer {access_token}'})
     raw_dict = raw_data.json()
     with open(path, 'w') as f:
         json.dump(raw_dict, f, indent='  ')
@@ -133,7 +167,7 @@ def fetch_all_crawlers(access_token,
         dictionary response from api
     """
     raw_data = requests.get(DOMAIN + 'crawlers',
-                            headers={'Authorization': f'Bearer {access_token}'})
+                            headers={'authorization': f'Bearer {access_token}'})
     raw_dict = raw_data.json()
     with open(path, 'w') as f:
         json.dump(raw_dict, f, indent='  ')
@@ -148,7 +182,7 @@ def fetch_html(access_token, url):
     Returns:
         html as text
     """
-    r = requests.get(url, headers={'Authorization': f'Bearer {access_token}'})
+    r = requests.get(url, headers={'authorization': f'Bearer {access_token}'})
     zipdata = io.BytesIO(r.content)
     as_zipfile = zipfile.ZipFile(zipdata)
     name = None
@@ -158,6 +192,44 @@ def fetch_html(access_token, url):
     raw_html = as_zipfile.read(name)
 
     return raw_html
+# def fetch_html( url):
+#     """
+#     Wrapper function to fetch html data from report urls
+#     Args:
+#         url: A url to a report file, e.g. "https://siaw.qlick.ch/api/v1/file/227989"
+#     Returns:
+#         html as text
+#     """
+#     r = requests.get(url)
+#     zipdata = io.BytesIO(r.content)
+#     as_zipfile = zipfile.ZipFile(zipdata)
+#     name = None
+#     for name in as_zipfile.namelist():
+#         if 'html' in name:
+#             break
+#     raw_html = as_zipfile.read(name)
+#
+#     return raw_html
+#
+
+def fetch_dynamic(access_token, url):
+    """
+    Wrapper function to fetch html data from report urls
+    Args:
+        url: A url to a report file, e.g. "https://siaw.qlick.ch/api/v1/file/227989"
+    Returns:
+        dict
+    """
+    r = requests.get(url, headers={'authorization': f'Bearer {access_token}'})
+    zipdata = io.BytesIO(r.content)
+    as_zipfile = zipfile.ZipFile(zipdata)
+    name = None
+    for name in as_zipfile.namelist():
+        if 'json' in name:
+            break
+    raw_json = as_zipfile.read(name)
+    raw_dict = json.loads(raw_json)
+    return raw_dict
 
 
 def set_reviewed(access_token, queue_id: int):
@@ -169,7 +241,7 @@ def set_reviewed(access_token, queue_id: int):
         'sucess' if status code 200, else raises ConnectionError with response status code
     """
     r = requests.put(DOMAIN + f'queues/{queue_id}', data={'reviewed': 1},
-                     headers={'Authorization': f'Bearer {access_token}'})
+                     headers={'authorization': f'Bearer {access_token}'})
     if r.status_code == 200:
         return 'success'
     else:
@@ -185,7 +257,7 @@ def set_inactive(access_token, queue_id):
         'sucess' if status code 200, else raises ConnectionError with response status code
     """
     r = requests.put(DOMAIN + f'queues/{queue_id}', data={'active': 0},
-                     headers={'Authorization': f'Bearer {access_token}'})
+                     headers={'authorization': f'Bearer {access_token}'})
     if r.status_code == 200:
         return 'success'
     else:
@@ -199,7 +271,7 @@ def get_outlets(access_token):
         contents of response json at key 'data'
     """
     r = requests.get(DOMAIN + 'outlets',
-                     headers={'Authorization': f'Bearer {access_token}'})
+                     headers={'authorization': f'Bearer {access_token}'})
     return r.json()['data']
 
 
@@ -210,5 +282,40 @@ def get_terms(access_token):
         contents of response json at key 'data'
     """
     r = requests.get(DOMAIN + 'terms',
-                     headers={'Authorization': f'Bearer {access_token}'})
-    return r
+                     headers={'authorization': f'Bearer {access_token}'})
+    return r.json()['data']
+
+
+def new_experiment(access_token, experiment):
+    """
+    Wrapper function to create a new experiment object
+    Returns:
+        contents of response json at key 'data'
+    """
+    r = requests.post(DOMAIN + 'experiments',
+                      headers={'authorization': f'Bearer {access_token}'},
+                      json=experiment)
+    return r.json()['data']
+
+
+def update_experiment(access_token, experiment):
+    """
+    Wrapper function to upaate an experiment object
+    Returns:
+        contents of response json at key 'data'
+    """
+    r = requests.put(DOMAIN + f'experiments/{experiment["id"]}',
+                     headers={'authorization': f'Bearer {access_token}'},
+                     json=experiment)
+    return r.json()['data']
+
+
+def fetch_experiment(access_token, id):
+    """
+    Wrapper function to fetch an existing experiment object
+    Returns:
+        contents of response json at key 'data'
+    """
+    r = requests.get(DOMAIN + f'experiments/{id}',
+                     headers={'authorization': f'Bearer {access_token}'})
+    return r.json()['data']

@@ -9,6 +9,55 @@ The [primemover_ui](https://github.com/umatter/primemover_ui/) offers a REST API
 
 Overall, this part of the primemover application contains most the economic details/specifications guiding the bot's decisions/behavior.
 
+## Structure
+All relevant code can be found in src. The purpose of this library being the initialization and updating of bot parameters
+as well as the assignment of tasks implies that some aspects of this library are intended to be edited by the user.
+Code can be found in src, with a few high level programs in the main directory. The main five being
+- ConfigurationFunctions.py
+- experiment_2_Test.py (Some experiment file, this should be migrated to a dedicated sub folder in a future update)
+- Preferences.py
+- Results.py
+- UpdateExperiment.py.
+These files are intended to be somewhat easily edited, although some care should be taken.
+It is perhaps best practice to store old files found here in the old experiments folder.
+### Preferences
+Preferences does not refers to the preferences of bots in the experiment that is to be conducted.
+This shapes the current experimental setup. Any bot utility functions
+can be found here.
+
+### ConfigurationFunctions
+This module determines how parameters are assigned. This includes attributes such as media outlets a bot knows
+or its political affiliation. These may be randomly assigned or set to a fixed value. Note, functions 
+found in this module are not always called upon initialization. They are only utilized when no parameter
+is passed in initialization.  The Preference functions may play a role here and are therefore imported into
+this module.
+
+### Results
+The functionality in this module shapes how queues processed by the api are parsed and returned.
+Note: This module may be mirgrated to worker in a future update. It is more complex than the other
+functions but must be updated when altering or extending tasks. (closely related to worker/parser)
+
+### Experiment...
+This program, currently experiment_2_Test.py initializes the current experiment.
+It should only be run once. Future experiments should make sure to utilize a fresh experiment_id.
+Use this program as a guide when creating a new setup.
+
+### UpdateExperiment
+Updates to the experiment occur regularly, currently daily. An update can consist
+of a variety of changes. Any of the aspects of a bot may be altered. In addition, 
+new tasks are set for the next day.
+
+### Worker
+The modules in this folder should be handled with care. In particular the classes
+defined in Behavior.py, Jobs.py, Queue.py, Agent.py, Proxy.py, ConfigureProfile.py and Profile.py.
+These mimic objects defined for the primemover_runner and the primemover_ui. 
+Changing these files may lead to errors when pushing to the runner.
+Changes to methods, in particular update methods are safe. 
+
+Use Tasks.py to define new taks for a bot to execute. Examples of existing tasks
+are google searches for specific terms and website visits.
+Tasks can be concatenated and are sent as queues, which represent a single browser session.
+
 
 ## Docker Image
 Steps to launch, navigate to primemover_py using the terminal and run 
@@ -37,3 +86,6 @@ airflow scheduler &
 airflow webserver
 ```
 The airflow ui is now accessible at localhost:<PORT>
+
+## Server Setup
+Follow docker image setup and the instructions for docker.

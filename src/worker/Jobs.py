@@ -10,6 +10,7 @@ Classes:
 
 import src.worker.Behavior as Behavior
 
+
 class Job:
     """
     Base class
@@ -136,7 +137,7 @@ class SingleSelect(Job):
         """
             - selector: string, a valid XPATH|CSS|CLASS|ID for a text field, default: 'XPATH'
             - selector_type: One of "XPATH|CSS|CLASS|ID"
-            - decision_type: one of "FIRST|LAST|RANDOM", Method of selecting a result if multiple elements match selector (default: First)
+            - decision_type: one of "FIRST|LAST|RANDOM|CALCULATED", Method of selecting a result if multiple elements match selector (default: First)
             - task: (optional) string,  task the job is a part of
             - flag: (optional) string,  some flag
         """
@@ -150,6 +151,15 @@ class SingleSelect(Job):
             Behavior.Selector(selector))
         self.behaviors.append(
             Behavior.DecisionType(decision_type))
+        if flag is not None:
+            self.behaviors.append(
+                Behavior.FlagBehavior(f'{decision_type}/{flag}')
+            )
+
+        if task is not None:
+            self.behaviors.append(
+                Behavior.TaskBehavior(f'{decision_type}/{task}')
+            )
 
 
 class TryClick(Job):
@@ -176,8 +186,34 @@ class TryClick(Job):
             Behavior.Selector(selector))
 
 
+class TrySwitchTo(Job):
+    """
+    Switch to some IFrame (e.g. accept cookies)
+    """
+
+    def __init__(self, selector, selector_type='XPATH',
+                 task=None,
+
+                 flag=None):
+        """
+            - selector: string, a valid XPATH|CSS|CLASS|ID for a text field, default: 'XPATH'
+            - selector_type: One of "XPATH|CSS|CLASS|ID"
+            - task: (optional) string,  task the job is a part of
+            - flag: (optional) string,  some flag
+        """
+        super().__init__(job_type='tryswitchtojob',
+                         name='Try Switch To',
+                         description=f'Try to switch to an iframe', task=task,
+                         flag=flag)
+        self.behaviors.append(
+            Behavior.SelectionType(selector_type))
+        self.behaviors.append(
+            Behavior.Selector(selector))
+
+
 class Scroll(Job):
     """Scroll in some direction for a percentage of a page or a pre-determined time"""
+
     def __init__(self, direction='DOWN', duration=None,
                  percentage=None,
                  task=None,
