@@ -54,8 +54,10 @@ class Proxy:
             proxies = pd.read_csv(PRIMEMOVER_PATH + path)
             proxies['gateway_ip_port'] = proxies[
                 'gateway_ip_port'].astype(str)
+            proxies = proxies.loc[proxies['active'] == 1]
             proxies = proxies.loc[proxies['gateway_ip'] == self._hostname]
             proxies = proxies.loc[proxies['gateway_ip_port'] == self._port]
+
             if len(proxies) >=1:
                 return proxies.iloc[0]['loc_id']
         raise LookupError('Cant match the hostname and port in the existing proxy files. Check if these are up to date.')
@@ -67,9 +69,10 @@ class Proxy:
         _check_location_nong_geosurf is called.
         """
         existing = f'{self._hostname}:{self._port}'
-        new_host_port = update_dict.get(existing)
-        if new_host_port is not None:
-            self._hostname, self._port = new_host_port.split(':')
+        new_proxy= update_dict.get(existing)
+        if new_proxy is not None:
+            self._hostname = new_proxy['host']
+            self._port = new_proxy['port']
             return self._check_location_non_geosurf()
         else:
             return 'not updated'

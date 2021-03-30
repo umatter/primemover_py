@@ -192,6 +192,8 @@ def fetch_html(access_token, url):
     raw_html = as_zipfile.read(name)
 
     return raw_html
+
+
 # def fetch_html( url):
 #     """
 #     Wrapper function to fetch html data from report urls
@@ -318,4 +320,24 @@ def fetch_experiment(access_token, id):
     """
     r = requests.get(DOMAIN + f'experiments/{id}',
                      headers={'authorization': f'Bearer {access_token}'})
+    return r.json()['data']
+
+
+def fetch_agent(id):
+    r = requests.get(DOMAIN + f'agents/{id}')
+    return r.json()['data']
+
+
+def fetch_crawler(id):
+    r = requests.get(DOMAIN + f'crawlers/{id}')
+    return r.json()['data']
+
+
+def fetch_proxy(id):
+    r = requests.get(DOMAIN + f'proxies/{id}')
+    return r.json()['data']
+
+
+def fetch_config(id):
+    r = requests.get(DOMAIN + f'configurations/{id}')
     return r.json()['data']

@@ -1,5 +1,5 @@
 """
-Wrapper functions for the primemover s3 wrapper.
+Wrapper functions for the primemover s3 bucket.
 
 Available Functions:
     - check_file
@@ -77,12 +77,12 @@ def fetch_outlets():
 
 
 def fetch_private():
-    path = "/resources/proxies/private_proxies.csv"
+    path = "/resources/proxies/private_proxies_new.csv"
     return fetch_file(path, "private_proxies.csv")
 
 
 def fetch_rotating():
-    path = "/resources/proxies/rotating_proxies.csv"
+    path = "/resources/proxies/rotating_proxies_new.csv"
     return fetch_file(path, "rotating_proxies.csv")
 
 

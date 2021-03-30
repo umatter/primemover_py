@@ -29,7 +29,7 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
 
 if __name__ == "__main__":
     exp = Experiment(
-        name='Test Experiment 2',
+        name='Test Experiment testing',
         description='A test of all systems based on a future experiment set up',
         contact='JLadwig',
     )
@@ -42,10 +42,11 @@ if __name__ == "__main__":
     s3_wrapper.fetch_outlets()
     s3_wrapper.fetch_terms()
 
-    key = api.get_access(KEYS['PRIMEMOVER']['username'], KEYS['PRIMEMOVER']['password'])
-    # exp_return = api.new_experiment(key, exp.as_dict())
-    # exp_id = Experiment.from_dict(exp_return).id
-    exp_id = 2
+    key = api.get_access(KEYS['PRIMEMOVER']['username'],
+                         KEYS['PRIMEMOVER']['password'])
+    exp_return = api.new_experiment(key, exp.as_dict())
+    exp_id = Experiment.from_dict(exp_return).id
+    # exp_id = 2
     TimeHandler.GLOBAL_SCHEDULE = Schedule(start_at=10 * 60 * 60,
                                            end_at=(10 + 23) * 60 * 60,
                                            interval=600,
@@ -81,6 +82,7 @@ if __name__ == "__main__":
 
     # Distribute rotating proxies
     rotating_proxies = pd.read_csv(ROTATING_PATH)
+    rotating_proxies = rotating_proxies.loc[rotating_proxies['active'] == 1]
     rotating_proxies['gateway_ip_port'] = rotating_proxies[
         'gateway_ip_port'].astype(str)
     location_groups = rotating_proxies.groupby('loc_id')
@@ -113,6 +115,8 @@ if __name__ == "__main__":
 
     # Distribute Private Proxies
     private_proxies = pd.read_csv(PRIVATE_PATH)
+    private_proxies = private_proxies.loc[private_proxies['active'] == 1]
+
     private_proxies['gateway_ip_port'] = private_proxies[
         'gateway_ip_port'].astype(
         str)

@@ -1,4 +1,6 @@
 from src.worker import Crawler, Tasks, ConfigureProfile, s3_wrapper, Experiment
+from src.worker.UpdateObject import *
+from src.worker.ReplaceProxies import update_all_proxies
 from src.auxiliary.GenerateBenignTerms import GenerateBenignTerms
 from src.worker.TimeHandler import Schedule, TimeHandler
 from datetime import datetime, timedelta
@@ -17,23 +19,15 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
 
 
 def single_update(day_delta=0):
+    "Set Date TODO: Replace with airflow date set"
     date = (datetime.now().date() + timedelta(days=0))
+    "Fetch Neutral terms from s3 Bucket"
     Neutral = s3_wrapper.fetch_neutral()
-
-    update_proxies = False
-    update_proxies_dict = {}
-    if s3_wrapper.check_file('rotating_proxies_updates.json'):
-        update_proxies_dict = s3_wrapper.fetch_proxy_rotating_update()
-        s3_wrapper.fetch_rotating()
-        update_proxies = True
-    if s3_wrapper.check_file('private_proxies_updates.json'):
-        update_proxies_dict.update(s3_wrapper.fetch_proxy_private_update())
-        s3_wrapper.fetch_rotating()
-        update_proxies = True
-    if not update_proxies:
-        update_proxies_dict = None
-
+    "Generate Benign Terms TODO: "
     GenerateBenignTerms()
+    "Compute Proxy Changes"
+    update_proxies_dict = update_all_proxies()
+
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
@@ -45,7 +39,11 @@ def single_update(day_delta=0):
 
     with open(existing_crawler_path, 'r') as file:
         raw_crawlers = json.load(file)
+
     crawler_list = Crawler.Crawler.from_dict(raw_crawlers, day_delta=day_delta)
+    crawler_list = UpdateObject(crawler_list, 'agent')
+    crawler_list = UpdateObject(crawler_list, 'proxy')
+    crawler_list = UpdateObject(crawler_list, 'config')
 
     crawler_list_neutral = []
     crawler_list_political = []
@@ -62,10 +60,11 @@ def single_update(day_delta=0):
                 'r') as file:
             cleaned_data = json.load(file)
         crawler_list_neutral = [
-            crawler.update_crawler(proxy_update=None) for crawler
+            crawler.update_crawler(proxy_update=update_proxies_dict) for crawler
             in crawler_list_neutral]
         crawler_list_political = [
-            crawler.update_crawler(cleaned_data, None) for crawler
+            crawler.update_crawler(results=cleaned_data,
+                                   proxy_update=update_proxies_dict) for crawler
             in crawler_list_political]
 
     neutral = r.choices(Neutral, k=1)
@@ -107,11 +106,12 @@ def single_update(day_delta=0):
                             params={'term': neutral[0]})
 
     crawler_list = crawler_list_neutral + crawler_list_political
-
     with open(PRIMEMOVER_PATH + "/resources/examples/test_update_py.json",
               'w') as file:
-        json.dump([crawler.as_dict() for crawler in crawler_list], file,
-                  indent='  ')
+        json.dump(
+            [crawler.as_dict(object_ids=False) for crawler in crawler_list],
+            file,
+            indent='  ')
 
     do = input('push data? (y/n): ')
     if do == 'y':
@@ -128,16 +128,22 @@ def single_update(day_delta=0):
         with open(
                 f'{PRIMEMOVER_PATH}/resources/updates/generated.json',
                 'w') as file:
-            json.dump([crawler.as_dict(object_ids=True) for crawler in crawler_list], file, indent='  ')
+            json.dump(
+                [crawler.as_dict(object_ids=False) for crawler in crawler_list],
+                file, indent='  ')
 
-        return_data = api.push_new(access_token=key, path=f'{PRIMEMOVER_PATH}/resources/updates/generated.json')
+        return_data = api.push_new(access_token=key,
+                                   path=f'{PRIMEMOVER_PATH}/resources/updates/generated.json')
+        if return_data.status_code == 200:
+            with open(
+                    f'{PRIMEMOVER_PATH}/resources/updates/test_{date.isoformat()}.json',
+                    'w') as file:
+                json.dump(return_data.json(), file, indent='  ')
+        else:
+            print(return_data)
 
-        with open(
-                f'{PRIMEMOVER_PATH}/resources/updates/test_{date.isoformat()}.json',
-                'w') as file:
-            json.dump(return_data.json(), file, indent='  ')
+        # experiment = api.update_experiment(key, exp.as_dict())
 
-        experiment = api.update_experiment(key, exp.as_dict())
 
 if __name__ == "__main__":
     # for day in range(13):

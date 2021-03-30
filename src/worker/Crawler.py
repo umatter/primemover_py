@@ -89,7 +89,7 @@ class Crawler:
             self._schedule = TimeHandler(self.agent.location,
                                          interval=120,
                                          wake_time=9 * 60 * 60,
-                                         bed_time=9.75 * 60 * 60,
+                                         bed_time=11 * 60 * 60,
                                          day_delta=day_delta)
         else:
             self._schedule = schedule
@@ -99,7 +99,18 @@ class Crawler:
         self._testing = testing
         self._crawler_info = crawler_info
         self.experiment_id = experiment_id
-        self._send_agent = True
+        self.send_agent = False
+
+    @property
+    def send_agent(self):
+        return self._send_agent
+
+    @send_agent.setter
+    def send_agent(self, val=False):
+        if type(val) is bool:
+            self._send_agent = val
+        else:
+            raise TypeError('expected boolean send agent')
 
     @property
     def schedule(self):
@@ -126,12 +137,14 @@ class Crawler:
     @agent.setter
     def agent(self, agent_in):
         if agent_in is None:
+            self.send_agent = True
             name = self._name.replace('Crawler', 'Agent')
             name = name.replace('crawler', 'agent')
             self._agent = Agent(name=name,
                                 location=self._configuration.location)
 
         elif type(agent_in) is Agent:
+            self.send_agent = False
             self._agent = agent_in
         else:
             raise TypeError(
@@ -153,6 +166,10 @@ class Crawler:
         else:
             raise TypeError(
                 f'proxies must be a list of or a single Proxy object')
+
+    @property
+    def crawler_info(self):
+        return self._crawler_info
 
     def as_dict(self, object_ids=False):
         """
@@ -318,13 +335,13 @@ class Crawler:
                              experiment_id=crawler_dict.get('experiment_id'),
                              day_delta=day_delta
                              )
-
+        crawler_object.send_agent = False
         return crawler_object
 
     def clear_day(self):
         self.queues = []
 
-    def update_crawler(self, results=None, proxy_update=None, update_agent=False):
+    def update_crawler(self, results=None, proxy_update=None):
         update_location = None
         if proxy_update is not None:
             update_location = self.proxy.update_proxy(proxy_update)
@@ -333,12 +350,14 @@ class Crawler:
 
         if update_location is not None:
             self.agent.location = update_location
+            self.send_agent = True
         if results is not None:
             relevant_results = results.get(str(self._crawler_info.crawler_id),
                                            'skip')
             if relevant_results == 'skip':
                 return self
-            results_selected = [result.get('data') for result in relevant_results]
+            results_selected = [result.get('data') for result in
+                                relevant_results]
 
             results_selected = list(filter(None, results_selected))
             results_valid = []
@@ -346,9 +365,5 @@ class Crawler:
                 if res.get('pi') is not None:
                     results_valid.append(res)
             self.configuration.update_config(results_valid, update_location)
-        if update_agent:
-            self._send_agent = True
-        else:
-            self._send_agent = False
 
         return self

@@ -247,7 +247,7 @@ def process_results(set_reviewed=True, parser_dict=Parser.ParserDict,path_end=''
 if __name__ == "__main__":
     date = (datetime.today().date() + timedelta(days=0)).isoformat()
     api_wrapper.fetch_results(access_token=ACCESS_TOKEN)
-    process_results(set_reviewed=True, parser_dict=Parser.ParserDict,path_end='all_data', day_delta=0)
+    process_results(set_reviewed=True, parser_dict=Parser.ParserDict, path_end='all_data', day_delta=0)
     s3.upload_data(f'output/{date}.json', path=f'/resources/cleaned_data/all_data{date}.json')
     process_results(set_reviewed=False, parser_dict=Parser.UpdateParser, day_delta=0)
     print(date)
