@@ -12,7 +12,8 @@ from src.worker.Info import ConfigurationInfo
 import json
 import pathlib
 import src.Preferences
-
+from src.worker.Utilities import pref_as_dict, EscapeStrings
+from src.worker.History import S3History
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 
@@ -75,7 +76,7 @@ class Config:
         self.name = name
         self.description = description
         self._info = info
-        if '/' in self.name:
+        if (self.name is not None) and ('/' in self.name):
             self._flag = self.name.split('/')[1]
         else:
             self._flag = None
@@ -93,7 +94,7 @@ class Config:
 
         self.media = media
         self.terms = terms
-        self._history = None
+        self._history = S3History(self)
 
     @property
     def info(self):
@@ -224,13 +225,17 @@ class Config:
         else:
             raise ValueError(
                 f'{val} is not a valid location see geosurf cities')
-        segments = val.split('-')
+        segments = self._location.split('-')
         if type(segments) is list and len(segments) == 3:
             self._state = segments[0] + '-' + segments[1]
         else:
             self._state = None
 
-    def as_dict(self, send_info= False):
+    @property
+    def history(self):
+        return self._history
+
+    def as_dict(self, send_info=False):
         """
         Generate dictionary object from self, matching configurations in primemover api
         Returns: dict, valid configurations dictionary.
@@ -247,31 +252,31 @@ class Config:
                 "beta": self.beta,
                 "search_terms": self.terms,
                 "media_outlet_urls": self.media
-                # "preferences": [{
-                #     'name': 'location',
-                #     'value': self.location
-                # },
-                #     {'name': 'history',
-                #      'value': self._history}
-                # ]
-            }]
+            }],
+            "preferences": [{
+                "name": 'location',
+                "value": self.location
+            }
+            ]
         }
         if send_info and self._info is not None:
             for key, value in self._info.as_dict().items():
                 return_dict[key] = value
+        if len(self.history.history) != 0:
 
+            return_dict["preferences"].append({"name": "history",
+             "value": str(list(self.history.history.keys()))})
         return return_dict
 
     def update_config(self, results, new_location):
         """
         Update self according to results
         """
-        if self._history is None:
-            self._history = {}
-        self._history[
-            (datetime.now().date() + timedelta(days=-1)).isoformat()] = {
-            'pi': self.pi, 'media': self.media, 'terms': self.terms,
-            'location': self.location}
+        if self.info is not None:
+            self.history.pull_existing()
+        self.history.update_current_status()
+        self.history.push()
+
         if new_location is not None:
             self.location = new_location
         kappa_j_t = self.kappa
@@ -298,6 +303,9 @@ class Config:
             config_dict: api return of configurations. Note: media and terms
             must be json type objects!
         """
+        pref = pref_as_dict(config_dict.get('preferences', []))
+
+
         config_object = cls(name=config_dict.get('name'),
                             description=config_dict.get('description'),
                             psi=config_dict['params'][0].get('psi'),

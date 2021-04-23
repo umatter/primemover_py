@@ -169,7 +169,7 @@ def kappa():
 
 
 def location():
-    return None
+    return "US-AL-AUBURN"
 
 
 """

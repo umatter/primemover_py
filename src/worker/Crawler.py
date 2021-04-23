@@ -84,12 +84,13 @@ class Crawler:
                 self.flag = split_name[1]
 
         self.configuration = configuration
+        self.send_agent = False
         self.agent = agent
         if schedule is None:
             self._schedule = TimeHandler(self.agent.location,
                                          interval=120,
-                                         wake_time=9 * 60 * 60,
-                                         bed_time=11 * 60 * 60,
+                                         wake_time=11 * 60 * 60,
+                                         bed_time=14 * 60 * 60,
                                          day_delta=day_delta)
         else:
             self._schedule = schedule
@@ -99,7 +100,6 @@ class Crawler:
         self._testing = testing
         self._crawler_info = crawler_info
         self.experiment_id = experiment_id
-        self.send_agent = False
 
     @property
     def send_agent(self):
@@ -192,8 +192,7 @@ class Crawler:
             return_dict['id'] = self._crawler_info.crawler_id
         if object_ids:
             return_dict['agent_id'] = self.agent._info.agent_id
-            # return_dict[
-            #     'configuration_id'] = self.configuration._info.configuration_id
+            return_dict['configuration_id'] = self.configuration._info.configuration_id
             # return_dict['proxy_id'] = self.proxy._info.proxy_id
 
         return_dict["queues"] = [x.as_dict() for x in self.queues.values()]
@@ -367,3 +366,5 @@ class Crawler:
             self.configuration.update_config(results_valid, update_location)
 
         return self
+
+

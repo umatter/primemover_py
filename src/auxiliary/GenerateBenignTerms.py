@@ -74,5 +74,6 @@ def GenerateBenignTerms():
         json.dump(terms, jar)
     return 'success'
 
+
 if __name__ == "__main__":
     GenerateBenignTerms()

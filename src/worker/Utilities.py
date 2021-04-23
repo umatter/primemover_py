@@ -45,3 +45,10 @@ def extract_domain(url):
         raise TypeError(f'{url} is strange')
     domain = split.domain + '.' + split.suffix
     return domain
+
+
+def pref_as_dict(pref_object):
+    pref_dict = {}
+    for item in pref_object:
+        pref_dict[item.get('name')] = item.get('value')
+    return pref_dict

@@ -9,19 +9,46 @@ J.L. 01.21
 import boto3
 import json
 import pathlib
+import io
+import botocore.exceptions
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 with open(PRIMEMOVER_PATH + "/resources/other/keys.json", 'r') as f:
     KEYS = json.load(f)['S3']
 
-BUCKET = 'primemover_py'
+BUCKET_IN_OUT = 'primemover_py'
 
 CLIENT = boto3.client('s3',
                       aws_access_key_id=KEYS['Access_Key_ID'],
                       aws_secret_access_key=KEYS['Secret_Access_Key'],
                       region_name="eu-central-1"
                       )
+
+
+def fetch_report(job_id: int, report_type='dynamic'):
+    """
+    fetch job report from s3 bucket:
+
+    """
+
+    report_type = report_type.lower()
+    if not report_type in ['dynamic', 'static']:
+        raise ValueError('report type must be one of dynamic, static')
+    in_stream = io.BytesIO()
+    try:
+        CLIENT.download_fileobj("primemoverrunner",
+                                f"reports/{report_type}_jobdata_{job_id}",
+                                in_stream,
+                                )
+        success = True
+    except botocore.exceptions.ClientError as err:
+        if err.response['Error']['Code'] == "404":
+            success = False
+        else:
+            raise err
+
+    return in_stream, success
 
 
 def check_file(filename):
@@ -143,3 +170,36 @@ def update_valid_cities():
     locations.update(fetch_rotating_json())
     with open(file_path, 'w') as f:
         json.dump(locations, f)
+
+
+def fetch_file_memory(filename):
+    """
+    fetch file from s3 bucket:
+
+    """
+
+    in_stream = io.BytesIO()
+
+    try:
+        CLIENT.download_fileobj("primemoverpy", filename, in_stream)
+        success = True
+
+    except botocore.exceptions.ClientError as err:
+        if err.response['Error']['Code'] == "404":
+            success = False
+        else:
+            raise err
+    return success, in_stream
+
+
+def push_dict(filename, to_push):
+    """
+    fetch file from s3 bucket:
+
+    """
+
+    out_stream = io.BytesIO()
+    out_stream.write(json.dumps(to_push).encode())
+    out_stream.seek(0)
+    response = CLIENT.upload_fileobj(out_stream, 'primemoverpy', filename)
+    return 'success'

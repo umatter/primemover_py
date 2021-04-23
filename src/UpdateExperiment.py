@@ -25,15 +25,13 @@ def single_update(day_delta=0):
     Neutral = s3_wrapper.fetch_neutral()
     "Generate Benign Terms TODO: "
     GenerateBenignTerms()
-    "Compute Proxy Changes"
-    update_proxies_dict = update_all_proxies()
 
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
     if not os.path.exists(
             f'{PRIMEMOVER_PATH}/resources/updates/{(date + timedelta(-1)).isoformat()}.json'):
-        existing_crawler_path = PRIMEMOVER_PATH + "/resources/crawlers/test_3_2021-01-22.json"
+        existing_crawler_path = PRIMEMOVER_PATH + "/resources/crawlers/test_5_2021-04-16.json"
     else:
         existing_crawler_path = f'{PRIMEMOVER_PATH}/resources/updates/{(date + timedelta(-1)).isoformat()}.json'
 
@@ -44,6 +42,9 @@ def single_update(day_delta=0):
     crawler_list = UpdateObject(crawler_list, 'agent')
     crawler_list = UpdateObject(crawler_list, 'proxy')
     crawler_list = UpdateObject(crawler_list, 'config')
+
+    "Compute Proxy Changes"
+    update_proxies_dict = update_all_proxies()
 
     crawler_list_neutral = []
     crawler_list_political = []
@@ -76,7 +77,7 @@ def single_update(day_delta=0):
                                          to_session=True,
                                          params={'term': r.choice(benign)})
         individual.add_task(Tasks.PoliticalSearch,
-                            to_session=session_id, )
+                            to_session=session_id)
 
         individual.add_task(Tasks.VisitMedia,
                             to_session=session_id)
@@ -106,7 +107,8 @@ def single_update(day_delta=0):
                             params={'term': neutral[0]})
 
     crawler_list = crawler_list_neutral + crawler_list_political
-    with open(PRIMEMOVER_PATH + "/resources/examples/test_update_py.json",
+
+    with open(PRIMEMOVER_PATH+"/resources/updates/generated.json",
               'w') as file:
         json.dump(
             [crawler.as_dict(object_ids=False) for crawler in crawler_list],
@@ -118,19 +120,12 @@ def single_update(day_delta=0):
         key = api.get_access(KEYS['PRIMEMOVER']['username'],
                              KEYS['PRIMEMOVER']['password'])
 
-        exp = Experiment.Experiment.from_dict(api.fetch_experiment(key, 2))
+        exp = Experiment.Experiment.from_dict(api.fetch_experiment(key, 1))
         if exp.neutral_terms is None:
             exp.neutral_terms = {date.isoformat(): neutral}
         else:
             existing = exp.neutral_terms
             exp.neutral_terms = existing[date.isoformat()] = neutral
-
-        with open(
-                f'{PRIMEMOVER_PATH}/resources/updates/generated.json',
-                'w') as file:
-            json.dump(
-                [crawler.as_dict(object_ids=False) for crawler in crawler_list],
-                file, indent='  ')
 
         return_data = api.push_new(access_token=key,
                                    path=f'{PRIMEMOVER_PATH}/resources/updates/generated.json')
@@ -142,7 +137,8 @@ def single_update(day_delta=0):
         else:
             print(return_data)
 
-        # experiment = api.update_experiment(key, exp.as_dict())
+        # experiment = api.update_experiment(key, [exp.as_dict()], exp.id)
+        # print(experiment)
 
 
 if __name__ == "__main__":

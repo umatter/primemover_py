@@ -57,7 +57,7 @@ def push_new(access_token,
 
     return post_crawlers
 
-
+#
 # def update_crawlers(access_token, crawler_objects=None,
 #                     ):
 #     """
@@ -300,13 +300,13 @@ def new_experiment(access_token, experiment):
     return r.json()['data']
 
 
-def update_experiment(access_token, experiment):
+def update_experiment(access_token, experiment, exp_id):
     """
     Wrapper function to upaate an experiment object
     Returns:
         contents of response json at key 'data'
     """
-    r = requests.put(DOMAIN + f'experiments/{experiment["id"]}',
+    r = requests.put(DOMAIN + f'experiments/{exp_id}',
                      headers={'authorization': f'Bearer {access_token}'},
                      json=experiment)
     return r.json()['data']

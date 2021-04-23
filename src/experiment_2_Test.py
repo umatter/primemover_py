@@ -111,7 +111,7 @@ if __name__ == "__main__":
                           username=KEYS['ROTATING']['username'],
                           password=KEYS['ROTATING']['password'])
             crawler_list.append(
-                Crawler(flag=flag, configuration=config, proxy=proxy))
+                Crawler(flag=flag, configuration=config, proxy=proxy, experiment_id=exp_id))
 
     # Distribute Private Proxies
     private_proxies = pd.read_csv(PRIVATE_PATH)
@@ -146,7 +146,7 @@ if __name__ == "__main__":
                           username=KEYS['PRIVATE']['username'],
                           password=KEYS['PRIVATE']['password'])
             crawler_list.append(
-                Crawler(flag=flag, configuration=config, proxy=proxy))
+                Crawler(flag=flag, configuration=config, proxy=proxy, experiment_id=exp_id))
     with open(PRIMEMOVER_PATH + "/resources/crawlers/test_2.json",
               'w') as file:
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
@@ -157,6 +157,6 @@ if __name__ == "__main__":
     data_as_dict = json.loads(return_data.text)
 
     with open(
-            f'{PRIMEMOVER_PATH}/resources/crawlers/test_3_{datetime.now().date().isoformat()}.json',
+            f'{PRIMEMOVER_PATH}/resources/crawlers/test_5_{datetime.now().date().isoformat()}.json',
             'w') as file:
         json.dump(data_as_dict, file, indent='  ')
