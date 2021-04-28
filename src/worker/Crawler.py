@@ -363,7 +363,8 @@ class Crawler:
             for res in results_selected:
                 if res.get('pi') is not None:
                     results_valid.append(res)
-            self.configuration.update_config(results_valid, update_location)
+            if len(results_valid) > 0:
+                self.configuration.update_config(results_valid, update_location)
 
         return self
 

@@ -274,8 +274,7 @@ class Config:
         """
         if self.info is not None:
             self.history.pull_existing()
-        self.history.update_current_status()
-        self.history.push()
+
 
         if new_location is not None:
             self.location = new_location
@@ -294,6 +293,9 @@ class Config:
         self.media = ConfigurationFunctions.update_media_outlets(
             outlets=self.media + results, alpha_tilde=self.alpha, pi=self.pi,
             tau_tilde_ij=self.tau, k=10)
+
+        self.history.update_current_status()
+        self.history.push()
 
     @classmethod
     def from_dict(cls, config_dict, location):

@@ -10,6 +10,7 @@ from src.worker.Info import ProxyInfo
 import json
 import pathlib
 import pandas as pd
+from src.worker.History import S3History
 
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
@@ -42,6 +43,8 @@ class Proxy:
         self._username = username
         self._password = password
         self._info = info
+        self._history = S3History(self)
+
 
     def _check_location_non_geosurf(self):
         """
@@ -71,8 +74,11 @@ class Proxy:
         existing = f'{self._hostname}:{self._port}'
         new_proxy= update_dict.get(existing)
         if new_proxy is not None:
+            self._history.pull_existing()
             self._hostname = new_proxy['host']
             self._port = new_proxy['port']
+            self._history.update_current_status()
+            self._history.push()
             return self._check_location_non_geosurf()
         else:
             return 'not updated'
