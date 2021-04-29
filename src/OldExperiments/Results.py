@@ -15,16 +15,20 @@ PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
 with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
 
-ACCESS_TOKEN = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'], KEYS['PRIMEMOVER']['password'])
+ACCESS_TOKEN = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
+                                      KEYS['PRIMEMOVER']['password'])
+
 
 class JobResult:
     """
     Stores and processes the returned data for a single job
     """
+
     def __init__(self, crawler_id=None, started_at=None,
                  status_code=None, status_message=None,
                  created_at=None, updated_at=None, finished_at=None,
-                 behaviors=None, reports=None, flag_list=None, parser_dict=Parser.ParserDict):
+                 behaviors=None, reports=None, flag_list=None,
+                 parser_dict=Parser.ParserDict):
         self._crawler_id = crawler_id
         self._started_at = started_at
         self._status_message = status_message
@@ -79,7 +83,8 @@ class JobResult:
         for report in self._reports:
             if 'static' in report['filename']:
                 path = report['path']
-                raw_data.append(api_wrapper.fetch_html(url=path, access_token=ACCESS_TOKEN))
+                raw_data.append(
+                    api_wrapper.fetch_html(url=path, access_token=ACCESS_TOKEN))
         return raw_data
 
     def _download_dynamic(self):
@@ -87,7 +92,8 @@ class JobResult:
         for report in self._reports:
             if 'dynamic' in report['filename']:
                 path = report['path']
-                raw_data.append(api_wrapper.fetch_dynamic(url=path, access_token=ACCESS_TOKEN))
+                raw_data.append(api_wrapper.fetch_dynamic(url=path,
+                                                          access_token=ACCESS_TOKEN))
         return raw_data
 
     def _extract_flags(self):
@@ -103,7 +109,8 @@ class JobResult:
     @classmethod
     def from_list(cls, result_list, parser_dict=Parser.ParserDict):
 
-        job_results = [cls.from_dict(ind_job, parser_dict) for ind_job in result_list]
+        job_results = [cls.from_dict(ind_job, parser_dict) for ind_job in
+                       result_list]
 
         return job_results
 
@@ -161,7 +168,7 @@ class SessionResult:
         self._updated_at = updated_at
         self._user_id = user_id
         self._jobs = jobs
-        self._parser_dict=parser_dict
+        self._parser_dict = parser_dict
 
         temp_results = [j.results for j in self._jobs]
         self.results = []
@@ -170,12 +177,15 @@ class SessionResult:
                 self.results.append(res)
 
     @classmethod
-    def from_list(cls, result_list, set_reviewed=True, parser_dict=Parser.ParserDict):
-        session_results = [cls.from_dict(ind_session, parser_dict=parser_dict) for ind_session in
+    def from_list(cls, result_list, set_reviewed=True,
+                  parser_dict=Parser.ParserDict):
+        session_results = [cls.from_dict(ind_session, parser_dict=parser_dict)
+                           for ind_session in
                            result_list]
         if set_reviewed:
             for sess in session_results:
-                api_wrapper.set_reviewed(queue_id=sess._queue_id, access_token=ACCESS_TOKEN)
+                api_wrapper.set_reviewed(queue_id=sess._queue_id,
+                                         access_token=ACCESS_TOKEN)
 
         return session_results
 
@@ -199,7 +209,8 @@ class SessionResult:
                                     updated_at=result_dict.get("updated_at"),
                                     user_id=result_dict.get("user_id"),
                                     jobs=JobResult.from_list(
-                                        result_dict.get('jobs'), parser_dict=parser_dict),
+                                        result_dict.get('jobs'),
+                                        parser_dict=parser_dict),
                                     parser_dict=parser_dict)
 
         return session_result_object
@@ -207,7 +218,7 @@ class SessionResult:
 
 def export_results(results, date=datetime.today().date().isoformat()):
     # existing_crawler_path = f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date() + timedelta(days=-1)).isoformat()}.json'
-    existing_crawler_path = PRIMEMOVER_PATH +'/resources/updates/test_2020-12-22.json'
+    existing_crawler_path = PRIMEMOVER_PATH + '/resources/updates/test_2020-12-22.json'
     out_path = f'{PRIMEMOVER_PATH}/resources/cleaned_data/with_crawler_{date}.json'
     with open(existing_crawler_path, 'r') as file:
         crawlers = Crawler.from_dict(json.load(file))
@@ -222,12 +233,15 @@ def export_results(results, date=datetime.today().date().isoformat()):
     return combined
 
 
-def process_results(set_reviewed=True, parser_dict=Parser.ParserDict,path_end='', day_delta=0):
+def process_results(set_reviewed=True, parser_dict=Parser.ParserDict,
+                    path_end='', day_delta=0):
     path = f'{PRIMEMOVER_PATH}/resources/raw_data/{(datetime.now().date() + timedelta(days=day_delta)).isoformat()}.json'
 
     with open(path, 'r') as file:
         raw_data = json.load(file)
-    session_data = SessionResult.from_list(raw_data['data'], set_reviewed=set_reviewed, parser_dict=parser_dict)
+    session_data = SessionResult.from_list(raw_data['data'],
+                                           set_reviewed=set_reviewed,
+                                           parser_dict=parser_dict)
 
     combined_sessions = {}
     for session in session_data:
@@ -238,18 +252,23 @@ def process_results(set_reviewed=True, parser_dict=Parser.ParserDict,path_end=''
             combined_sessions[session.crawler_id] = session.results
 
     with open(
-            f'{PRIMEMOVER_PATH}/resources/cleaned_data/{path_end}{(datetime.today().date()+ timedelta(days=day_delta)).isoformat()}.json',
+            f'{PRIMEMOVER_PATH}/resources/cleaned_data/{path_end}{(datetime.today().date() + timedelta(days=day_delta)).isoformat()}.json',
             'w') as file:
         json.dump(combined_sessions, file, indent='  ')
 
     data = export_results(combined_sessions)
     return data
+
+
 if __name__ == "__main__":
     date = (datetime.today().date() + timedelta(days=0)).isoformat()
     api_wrapper.fetch_results(access_token=ACCESS_TOKEN)
-    process_results(set_reviewed=True, parser_dict=Parser.ParserDict, path_end='all_data', day_delta=0)
-    s3.upload_data(f'output/{date}.json', path=f'/resources/cleaned_data/all_data{date}.json')
-    process_results(set_reviewed=False, parser_dict=Parser.UpdateParser, day_delta=0)
+    process_results(set_reviewed=True, parser_dict=Parser.ParserDict,
+                    path_end='all_data', day_delta=0)
+    s3.upload_data(f'output/{date}.json',
+                   path=f'/resources/cleaned_data/all_data{date}.json')
+    process_results(set_reviewed=False, parser_dict=Parser.UpdateParser,
+                    day_delta=0)
     print(date)
 
     # process_results(set_reviewed=True, parser_dict=Parser.UpdateParser)

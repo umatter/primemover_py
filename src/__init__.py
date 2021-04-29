@@ -1,2 +1,2 @@
-from . import worker, OldExperiments, auxiliary, BrowserLeaks, ConfigurationFunctions, experiment_2_Test, Preferences, Results, UpdateExperiment
-__all__ = [worker, OldExperiments, auxiliary, BrowserLeaks, ConfigurationFunctions, experiment_2_Test, Preferences, Results, UpdateExperiment]
+from . import worker, OldExperiments, auxiliary, BrowserLeaks, ConfigurationFunctions, experiment_2_Test, Preferences, UpdateExperiment, Results_s3
+__all__ = [worker, OldExperiments, auxiliary, BrowserLeaks, ConfigurationFunctions, experiment_2_Test, Preferences, UpdateExperiment, Results_s3]

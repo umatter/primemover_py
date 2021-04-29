@@ -70,7 +70,7 @@ class JobResult:
             if success:
                 self.parsed_data = self._parser_dict[self.task]['method'](
                     self.behaviors,
-                    raw_data)
+                    raw_data, job_id)
                 self.results = {'finished_at': self.finished_at,
                                 'status_code': self.status_code,
                                 'status_message': self.status_message,
