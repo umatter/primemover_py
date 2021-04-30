@@ -22,7 +22,6 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
 ACCESS_TOKEN = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
                                       KEYS['PRIMEMOVER']['password'])
 
-
 class JobResult:
     """
     Stores and processes the returned data for a single job

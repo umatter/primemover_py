@@ -17,7 +17,7 @@ htmlparser = etree.HTMLParser()
 UpdateParser = {}
 
 
-def GoogleParser(behaviors, raw_html):
+def GoogleParser(behaviors, raw_html, job_id):
     term = None
     for b in behaviors:
         if b['name'] == 'text':
@@ -26,7 +26,7 @@ def GoogleParser(behaviors, raw_html):
         return {'issue': 'unknown', 'term': term}
 
     if 'captcha' in str(raw_html):
-        print('Captcha!')
+        print(f'Captcha: {job_id} ')
         return {'issue': 'Captcha', 'term': term}
 
     soup = BeautifulSoup(raw_html, "html.parser")
@@ -65,7 +65,7 @@ def GoogleParser(behaviors, raw_html):
     return parsed_data
 
 
-def BrowserLeaksParser(behaviors, reports):
+def BrowserLeaksParser(behaviors, reports, job_id):
     if reports is None:
         return {'issue': 'unknown'}
     parsed_data = []
@@ -76,7 +76,7 @@ def BrowserLeaksParser(behaviors, reports):
     return parsed_data
 
 
-def SelectionParser(behaviors, dynamic_data):
+def SelectionParser(behaviors, dynamic_data, job_id):
     if dynamic_data is None:
         return {'issue': 'unknown'}
 

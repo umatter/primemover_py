@@ -17,7 +17,7 @@ def UpdateObject(crawler_list, object_name='agent'):
         values = [api_wrapper.fetch_proxy(i) for i in ids]
     elif object_name == 'agent':
         ids = [c.agent.info.agent_id for c in crawler_list]
-        values = [api_wrapper.fetch_agent(i) for i in ids ]
+        values = [api_wrapper.fetch_agent(i) for i in ids]
     elif object_name == 'config':
         ids = [c.configuration.info.configuration_id for c in crawler_list]
         values = [api_wrapper.fetch_config(i) for i in ids]
