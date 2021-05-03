@@ -1,10 +1,10 @@
-numpy~=1.19.4
+numpy~=1.20.2
 beautifulsoup4~=4.9.3
 tldextract~=3.1.0
-requests~=2.25.0
-pytz~=2020.4
-pandas~=1.1.5
-webob~=1.8.6
+requests~=2.25.1
+pytz~=2021.1
+pandas~=1.2.4
+webob~=1.8.7
 # apache-airflow~=1.10.13
 
-lxml~=4.6.2
+lxml~=4.6.3

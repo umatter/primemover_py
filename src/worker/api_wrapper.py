@@ -14,6 +14,7 @@ Available Functions:
 
 J.L. 11.2020
 """
+
 import requests
 from requests_oauthlib import OAuth2Session
 import json
@@ -26,6 +27,8 @@ from src.worker.Crawler import Crawler
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 DOMAIN = "https://primemover.wimando.ch/api/v1/"
+
+
 
 
 def get_access(e_mail, password):
@@ -56,6 +59,7 @@ def push_new(access_token,
         'authorization': 'Bearer ' + access_token})
 
     return post_crawlers
+
 
 #
 # def update_crawlers(access_token, crawler_objects=None,

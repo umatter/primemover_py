@@ -29,7 +29,6 @@ CLIENT = boto3.client('s3',
 def fetch_report(job_id: int, report_type='dynamic'):
     """
     fetch job report from s3 bucket:
-
     """
 
     report_type = report_type.lower()

@@ -14,6 +14,7 @@ import pathlib
 import src.Preferences
 from src.worker.Utilities import pref_as_dict, EscapeStrings
 from src.worker.History import S3History
+
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 
@@ -71,6 +72,7 @@ class Config:
                  terms=None,
                  location=None,
                  info=None,
+                 date=datetime.now()
                  ):
 
         self.name = name
@@ -94,7 +96,8 @@ class Config:
 
         self.media = media
         self.terms = terms
-        self._history = S3History(self)
+        self._date = date
+        self._history = S3History(self, date)
 
     @property
     def info(self):
@@ -263,9 +266,9 @@ class Config:
             for key, value in self._info.as_dict().items():
                 return_dict[key] = value
         if len(self.history.history) != 0:
-
             return_dict["preferences"].append({"name": "history",
-             "value": str(list(self.history.history.keys()))})
+                                               "value": str(list(
+                                                   self.history.history.keys()))})
         return return_dict
 
     def update_config(self, results, new_location):
@@ -274,7 +277,6 @@ class Config:
         """
         if self.info is not None:
             self.history.pull_existing()
-
 
         if new_location is not None:
             self.location = new_location
@@ -298,7 +300,7 @@ class Config:
         self.history.push()
 
     @classmethod
-    def from_dict(cls, config_dict, location):
+    def from_dict(cls, config_dict, location, date=datetime.now()):
         """
         Generate config object from single api return
         Parameters:
@@ -306,7 +308,6 @@ class Config:
             must be json type objects!
         """
         pref = pref_as_dict(config_dict.get('preferences', []))
-
 
         config_object = cls(name=config_dict.get('name'),
                             description=config_dict.get('description'),
@@ -321,6 +322,7 @@ class Config:
                             terms=json.loads(
                                 config_dict['params'][0].get('search_terms')),
                             info=ConfigurationInfo.from_dict(config_dict),
-                            location=location
+                            location=location,
+                            date=date
                             )
         return config_object

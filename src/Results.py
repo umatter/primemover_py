@@ -12,8 +12,6 @@ import src.worker.s3_wrapper as s3
 import zipfile
 import io
 
-
-
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
 
 with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
@@ -21,6 +19,7 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
 
 ACCESS_TOKEN = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
                                       KEYS['PRIMEMOVER']['password'])
+
 
 class JobResult:
     """
@@ -31,7 +30,7 @@ class JobResult:
                  status_code=None, status_message=None,
                  created_at=None, updated_at=None, finished_at=None,
                  behaviors=None, flag_list=None, reports=None,
-                 parser_dict=Parser.ParserDict):
+                 parser_dict=Parser.ParserDict, captcha_parse=False):
         self.crawler_id = crawler_id
         self.job_id = job_id
         self._started_at = started_at
@@ -46,11 +45,11 @@ class JobResult:
         self.reports = reports
         self.behaviors = behaviors
         self._extract_flags()
-
         self._flag_list = flag_list
         self._parser_dict = parser_dict
         self.results = None
-
+        if captcha_parse:
+            self.task = 'captcha'
         # Check if flag in parser dict, if yes, parse
         if self.task in self._parser_dict.keys():
             if parser_dict[self.task]['data'] == 'html':
@@ -254,8 +253,8 @@ def export_results(results, date=datetime.today().date().isoformat()):
 
 
 def process_results(set_reviewed=True, parser_dict=Parser.ParserDict,
-                    path_end='', day_delta=0):
-    path = f'{PRIMEMOVER_PATH}/resources/raw_data/{(datetime.now().date() + timedelta(days=day_delta)).isoformat()}.json'
+                    path_end='', date=datetime.now()):
+    path = f'{PRIMEMOVER_PATH}/resources/raw_data/{date.date().isoformat()}.json'
 
     with open(path, 'r') as file:
         raw_data = json.load(file)
@@ -272,52 +271,29 @@ def process_results(set_reviewed=True, parser_dict=Parser.ParserDict,
             combined_sessions[session.crawler_id] = session.results
 
     with open(
-            f'{PRIMEMOVER_PATH}/resources/cleaned_data/{path_end}{(datetime.today().date() + timedelta(days=day_delta)).isoformat()}.json',
+            f'{PRIMEMOVER_PATH}/resources/cleaned_data/{path_end}_{date.date().isoformat()}.json',
             'w') as file:
         json.dump(combined_sessions, file, indent='  ')
 
-    data = export_results(combined_sessions)
-    return data
+    return 'Success'
+
+
+def fetch_results():
+    with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
+        keys = json.load(f)
+    access_token = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
+                                          KEYS['PRIMEMOVER']['password'])
+    api_wrapper.fetch_results(access_token=access_token)
 
 
 if __name__ == "__main__":
-    date = (datetime.today().date() + timedelta(days=0)).isoformat()
+    date = datetime.now()
     api_wrapper.fetch_results(access_token=ACCESS_TOKEN)
     process_results(set_reviewed=True, parser_dict=Parser.ParserDict,
-                    path_end='all_data', day_delta=0)
-    s3.upload_data(f'output/{date}.json',
-                   path=f'/resources/cleaned_data/all_data{date}.json')
-    process_results(set_reviewed=False, parser_dict=Parser.UpdateParser,
-                    day_delta=0)
-    print(date)
+                    path_end='all_data', date=date)
 
-    # process_results(set_reviewed=True, parser_dict=Parser.UpdateParser)
-    # combined_session_1 = {}
-    # combined_session_2 = {}
-    # for session in session_data:
-    #     if "10-14" in session.start_at:
-    #
-    #         if session.crawler_id in combined_session_1.keys():
-    #             combined_session_1[session.crawler_id] = combined_session_1[
-    #                                                         session.crawler_id] + session.results
-    #         else:
-    #             combined_session_1[session.crawler_id] = session.results
-    #     elif "10-15" in session.start_at:
-    #
-    #         if session.crawler_id in combined_session_2.keys():
-    #             combined_session_2[session.crawler_id] = combined_session_2[
-    #                                                         session.crawler_id] + session.results
-    #         else:
-    #             combined_session_2[session.crawler_id] = session.results
-    #
-    # with open(
-    #         f'resources/cleaned_data/2020-10-15.json',
-    #         'w') as file:
-    #     json.dump(combined_session_1, file, indent='  ')
-    # export_results(combined_session_1, '2020-10-1')
-    #
-    # with open(
-    #         f'resources/cleaned_data/2020-10-16.json',
-    #         'w') as file:
-    #     json.dump(combined_session_2, file, indent='  ')
-    # export_results(combined_session_2, date='2020-10-16')
+    s3.upload_data(f'output/{date.date().isoformat()}.json',
+                   path=f'/resources/cleaned_data/all_data_{date}.json')
+
+    process_results(set_reviewed=False, parser_dict=Parser.UpdateParser,
+                    date=datetime.now())

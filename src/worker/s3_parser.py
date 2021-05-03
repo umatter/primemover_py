@@ -65,6 +65,15 @@ def GoogleParser(behaviors, raw_html, job_id):
     return parsed_data
 
 
+def CaptchaParser(behaviors, raw_html, job_id):
+    if raw_html is None:
+        return {'issue': 'unknown'}
+
+    if 'captcha' in str(raw_html):
+        print(f'Captcha: {job_id}')
+        return {'issue': 'Captcha'}
+    return {'issue':'no captcha'}
+
 def BrowserLeaksParser(behaviors, reports, job_id):
     if reports is None:
         return {'issue': 'unknown'}
@@ -91,7 +100,8 @@ def SelectionParser(behaviors, dynamic_data, job_id):
                 outlet_match = outlets.loc[
                     outlets['domain'] == result['normalizedUrl']]
                 if outlet_match.shape[0] > 1:
-                    if outlet_match.loc[outlets['redirect_url'] == result['url']].shape[0] > 0:
+                    if outlet_match.loc[
+                        outlets['redirect_url'] == result['url']].shape[0] > 0:
                         outlet_match = outlet_match.loc[
                             outlets['redirect_url'] == result['url']]
                 if outlet_match.shape[0] >= 1:
@@ -121,3 +131,4 @@ ParserDict['CALCULATED/search_google_neutral'] = {'method': SelectionParser,
 
 UpdateParser['CALCULATED/search_google_neutral'] = {'method': SelectionParser,
                                                     'data': 'dynamic'}
+ParserDict['captcha'] = {'method': CaptchaParser, 'data': 'html'}

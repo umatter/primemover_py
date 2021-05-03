@@ -36,15 +36,18 @@ def GoogleParser(behaviors, raw_html, job_id):
 
     parsed_data = []
     for rank, result in enumerate(results_in):
-        try: url = result.find('a').get('href')
+        try:
+            url = result.find('a').get('href')
         except:
             url = ''
             print('URL is missing')
-        try: domain = extract_domain(url)
+        try:
+            domain = extract_domain(url)
         except:
             domain = ''
 
-        try: title = result.find('h3').text
+        try:
+            title = result.find('h3').text
         except:
             title = ''
             # print('Title is missing')
@@ -73,6 +76,8 @@ def BrowserLeaksParser(behaviors, reports, job_id):
     return parsed_data
 
 
+
+
 def SelectionParser(behaviors, dynamic_data, job_id):
     if dynamic_data is None:
         return {'issue': 'unknown'}
@@ -85,19 +90,26 @@ def SelectionParser(behaviors, dynamic_data, job_id):
     for result in dynamic_data[0]['items']:
         if result['selected']:
             for row in outlets.index:
-                outlet_match = outlets.loc[outlets['domain']==result['normalizedUrl']]
-                if outlet_match.shape[0]>1:
-                    if outlet_match.loc[outlets['redirect_url'] == result['url']].shape[0]>0:
-                        outlet_match = outlet_match.loc[outlets['redirect_url'] == result['url']]
-                if outlet_match.shape[0]>=1:
+                outlet_match = outlets.loc[
+                    outlets['domain'] == result['normalizedUrl']]
+                if outlet_match.shape[0] > 1:
+                    if outlet_match.loc[
+                        outlets['redirect_url'] == result['url']].shape[0] > 0:
+                        outlet_match = outlet_match.loc[
+                            outlets['redirect_url'] == result['url']]
+                if outlet_match.shape[0] >= 1:
                     outlet_match = outlet_match.iloc[0]
                 else:
                     continue
 
-                return {'url': outlet_match['redirect_url'], 'domain': result['normalizedUrl'], 'pi': outlet_match['pi'], 'known': result['known']}
+                return {'url': outlet_match['redirect_url'],
+                        'domain': result['normalizedUrl'],
+                        'pi': outlet_match['pi'], 'known': result['known']}
             else:
-                return({'url': result['url'], 'domain': result['normalizedUrl'],
-                        'pi': None, 'known': False})
+                return (
+                {'url': result['url'], 'domain': result['normalizedUrl'],
+                 'pi': None, 'known': False})
+
 
 
 ParserDict['GoogleSearch'] = {'method': GoogleParser, 'data': 'html'}
@@ -108,6 +120,9 @@ ParserDict['search_google_political_no_utility'] = {'method': GoogleParser,
                                                     'data': 'html'}
 ParserDict['search_google_neutral'] = {'method': GoogleParser, 'data': 'html'}
 ParserDict['BrowserLeaks'] = {'method': BrowserLeaksParser, 'data': 'reports'}
-ParserDict['CALCULATED/search_google_neutral'] = {'method': SelectionParser, 'data':'dynamic'}
+ParserDict['CALCULATED/search_google_neutral'] = {'method': SelectionParser,
+                                                  'data': 'dynamic'}
 
-UpdateParser['CALCULATED/search_google_neutral'] = {'method': SelectionParser, 'data':'dynamic'}
+UpdateParser['CALCULATED/search_google_neutral'] = {'method': SelectionParser,
+                                                    'data': 'dynamic'}
+ParserDict['CA'] = {'method': GoogleParser, 'data': 'html'}

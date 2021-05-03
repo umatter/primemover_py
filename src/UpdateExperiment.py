@@ -18,9 +18,8 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
 
 
-def single_update(day_delta=0):
-    "Set Date TODO: Replace with airflow date set"
-    date = (datetime.now().date() + timedelta(days=0))
+def single_update(date, default_crawler_path, manual=False):
+
     "Fetch Neutral terms from s3 Bucket"
     Neutral = s3_wrapper.fetch_neutral()
     "Generate Benign Terms TODO: "
@@ -31,14 +30,14 @@ def single_update(day_delta=0):
                                            end_at=(9 + 24) * 60 * 60)
     if not os.path.exists(
             f'{PRIMEMOVER_PATH}/resources/updates/{(date + timedelta(-1)).isoformat()}.json'):
-        existing_crawler_path = PRIMEMOVER_PATH + "/resources/crawlers/test_5_2021-04-16.json"
+        existing_crawler_path = PRIMEMOVER_PATH + default_crawler_path
     else:
         existing_crawler_path = f'{PRIMEMOVER_PATH}/resources/updates/{(date + timedelta(-1)).isoformat()}.json'
 
     with open(existing_crawler_path, 'r') as file:
         raw_crawlers = json.load(file)
 
-    crawler_list = Crawler.Crawler.from_dict(raw_crawlers, day_delta=day_delta)
+    crawler_list = Crawler.Crawler.from_dict(raw_crawlers, date=date)
     crawler_list = UpdateObject(crawler_list, 'agent')
     crawler_list = UpdateObject(crawler_list, 'proxy')
     crawler_list = UpdateObject(crawler_list, 'config')
@@ -108,30 +107,25 @@ def single_update(day_delta=0):
 
     crawler_list = crawler_list_neutral + crawler_list_political
 
-    with open(PRIMEMOVER_PATH+"/resources/updates/generated.json",
+    with open(PRIMEMOVER_PATH + "/resources/updates/generated.json",
               'w') as file:
         json.dump(
             [crawler.as_dict(object_ids=False) for crawler in crawler_list],
             file,
             indent='  ')
-
-    do = input('push data? (y/n): ')
+    if manual:
+        do = input('push data? (y/n): ')
+    else:
+        do = 'y'
     if do == 'y':
         key = api.get_access(KEYS['PRIMEMOVER']['username'],
                              KEYS['PRIMEMOVER']['password'])
-
-        exp = Experiment.Experiment.from_dict(api.fetch_experiment(key, 1))
-        if exp.neutral_terms is None:
-            exp.neutral_terms = {date.isoformat(): neutral}
-        else:
-            existing = exp.neutral_terms
-            exp.neutral_terms = existing[date.isoformat()] = neutral
 
         return_data = api.push_new(access_token=key,
                                    path=f'{PRIMEMOVER_PATH}/resources/updates/generated.json')
         if return_data.status_code == 200:
             with open(
-                    f'{PRIMEMOVER_PATH}/resources/updates/test_{date.isoformat()}.json',
+                    f'{PRIMEMOVER_PATH}/resources/updates/{date.date().isoformat()}.json',
                     'w') as file:
                 json.dump(return_data.json(), file, indent='  ')
         else:
@@ -145,4 +139,4 @@ if __name__ == "__main__":
     # for day in range(13):
     #     single_update(day_delta=day)
     #     print((datetime.now().date() + timedelta(days=day)).isoformat())
-    single_update(day_delta=0)
+    single_update(datetime.now(), default_crawler_path="/resources/crawlers/test_5_2021-04-16.json", manual=True)
