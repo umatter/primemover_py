@@ -97,7 +97,10 @@ class Config:
         self.media = media
         self.terms = terms
         self._date = date
-        self._history = S3History(self, date)
+        if self.info is not None:
+            self._history = S3History(self, date)
+        else:
+            self._history = None
 
     @property
     def info(self):

@@ -19,6 +19,7 @@ class Job:
         - name: string
         - description: string
         - behaviors: list of behavior objects
+        - captcha_mode: str, one of {'always', 'never', 'random'}
     """
 
     def __init__(self,
@@ -27,6 +28,7 @@ class Job:
                  description="",
                  task=None,
                  flag=None,
+                 captcha_mode='never',
                  ):
         self.type = job_type
         self._description = description
@@ -36,6 +38,7 @@ class Job:
             self.behaviors.append(Behavior.TaskBehavior(task))
         if flag is not None:
             self.behaviors.append(Behavior.FlagBehavior(flag))
+        self.behaviors.append(Behavior.CaptchaMode(captcha_mode))
 
     def as_dict(self):
         """
@@ -56,15 +59,17 @@ class VisitJob(Job):
 
     def __init__(self, url,
                  task=None,
-                 flag=None):
+                 flag=None,
+                 captcha_mode='never'):
         """
         Arguments:
             - url: A valid URL to visit
             - task: (optional) string,  task the job is a part of
             - flag: (optional) string,  some flag
+            - captcha_mode: str, one of {'always', 'never', 'random'}
         """
         super().__init__(job_type='visitjob', name='Visit',
-                         description=f'Visit {url}', task=task, flag=flag)
+                         description=f'Visit {url}', task=task, flag=flag, captcha_mode=captcha_mode)
         self.behaviors.append(Behavior.URL(url))
 
 
@@ -73,16 +78,18 @@ class Wait(Job):
 
     def __init__(self, time,
                  task=None,
-                 flag=None):
+                 flag=None,
+                 captcha_mode='never'):
         """
         Arguments:
             - time: Wait time in seconds
             - task: (optional) string,  task the job is a part of
             - flag: (optional) string,  some flag
+            - captcha_mode: str, one of {'always', 'never', 'random'}
         """
         super().__init__(job_type='waitjob', name='Wait',
                          description=f'Wait for {time} seconds', task=task,
-                         flag=flag)
+                         flag=flag, captcha_mode=captcha_mode)
         self.behaviors.append(
             Behavior.WaitSeconds(time))
 
@@ -97,7 +104,8 @@ class EnterText(Job):
                  send_return=True,
                  type_mode="SIMULATED_NOTYPOS",
                  task=None,
-                 flag=None
+                 flag=None,
+                 captcha_mode='never'
                  ):
         """
             - text: string, text to enter
@@ -111,11 +119,12 @@ class EnterText(Job):
             - selector_type: One of "XPATH|CSS|CLASS|ID"
             - task: (optional) string,  task the job is a part of
             - flag: (optional) string,  some flag
+            - captcha_mode: str, one of {'always', 'never', 'random'}
         """
         super().__init__(job_type='entertextfieldjob',
                          name='Enter Text',
                          description=f'Enter text into the defined field',
-                         task=task, flag=flag)
+                         task=task, flag=flag, captcha_mode=captcha_mode)
         self.behaviors.append(Behavior.Text(text))
         self.behaviors.append(
             Behavior.SelectionType(selector_type))
@@ -133,18 +142,21 @@ class SingleSelect(Job):
     def __init__(self, selector, selector_type='XPATH',
                  decision_type='FIRST',
                  task=None,
-                 flag=None):
+                 flag=None,
+                 captcha_mode='never'):
         """
             - selector: string, a valid XPATH|CSS|CLASS|ID for a text field, default: 'XPATH'
             - selector_type: One of "XPATH|CSS|CLASS|ID"
             - decision_type: one of "FIRST|LAST|RANDOM|CALCULATED", Method of selecting a result if multiple elements match selector (default: First)
             - task: (optional) string,  task the job is a part of
             - flag: (optional) string,  some flag
+            - captcha_mode: str, one of {'always', 'never', 'random'}
         """
         super().__init__(job_type='singleselecturljob',
                          name='Select',
                          description=f'Select an item and click', task=task,
-                         flag=flag)
+                         flag=flag,
+                         captcha_mode=captcha_mode)
         self.behaviors.append(
             Behavior.SelectionType(selector_type))
         self.behaviors.append(
@@ -169,17 +181,19 @@ class TryClick(Job):
 
     def __init__(self, selector, selector_type='XPATH',
                  task=None,
-                 flag=None):
+                 flag=None,
+                 captcha_mode='never'):
         """
             - selector: string, a valid XPATH|CSS|CLASS|ID for a text field, default: 'XPATH'
             - selector_type: One of "XPATH|CSS|CLASS|ID"
             - task: (optional) string,  task the job is a part of
             - flag: (optional) string,  some flag
+            - captcha_mode: str, one of {'always', 'never', 'random'}
         """
         super().__init__(job_type='tryclickjob',
                          name='Try Click',
                          description=f'Try to click a button/item', task=task,
-                         flag=flag)
+                         flag=flag, captcha_mode=captcha_mode)
         self.behaviors.append(
             Behavior.SelectionType(selector_type))
         self.behaviors.append(
@@ -193,18 +207,20 @@ class TrySwitchTo(Job):
 
     def __init__(self, selector, selector_type='XPATH',
                  task=None,
-
-                 flag=None):
+                 flag=None,
+                 captcha_mode='never'):
         """
             - selector: string, a valid XPATH|CSS|CLASS|ID for a text field, default: 'XPATH'
             - selector_type: One of "XPATH|CSS|CLASS|ID"
             - task: (optional) string,  task the job is a part of
             - flag: (optional) string,  some flag
+            - captcha_mode: str, one of {'always', 'never', 'random'}
         """
         super().__init__(job_type='tryswitchtojob',
                          name='Try Switch To',
                          description=f'Try to switch to an iframe', task=task,
-                         flag=flag)
+                         flag=flag,
+                         captcha_mode=captcha_mode)
         self.behaviors.append(
             Behavior.SelectionType(selector_type))
         self.behaviors.append(
@@ -217,12 +233,14 @@ class Scroll(Job):
     def __init__(self, direction='DOWN', duration=None,
                  percentage=None,
                  task=None,
-                 flag=None):
+                 flag=None,
+                 captcha_mode='never'):
         """
         Arguments:
             - direction: string,  one of "UP/U|DOWN/D" (not case sensitive)
             - duration: int, seconds>0
             - percentage: numeric in [0,100] (overwrites duration)
+            - captcha_mode: str, one of {'always', 'never', 'random'}
             """
         if percentage is not None:
             method = 'length'
@@ -234,7 +252,8 @@ class Scroll(Job):
         super().__init__(job_type=f'scrollby{method}job',
                          name=f'Scroll by {method}',
                          description=f'Scroll {direction.lower()}', task=task,
-                         flag=flag)
+                         flag=flag,
+                         captcha_mode=captcha_mode)
         if method == 'length':
             self.behaviors.append(
                 Behavior.ScrollLength(percentage))

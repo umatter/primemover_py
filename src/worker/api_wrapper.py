@@ -16,14 +16,12 @@ J.L. 11.2020
 """
 
 import requests
-from requests_oauthlib import OAuth2Session
 import json
 from datetime import datetime
 import os
 import io
 import zipfile
 import pathlib
-from src.worker.Crawler import Crawler
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 DOMAIN = "https://primemover.wimando.ch/api/v1/"
@@ -108,7 +106,7 @@ def fetch_results(access_token,
         dictionary response from api
     """
     if os.path.exists(path):
-        raise Exception('file already exists')
+        raise FileExistsError('file already exists')
     raw_data = requests.get(DOMAIN + 'queues-unreviewed',
                             headers={'authorization': 'Bearer ' + access_token})
     raw_dict = raw_data.json()
@@ -272,6 +270,7 @@ def set_inactive(access_token, queue_id):
 
 def get_outlets(access_token):
     """
+    DEPRECIATED
     Wrapper function to retrive media outlets from primemover api
     Returns:
         contents of response json at key 'data'
@@ -283,6 +282,7 @@ def get_outlets(access_token):
 
 def get_terms(access_token):
     """
+    DEPRECIATED
     Wrapper function to retrive search terms from primemover api
     Returns:
         contents of response json at key 'data'

@@ -54,7 +54,7 @@ t1 = PythonOperator(
 )
 
 t2 = PythonOperator(
-    task_id='parse_results',
+    task_id='parse_all_results',
     python_callable=src.Results.process_results,
     op_kwargs={'set_reviewed': True,
                'parser_dict': src.worker.s3_parser.ParserDict,
@@ -64,13 +64,13 @@ t2 = PythonOperator(
 
 t3 = PythonOperator(
     task_id='upload_results',
-    python_callable=src.worker.s3_wrapper,
+    python_callable=src.worker.s3_wrapper.upload_data,
     op_kwargs={'filename': f'output/{datetime.now().date().isoformat()}.json',
-               'path': f'/resources/cleaned_data/all_data_{datetime.now()}.json'},
+               'path': f'/resources/cleaned_data/all_data_{datetime.now().date().isoformat()}.json'},
     dag=dag)
 
 t4 = PythonOperator(
-    task_id='parse_results',
+    task_id='parse_search_results',
     python_callable=src.Results.process_results,
     op_kwargs={'set_reviewed': False,
                'parser_dict': src.worker.s3_parser.UpdateParser,
@@ -82,14 +82,14 @@ t5 = PythonOperator(
     python_callable=src.UpdateExperiment.single_update,
     op_kwargs={'date': datetime.now(),
                'default_crawler_path': "/resources/crawlers/test_5_2021-04-16.json"},
-    dag=dag,
+    dag=dag
 )
 
 t6 = PythonOperator(
     task_id='cleanup',
-    python_callable=src.worker.CleanUp.cleanup(),
+    python_callable=src.worker.CleanUp.cleanup,
     op_kwargs={'date': datetime.now(),
                'nr_days': 5},
-    dag=dag,
-)
+    dag=dag)
+
 t1 >> t2 >> t3 >> t4 >> t5 >> t6

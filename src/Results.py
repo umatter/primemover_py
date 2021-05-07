@@ -283,7 +283,10 @@ def fetch_results():
         keys = json.load(f)
     access_token = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
                                           KEYS['PRIMEMOVER']['password'])
-    api_wrapper.fetch_results(access_token=access_token)
+    try:
+        api_wrapper.fetch_results(access_token=access_token)
+    except FileExistsError:
+        print('file already exists')
 
 
 if __name__ == "__main__":
@@ -293,7 +296,7 @@ if __name__ == "__main__":
                     path_end='all_data', date=date)
 
     s3.upload_data(f'output/{date.date().isoformat()}.json',
-                   path=f'/resources/cleaned_data/all_data_{date}.json')
+                   path=f'/resources/cleaned_data/all_data_{date.date()}.json')
 
     process_results(set_reviewed=False, parser_dict=Parser.UpdateParser,
                     date=datetime.now())

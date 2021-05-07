@@ -51,10 +51,10 @@ def SelectSearchTerms(pi, alpha_hat, tau_hat_ik, k=10):
     utilities = []
     for row in terms.index:
         term_k, pi_hat_k = terms.loc[row]
-        # epsilon_ik = NoiseUtility()
+        epsilon_ik = NoiseUtility()/10
         utilities.append((search_utility_v_ik(pi_i=pi,
                                               pi_hat_k=pi_hat_k,
-                                              epsilon_ik=0,
+                                              epsilon_ik=epsilon_ik,
                                               alpha_hat=alpha_hat,
                                               tau_hat_ik=tau_hat_ik), term_k,
                           pi_hat_k))

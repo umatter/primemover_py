@@ -68,7 +68,7 @@ if __name__ == "__main__":
                         GEO_SURF_PROXIES]
     config_list_right = [
         Config(name='Config/right', location=left_config.location,
-               pi=left_config.pi) for left_config in
+               pi=-left_config.pi) for left_config in
         config_list_left]
 
     crawler_list += [

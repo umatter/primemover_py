@@ -40,8 +40,10 @@ class Behavior:
     Public methods:
         as_dict: returns a dictionary representation of the behavior
     """
+
     def __init__(self, name: str, value,
-                 description="Lorem Ipsum", updated_at=None, created_at=None, active=1):
+                 description="Lorem Ipsum", updated_at=None, created_at=None,
+                 active=1):
         self.name = name
         self.description = description
         self.value = value
@@ -116,6 +118,7 @@ class URL(Behavior):
         - url: string that is parsed to see if it is a structurally sound url
         - description: a description of the url, default: "URL"
     """
+
     def __init__(self, url, description='URL'):
         self.url = url
         super().__init__(name='url', value=self.url, description=description)
@@ -146,6 +149,7 @@ class Text(Behavior):
         - text: some string
         - description: a description of the url, default: "Text to enter"
     """
+
     def __init__(self, text):
 
         self.text = text
@@ -172,6 +176,7 @@ class SelectionType(Behavior):
         - selector_type: string, one of "XPATH|CSS|CLASS|ID"
         - description: a description of the url, default: "Type of selection"
     """
+
     def __init__(self, selector_type):
 
         self.selector_type = selector_type
@@ -199,6 +204,7 @@ class Selector(Behavior):
         - selector: string, a valid XPATH|CSS|CLASS|ID selector
         - kind: string, what is the selector? use to specify purpose or type
     """
+
     def __init__(self, selector, kind=""):
         self.selector = selector
         self.kind = kind
@@ -222,6 +228,7 @@ class DecisionType(Behavior):
     Public Attributes:
         - decision_type: string,  one of "FIRST|LAST|RANDOM|CALCULATED"
     """
+
     def __init__(self, decision_type):
         self.decision_type = decision_type
 
@@ -249,6 +256,7 @@ class ScrollDuration(Behavior):
     Public Attributes:
         - duration: int, seconds>0
     """
+
     def __init__(self, duration: int):
 
         self.duration = duration
@@ -317,6 +325,7 @@ class ScrollLength(Behavior):
     Public Attributes:
         - percentage: numeric in [0,100]
     """
+
     def __init__(self, percentage):
         self.percentage = percentage
         super().__init__(name='length', value=self.percentage,
@@ -344,6 +353,7 @@ class WaitSeconds(Behavior):
     Public Attributes:
         - duration: int, seconds to wait
     """
+
     def __init__(self, duration):
         """
         :param duration: int >0 time in seconds
@@ -376,6 +386,7 @@ class AppendReturn(Behavior):
     Public Attributes:
         - send_return, boolean
     """
+
     def __init__(self, send_return=False):
         self.send_return = send_return
         super().__init__(name='appendReturn', value=self.send_return,
@@ -388,7 +399,7 @@ class AppendReturn(Behavior):
     @send_return.setter
     def send_return(self, val):
         if type(val) is str:
-            val.strip().lower()
+            val = val.strip().lower()
             if val == 'false':
                 self._send_return = False
             elif val == 'true':
@@ -412,6 +423,7 @@ class TypingMode(Behavior):
             Simulated_FixingTypos: Simulate key presses, make typos fix all of them
             Simulated_NoTypos: Simulate key presses, make no mistakes  (default argument)
     """
+
     def __init__(self, mode="SIMULATED_NOTYPOS"):
         self.mode = mode
         super().__init__(name='typingMode', value=self.mode,
@@ -442,6 +454,7 @@ class TaskBehavior(Behavior):
     Public Attributes:
         - task, task name (determined by primemover_py
     """
+
     def __init__(self, task):
         self.task = task
         super().__init__(name='task', value=self.task,
@@ -466,6 +479,7 @@ class FlagBehavior(Behavior):
     Public Attributes:
         - flag, some flag to pass
     """
+
     def __init__(self, flag):
         self.flag = flag
         super().__init__(name='flag', value=self.flag,
@@ -478,3 +492,35 @@ class FlagBehavior(Behavior):
     @flag.setter
     def flag(self, val):
         self._flag = val
+
+
+class CaptchaMode(Behavior):
+    """
+        input: str, one of { 'always', 'never', 'random'} default = 'never'
+            always -> always attempt to solve captchas when they occur
+            never -> never attempt to solve captchas, proceed as if none exists
+            random -> randomly attempt solve
+        can be appended to any job, is not required?
+    """
+
+    def __init__(self, mode='never'):
+        self.mode = mode
+        super().__init__(name='captchaMode', value=self.mode,
+                         description="")
+
+    @property
+    def mode(self):
+        return self._mode
+
+    @mode.setter
+    def mode(self, val):
+        if type(val) is str:
+            val = val.strip().lower()
+        else:
+            raise TypeError('Expected string')
+        if val in {'always', 'never', 'random'}:
+            self._mode = val
+        elif val == "":
+            self._mode = 'never'
+        else:
+            raise ValueError(f'Mode must be one of: [ always, never, random] received {val}')

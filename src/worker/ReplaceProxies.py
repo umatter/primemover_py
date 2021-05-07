@@ -2,7 +2,6 @@
 Takes new and old proxy list and finds best match for replaced proxies.
 """
 import src.worker.s3_wrapper as s3
-import json
 import pathlib
 import os
 import pandas as pd

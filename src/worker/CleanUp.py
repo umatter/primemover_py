@@ -21,7 +21,7 @@ def cleanup(date, nr_days):
 
     deletes files for date - nr_days
     """
-    to_delete = date.isoformat() + timedelta(days=-nr_days)
+    to_delete = date + timedelta(days=-nr_days)
     to_delete = to_delete.date().isoformat()
     # Delete api response
     if check_and_delete('resources/updates/{to_delete}.json'):
