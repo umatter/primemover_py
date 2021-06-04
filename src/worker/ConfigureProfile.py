@@ -71,6 +71,7 @@ class Config:
                  media=None,
                  terms=None,
                  location=None,
+                 usage_type=None,
                  info=None,
                  date=datetime.now()
                  ):
@@ -97,6 +98,7 @@ class Config:
         self.media = media
         self.terms = terms
         self._date = date
+        self.usage_type = usage_type
         if self.info is not None:
             self._history = S3History(self, date)
         else:
@@ -172,9 +174,8 @@ class Config:
     @pi.setter
     def pi(self, value):
         if value is None:
-            self._pi = ConfigurationFunctions.Pi(self._flag)
-        else:
-            self._pi = float(value)
+            value = ConfigurationFunctions.Pi(self._flag)
+        self._pi = float(value)
 
     @property
     def media(self):
@@ -190,6 +191,8 @@ class Config:
                                                                     k=10)
         elif type(media_in) in {list, dict}:
             self._media = media_in
+        elif type(media_in) is str and media_in != "":
+            self._media = json.loads(media_in)
         elif media_in == "":
             self._media = ""
         else:
@@ -212,6 +215,8 @@ class Config:
             self._terms = term_dict
         elif type(term_dict) is dict:
             self._terms = term_dict
+        elif type(term_dict) is str and term_dict != "":
+            self._terms = json.loads(term_dict)
         elif term_dict == "":
             self._terms = ""
         else:
@@ -241,6 +246,22 @@ class Config:
     def history(self):
         return self._history
 
+    @property
+    def usage_type(self):
+        return self._usage_type
+
+    @usage_type.setter
+    def usage_type(self, val):
+        if (val is None) or (val == "Value not provided at update!"):
+            val = ConfigurationFunctions.usage_type()
+        elif type(val) is str:
+            val = val.lower().strip()
+
+        if val in ['only_search', 'only_direct', 'both']:
+            self._usage_type = val
+        else:
+            raise ValueError('Not a valid value for usage_type')
+
     def as_dict(self, send_info=False):
         """
         Generate dictionary object from self, matching configurations in primemover api
@@ -262,13 +283,17 @@ class Config:
             "preferences": [{
                 "name": 'location',
                 "value": self.location
-            }
+            },
+                {
+                    "name": 'usage_type',
+                    "value": self.usage_type
+                }
             ]
         }
         if send_info and self._info is not None:
             for key, value in self._info.as_dict().items():
                 return_dict[key] = value
-        if len(self.history.history) != 0:
+        if self.history is not None and len(self.history.history) != 0:
             return_dict["preferences"].append({"name": "history",
                                                "value": str(list(
                                                    self.history.history.keys()))})
@@ -310,8 +335,10 @@ class Config:
             config_dict: api return of configurations. Note: media and terms
             must be json type objects!
         """
+        if type(config_dict) is list:
+            config_dict = config_dict[0]
         pref = pref_as_dict(config_dict.get('preferences', []))
-
+        usage_type = pref.get('usage_type')
         config_object = cls(name=config_dict.get('name'),
                             description=config_dict.get('description'),
                             psi=config_dict['params'][0].get('psi'),
@@ -320,12 +347,12 @@ class Config:
                             tau=config_dict['params'][0].get('tau'),
                             beta=config_dict['params'][0].get('beta'),
                             kappa=config_dict['params'][0].get('kappa'),
-                            media=json.loads(config_dict['params'][0].get(
-                                'media_outlet_urls')),
-                            terms=json.loads(
-                                config_dict['params'][0].get('search_terms')),
+                            media=config_dict['params'][0].get(
+                                'media_outlet_urls'),
+                            terms=config_dict['params'][0].get('search_terms'),
                             info=ConfigurationInfo.from_dict(config_dict),
                             location=location,
-                            date=date
+                            date=date,
+                            usage_type=usage_type
                             )
         return config_object

@@ -19,9 +19,17 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
 
 
 def single_update(date, default_crawler_path, manual=False):
-
     "Fetch Neutral terms from s3 Bucket"
-    Neutral = s3_wrapper.fetch_neutral()
+    neutral_path = PRIMEMOVER_PATH + '/resources/input_data/neutral_searchterms_pool.json'
+    if not os.path.exists(neutral_path):
+        Neutral = s3_wrapper.fetch_neutral()
+    else:
+        with open(neutral_path) as file:
+            Neutral = json.load(file)
+    if len(Neutral) == 0:
+        Neutral = s3_wrapper.fetch_neutral()
+    neutral = Neutral[0:3]
+
     "Generate Benign Terms TODO: "
     GenerateBenignTerms()
 
@@ -67,7 +75,6 @@ def single_update(date, default_crawler_path, manual=False):
                                    proxy_update=update_proxies_dict) for crawler
             in crawler_list_political]
 
-    neutral = r.choices(Neutral, k=1)
     with open(PATH_BENIGN_TERMS, 'r') as file:
         benign = json.load(file)
 
@@ -113,6 +120,17 @@ def single_update(date, default_crawler_path, manual=False):
             [crawler.as_dict(object_ids=False) for crawler in crawler_list],
             file,
             indent='  ')
+    # Create complete copy of crawlers
+    for c in crawler_list:
+        c.send_agent = True
+
+    with open(PRIMEMOVER_PATH + "/resources/updates/complete.json",
+              'w') as file:
+        json.dump(
+            [crawler.as_dict(object_ids=True) for crawler in crawler_list],
+            file,
+            indent='  ')
+
     if manual:
         do = input('push data? (y/n): ')
     else:
@@ -128,6 +146,9 @@ def single_update(date, default_crawler_path, manual=False):
                     f'{PRIMEMOVER_PATH}/resources/updates/{date.date().isoformat()}.json',
                     'w') as file:
                 json.dump(return_data.json(), file, indent='  ')
+            # Delete neutral terms if push was successful
+            with open(neutral_path, 'w') as file:
+                json.dump(Neutral[3:], file)
         else:
             print(return_data)
 
@@ -139,4 +160,6 @@ if __name__ == "__main__":
     # for day in range(13):
     #     single_update(day_delta=day)
     #     print((datetime.now().date() + timedelta(days=day)).isoformat())
-    single_update(datetime.now(), default_crawler_path="/resources/crawlers/test_5_2021-04-16.json", manual=True)
+    single_update(datetime.now(),
+                  default_crawler_path="/resources/crawlers/test_6_2021-06-01.json",
+                  manual=True)

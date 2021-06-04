@@ -15,6 +15,7 @@ from src.worker.Experiment import Experiment
 from datetime import datetime
 import pathlib
 from src.worker.Proxy import Proxy
+import random as r
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
 
@@ -24,10 +25,65 @@ ROTATING_PATH = PRIMEMOVER_PATH + '/resources/proxies/rotating_proxies.csv'
 
 PRIVATE_PATH = PRIMEMOVER_PATH + '/resources/proxies/private_proxies.csv'
 
+
 with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
 
-if __name__ == "__main__":
+
+def distribute_proxies(location_groups,exp_id, proxy_type="rotating"):
+    crawler_list = []
+    for single_location in location_groups:
+        pi_left = None
+        pi_right = None
+        location = single_location[0]
+        single_location = single_location[1].reset_index(drop=True)
+        shift = r.sample([0, 1], 2)
+        for idx in single_location.index:
+            if idx % 3 == shift[0]:
+                if pi_right is not None:
+                    if type(pi_right) == str:
+                        print('string error occoured!')
+                        print(crawler_list[-1].as_dict())
+                    config = Config(name='Config/left', location=location,
+                                    pi=-pi_right)
+                    pi_right = None
+                else:
+                    config = Config(name='Config/left', location=location)
+                    pi_left = config.pi
+                flag = 'left_test'
+
+            elif idx % 3 == shift[1]:
+                if pi_left is not None:
+                    if type(pi_left) == str:
+                        print('string error occoured!')
+                        print(crawler_list[-1].as_dict())
+
+                    config = Config(name='Config/right', location=location,
+                                    pi= - pi_left)
+                    pi_left = None
+                else:
+                    config = Config(name='Config/right', location=location,
+                                    )
+                    pi_right = config.pi
+                flag = 'right_test'
+            else:
+                config = Config(name='Config/neutral', location=location, pi=0,
+                                media=[],
+                                terms=[])
+                flag = 'neutral_test'
+            proxy = Proxy(name=f'{proxy_type.lower().capitalize()} Proxy', type='HTTP',
+                          hostname=single_location.loc[idx]['gateway_ip'],
+                          port=int(single_location.loc[idx]['gateway_ip_port']),
+                          username=KEYS[proxy_type.upper()]['username'],
+                          password=KEYS[proxy_type.upper()]['password'])
+            crawler_list.append(
+                Crawler(flag=flag, configuration=config, proxy=proxy,
+                        experiment_id=exp_id))
+
+    return crawler_list
+
+
+def launch_experiment():
     exp = Experiment(
         name='Test Experiment testing',
         description='A test of all systems based on a future experiment set up',
@@ -46,7 +102,7 @@ if __name__ == "__main__":
                          KEYS['PRIMEMOVER']['password'])
     exp_return = api.new_experiment(key, exp.as_dict())
     exp_id = Experiment.from_dict(exp_return).id
-    # exp_id = 2
+    # exp_id = 5
     TimeHandler.GLOBAL_SCHEDULE = Schedule(start_at=10 * 60 * 60,
                                            end_at=(10 + 23) * 60 * 60,
                                            interval=600,
@@ -86,32 +142,7 @@ if __name__ == "__main__":
     rotating_proxies['gateway_ip_port'] = rotating_proxies[
         'gateway_ip_port'].astype(str)
     location_groups = rotating_proxies.groupby('loc_id')
-    for single_location in location_groups:
-        pi_left = 'None'
-        location = single_location[0]
-        single_location = single_location[1].reset_index(drop=True)
-        for idx in single_location.index:
-            if idx % 3 == 0:
-                config = Config(name='Config/left', location=location)
-                pi_left = config.pi
-                flag = 'left_test'
-
-            elif idx % 3 == 1:
-                config = Config(name='Config/right', location=location,
-                                pi=-pi_left)
-                flag = 'right_test'
-            else:
-                config = Config(name='Config/neutral', location=location, pi=0,
-                                media=[],
-                                terms=[])
-                flag = 'neutral_test'
-            proxy = Proxy(name='Rotating Proxy', type='HTTP',
-                          hostname=single_location.loc[idx]['gateway_ip'],
-                          port=int(single_location.loc[idx]['gateway_ip_port']),
-                          username=KEYS['ROTATING']['username'],
-                          password=KEYS['ROTATING']['password'])
-            crawler_list.append(
-                Crawler(flag=flag, configuration=config, proxy=proxy, experiment_id=exp_id))
+    crawler_list += distribute_proxies(location_groups,exp_id, "rotating" )
 
     # Distribute Private Proxies
     private_proxies = pd.read_csv(PRIVATE_PATH)
@@ -121,42 +152,24 @@ if __name__ == "__main__":
         'gateway_ip_port'].astype(
         str)
     location_groups = private_proxies.groupby('loc_id')
-    for single_location in location_groups:
-        pi_left = 'None'
-        location = single_location[0]
-        single_location = single_location[1].reset_index(drop=True)
-        for idx in single_location.index:
-            if idx % 3 == 0:
-                config = Config(name='Config/left', location=location)
-                pi_left = config.pi
-                flag = 'left_test'
+    crawler_list += distribute_proxies(location_groups, exp_id, "private")
 
-            elif idx % 3 == 1:
-                config = Config(name='Config/right', location=location,
-                                pi=-pi_left)
-                flag = 'right_test'
-            else:
-                config = Config(name='Config/neutral', location=location, pi=0,
-                                media=[],
-                                terms=[])
-                flag = 'neutral_test'
-            proxy = Proxy(name='Private Proxy', type='HTTP',
-                          hostname=single_location.loc[idx]['gateway_ip'],
-                          port=int(single_location.loc[idx]['gateway_ip_port']),
-                          username=KEYS['PRIVATE']['username'],
-                          password=KEYS['PRIVATE']['password'])
-            crawler_list.append(
-                Crawler(flag=flag, configuration=config, proxy=proxy, experiment_id=exp_id))
-    with open(PRIMEMOVER_PATH + "/resources/crawlers/test_2.json",
+    with open(PRIMEMOVER_PATH + "/resources/crawlers/test_6.json",
               'w') as file:
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
     return_data = api.push_new(access_token=key,
-                               path=PRIMEMOVER_PATH + "/resources/crawlers/test_2.json")
+                               path=PRIMEMOVER_PATH + "/resources/crawlers/test_6.json")
     data_as_dict = json.loads(return_data.text)
 
     with open(
-            f'{PRIMEMOVER_PATH}/resources/crawlers/test_5_{datetime.now().date().isoformat()}.json',
+            f'{PRIMEMOVER_PATH}/resources/crawlers/test_6_{datetime.now().date().isoformat()}.json',
             'w') as file:
         json.dump(data_as_dict, file, indent='  ')
+
+    return f"exp_id = {exp_id}, default_crawler_path = /resources/crawlers/test_6_{datetime.now().date().isoformat()}.json'"
+
+
+if __name__ == "__main__":
+    launch_experiment()

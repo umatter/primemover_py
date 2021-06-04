@@ -15,6 +15,7 @@ import src.worker.Utilities as Util
 import src.worker.Tasks as Tasks
 from datetime import datetime
 
+
 class Crawler:
     """ Crawler combines all relevant information about an individual bot. It contains
     configuration, proxy, agent, queue (task) data and the necessary information
@@ -70,14 +71,7 @@ class Crawler:
                  ):
         self.flag = flag
         self._description = description
-        if name is None:
-            if self.flag is not None:
-                self._name = f'Crawler_{Crawler.CRAWLER_NR}/{self.flag}'
-            else:
-                self._name = f'Crawler_{Crawler.CRAWLER_NR}'
-            Crawler.CRAWLER_NR += 1
-        else:
-            self._name = name
+        self.name = name
         if self.flag is None and self._name is not None:
             split_name = self._name.split('/')
             if len(split_name) > 0:
@@ -100,6 +94,21 @@ class Crawler:
         self._testing = testing
         self._crawler_info = crawler_info
         self.experiment_id = experiment_id
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, val):
+        if val is None:
+            if self.flag is not None:
+                self._name = f'Crawler_{Crawler.CRAWLER_NR}/{self.flag}'
+            else:
+                self._name = f'Crawler_{Crawler.CRAWLER_NR}'
+            Crawler.CRAWLER_NR += 1
+        else:
+            self._name = val
 
     @property
     def send_agent(self):
@@ -186,13 +195,14 @@ class Crawler:
         }
         if self.experiment_id is not None:
             return_dict["experiment_id"] = self.experiment_id
-        if self._send_agent:
+        if self.send_agent:
             return_dict["agent"] = [self.agent.as_dict()]
         if self._crawler_info is not None:
             return_dict['id'] = self._crawler_info.crawler_id
         if object_ids:
             return_dict['agent_id'] = self.agent._info.agent_id
-            return_dict['configuration_id'] = self.configuration._info.configuration_id
+            return_dict[
+                'configuration_id'] = self.configuration._info.configuration_id
             # return_dict['proxy_id'] = self.proxy._info.proxy_id
 
         return_dict["queues"] = [x.as_dict() for x in self.queues.values()]
@@ -284,7 +294,7 @@ class Crawler:
         return to_session
 
     @classmethod
-    def from_list(cls, crawler_list, date):
+    def from_list(cls, crawler_list, date=datetime.now()):
         """
         Initialize crawler objects from list of crawlers in dictionary format
         Arguments:
@@ -294,6 +304,7 @@ class Crawler:
         Returns:
             list of crawlers
         """
+
         crawlers = [cls._single_crawler(ind_crawler, date) for
                     ind_crawler in crawler_list]
         return crawlers
@@ -367,5 +378,3 @@ class Crawler:
                 self.configuration.update_config(results_valid, update_location)
 
         return self
-
-

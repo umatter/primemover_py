@@ -10,7 +10,10 @@ import boto3
 import json
 import pathlib
 import io
+import os
+import zipfile
 import botocore.exceptions
+import pandas as pd
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
@@ -50,8 +53,23 @@ def fetch_report(job_id: int, report_type='dynamic'):
     return in_stream, success
 
 
-def check_file(filename):
-    resp = CLIENT.list_objects_v2(Bucket='primemoverpy')
+def download_dynamic(job_id):
+    raw_data, success = fetch_report(job_id, 'dynamic')
+    if success:
+        as_zipfile = zipfile.ZipFile(raw_data)
+        name = None
+        for name in as_zipfile.namelist():
+            if 'json' in name:
+                break
+        raw_json = as_zipfile.read(name)
+        raw_dict = json.loads(raw_json)
+    else:
+        raw_dict = {}
+    return raw_dict, success
+
+
+def check_file(filename, bucket='primemoverpy'):
+    resp = CLIENT.list_objects_v2(Bucket=bucket)
     exists = False
     for obj in resp.get('Contents'):
         if obj['Key'] == filename:
@@ -202,3 +220,18 @@ def push_dict(filename, to_push):
     out_stream.seek(0)
     response = CLIENT.upload_fileobj(out_stream, 'primemoverpy', filename)
     return 'success'
+
+
+def append_csv(filename, data):
+    # If file existis on s3, download and append
+    temp_path = f"/resources/temp/{filename.replace('/', '_')}"
+    path = PRIMEMOVER_PATH + temp_path
+    if  check_file(filename):
+        fetch_file(temp_path, filename)
+        data.to_csv(path, mode='a')
+    else:
+        data.to_csv(path)
+
+    response = upload_data(filename, temp_path)
+    os.remove(path)
+    return response

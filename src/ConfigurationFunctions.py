@@ -26,7 +26,12 @@ def Pi(flag=None):
     Determine political orientation
     Returns pi: political orientation of individual i
     """
-    pi = r.uniform(-1, 0)
+    if flag == 'left':
+        pi = r.uniform(-1, 0)
+    elif flag == 'right':
+        pi = r.uniform(0, 1)
+    else:
+        pi = r.uniform(-1, 1)
     return pi
 
 
@@ -51,7 +56,7 @@ def SelectSearchTerms(pi, alpha_hat, tau_hat_ik, k=10):
     utilities = []
     for row in terms.index:
         term_k, pi_hat_k = terms.loc[row]
-        epsilon_ik = NoiseUtility()/10
+        epsilon_ik = NoiseUtility() / 10
         utilities.append((search_utility_v_ik(pi_i=pi,
                                               pi_hat_k=pi_hat_k,
                                               epsilon_ik=epsilon_ik,
@@ -208,6 +213,12 @@ def hardware_canvas():
 
 def local_storage():
     choice = r.choices([True, False], [0.8, 0.2])[0]
+    return choice
+
+
+def usage_type():
+    choice = \
+    r.choices(['only_search', 'only_direct', 'both'], [0.25, 0.25, 0.5])[0]
     return choice
 
 

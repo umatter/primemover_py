@@ -91,6 +91,8 @@ class Agent:
             self._multilogin_profile = val
         elif type(val) is str:
             self._multilogin_profile = json.loads(val)
+        elif type(val) is dict:
+            self._multilogin_profile = val
         else:
             raise TypeError(
                 f'multilogin profile must be of type Profile got {type(val)} instead')
@@ -116,6 +118,10 @@ class Agent:
 
     @classmethod
     def from_dict(cls, agent_dict):
+        if type(agent_dict) is list:
+            agent_dict = agent_dict[0]
+        elif type(agent_dict) is str:
+            agent_dict = json.loads(agent_dict)
         agent_object = cls(name=agent_dict.get('name'),
                            description=agent_dict.get('description'),
                            identification=agent_dict.get('identification'),

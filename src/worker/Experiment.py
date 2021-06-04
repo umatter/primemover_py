@@ -14,10 +14,12 @@ class Experiment:
     def __init__(self, name='experiment', description='This is an experiment',
                  contact=None, crawlers=None, id=None, neutral_terms=None,
                  preferences=None):
+        self._crawler_ids = []
+
         self.name = name
         self.description = description
         self.contact = contact
-        self._crawlers = crawlers
+        self.crawlers = crawlers
         self._id = id
         self.neutral_terms = neutral_terms
         self._preferences = preferences
@@ -33,6 +35,19 @@ class Experiment:
     @property
     def crawlers(self):
         return self._crawlers
+
+    @crawlers.setter
+    def crawlers(self, crawler_list):
+        id_list = []
+        if crawler_list is not None:
+            for c in crawler_list:
+                id_list.append(c.get('id'))
+        self._crawler_ids = id_list
+        self._crawlers = crawler_list
+
+    @property
+    def crawler_ids(self):
+        return self._crawler_ids
 
     def as_dict(self):
         return_dict = {'name': self.name,

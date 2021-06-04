@@ -8,7 +8,8 @@ from lxml import etree
 from src.worker.Utilities import extract_domain
 import pandas as pd
 import pathlib
-
+import sqlite3
+sqlite3.version
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 ParserDict = {}

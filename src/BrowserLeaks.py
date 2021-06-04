@@ -1,7 +1,7 @@
 """Assign desired crawlers the task to visit browserleaks.com and all relevant sub sites
 J.L. 11.2020
 """
-
+from src.worker.UpdateObject import *
 from src.worker.Crawler import *
 from src.worker.TimeHandler import Schedule
 from datetime import datetime, timedelta
@@ -18,15 +18,17 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
 
 
 def single_update(day_delta=0):
-    existing_crawler_path = PRIMEMOVER_PATH + "/resources/crawlers/test_3_2021-01-22.json"
+    existing_crawler_path = PRIMEMOVER_PATH + "/resources/crawlers/test_5_2021-04-16.json"
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
 
     with open(existing_crawler_path, 'r') as file:
         raw_crawlers = json.load(file)
-    crawler_list = Crawler.from_dict(raw_crawlers, day_delta=day_delta)
-
+    crawler_list = Crawler.from_dict(raw_crawlers, date=datetime.now())
+    crawler_list = UpdateObject(crawler_list, 'agent')
+    crawler_list = UpdateObject(crawler_list, 'proxy')
+    crawler_list = UpdateObject(crawler_list, 'config')
     for individual in crawler_list:
         individual.add_task(BrowserLeaks)
     with open(PRIMEMOVER_PATH + "/resources/examples/test_update_py.json", 'w') as file:

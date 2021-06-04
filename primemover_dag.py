@@ -3,7 +3,9 @@ import sys
 
 PATH_MODULES = '/primemover_py'
 sys.path += [PATH_MODULES]
+
 # The DAG object; we'll need this to instantiate a DAG
+from airflow.models import Variable
 
 from airflow import DAG
 # Operators; we need this to operate!
@@ -78,18 +80,25 @@ t4 = PythonOperator(
     dag=dag)
 
 t5 = PythonOperator(
-    task_id='update_crawlers',
-    python_callable=src.UpdateExperiment.single_update,
-    op_kwargs={'date': datetime.now(),
-               'default_crawler_path': "/resources/crawlers/test_5_2021-04-16.json"},
-    dag=dag
+    task_id = 'csv_hist',
+    python_callable = src.worker.DataCopy.create_copy,
+    op_kwargs={'experiment_id': Variable.get("experiment_id", 'id_missing')},
+    dag =dag
 )
 
 t6 = PythonOperator(
+    task_id='update_crawlers',
+    python_callable=src.UpdateExperiment.single_update,
+    op_kwargs={'date': datetime.now(),
+               'default_crawler_path': Variable.get("default_crawler_path", 'path_missing')},
+    dag=dag
+)
+
+t7 = PythonOperator(
     task_id='cleanup',
     python_callable=src.worker.CleanUp.cleanup,
     op_kwargs={'date': datetime.now(),
                'nr_days': 5},
     dag=dag)
 
-t1 >> t2 >> t3 >> t4 >> t5 >> t6
+t1 >> t2 >> t3 >> t4 >> t5 >> t6 >> t7

@@ -39,7 +39,7 @@ def search_utility_v_ik(pi_i, pi_hat_k, epsilon_ik, alpha_hat=0, tau_hat_ik=1):
 
 
 def political_orientation_pi_i_t(psi_i, kappa_j_t_prev, pi_i_prev,
-                                 pi_tilde_j_prev):
+                          pi_tilde_j_prev):
     """
     :param psi_i: float in [0,1], individuals persuadability
     :param kappa_j_t_prev: binary {0,1}, indicates  whether ind. can be persuaded

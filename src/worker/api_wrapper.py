@@ -22,11 +22,10 @@ import os
 import io
 import zipfile
 import pathlib
+from src.worker.Experiment import Experiment
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 DOMAIN = "https://primemover.wimando.ch/api/v1/"
-
-
 
 
 def get_access(e_mail, password):
@@ -345,3 +344,12 @@ def fetch_proxy(id):
 def fetch_config(id):
     r = requests.get(DOMAIN + f'configurations/{id}')
     return r.json()['data']
+
+
+def fetch_crawlers_by_exp(access_token, experiment_id):
+    exp = fetch_experiment(access_token, experiment_id)
+    exp = Experiment.from_dict(exp)
+    crawler_list = []
+    for c in exp.crawler_ids:
+        crawler_list.append(fetch_crawler(c))
+    return crawler_list

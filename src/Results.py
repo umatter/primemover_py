@@ -56,7 +56,7 @@ class JobResult:
                 raw_data, success = self._download_html()
             elif parser_dict[self.task]['data'] == 'reports':
                 raw_data = self.reports
-                if len(self.reports > 0):
+                if len(self.reports) > 0:
                     success = True
                 else:
                     success = False
@@ -271,7 +271,7 @@ def process_results(set_reviewed=True, parser_dict=Parser.ParserDict,
             combined_sessions[session.crawler_id] = session.results
 
     with open(
-            f'{PRIMEMOVER_PATH}/resources/cleaned_data/{path_end}_{date.date().isoformat()}.json',
+            f'{PRIMEMOVER_PATH}/resources/cleaned_data/{path_end}{date.date().isoformat()}.json',
             'w') as file:
         json.dump(combined_sessions, file, indent='  ')
 
@@ -291,9 +291,8 @@ def fetch_results():
 
 if __name__ == "__main__":
     date = datetime.now()
-    api_wrapper.fetch_results(access_token=ACCESS_TOKEN)
     process_results(set_reviewed=True, parser_dict=Parser.ParserDict,
-                    path_end='all_data', date=date)
+                    path_end='all_data_', date=date)
 
     s3.upload_data(f'output/{date.date().isoformat()}.json',
                    path=f'/resources/cleaned_data/all_data_{date.date()}.json')

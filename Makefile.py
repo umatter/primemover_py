@@ -1,6 +1,6 @@
 import os
 import json
-
+from src.worker.ConfigAirflow import SetPassword
 if __name__ == "__main__":
     input_val = input('Have you installed all requirements from requirements.txt? (y/n): ')
     if input_val != 'y':
@@ -21,6 +21,12 @@ if __name__ == "__main__":
         os.mkdir('resources/crawlers')
         os.mkdir('resources/raw_data')
         os.mkdir('resources/updates')
-        os.mkdir('resources/to_push')
         os.mkdir('resources/input_data')
+        os.mkdir('resources/cleaned_data')
+    input_val = input('Would you like to add a password to Airflow?')
+    if input_val == 'y':
+        SetPassword()
+
+
+
 

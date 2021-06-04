@@ -80,12 +80,28 @@ If your primemover_py package is a raw copy of the github repository, run
 ```
 Makefile.py
 ```
+```
+airflow users create \
+    --username <USERNAME> \
+    --firstname <FIRSTNAME> \
+    --lastname <LASTNAME> \
+    --role Admin \
+    --email <E-MAIL>
+
+```
+
 Run the following code to launch airflow:
 ```
 airflow scheduler &
 airflow webserver
 ```
-The airflow ui is now accessible at localhost:<PORT>
+The airflow UI is now accessible via your browser under localhost:<PORT>.
+If no bots are setup unpause the dag "primemover_test_dag" and execute a dag run without configurations.
+Once the run is complete visit "Admin" -> "XComs" and set the return values of the "create_experiment" task
+as variables under "Admin" -> "Variables". This ensures that the correct experiment is updated
+by the main dag. You can now pause "primemover_test_dag".
+Unpause "primemover_dag", make sure this occurs after 10:30, the dag will otherwise execute twice.
+There is no need to manually trigger this Dag, it will now proceed to execute every morning.
 
 ## Server Setup
 Follow docker image setup and the instructions for docker.

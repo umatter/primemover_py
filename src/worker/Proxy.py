@@ -5,13 +5,11 @@ TODO Secure passwords
 TODO check with Ueli if update format is correct, seems to be missing a :
 """
 
-
 from src.worker.Info import ProxyInfo
 import json
 import pathlib
 import pandas as pd
 from src.worker.History import S3History
-
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
@@ -20,7 +18,8 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as key_file:
 GEOSURF_USERNAME = keys['GEOSURF']['username']
 GEOSURF_PASSWORD = keys['GEOSURF']['password']
 
-PROXYPATHS = ['/resources/proxies/rotating_proxies.csv', '/resources/proxies/private_proxies.csv']
+PROXYPATHS = ['/resources/proxies/rotating_proxies.csv',
+              '/resources/proxies/private_proxies.csv']
 
 
 class Proxy:
@@ -43,8 +42,10 @@ class Proxy:
         self._username = username
         self._password = password
         self._info = info
-        self._history = S3History(self)
-
+        if self._info is not None:
+            self._history = S3History(self)
+        else:
+            self._history = None
 
     def _check_location_non_geosurf(self):
         """
@@ -61,9 +62,10 @@ class Proxy:
             proxies = proxies.loc[proxies['gateway_ip'] == self._hostname]
             proxies = proxies.loc[proxies['gateway_ip_port'] == self._port]
 
-            if len(proxies) >=1:
+            if len(proxies) >= 1:
                 return proxies.iloc[0]['loc_id']
-        raise LookupError('Cant match the hostname and port in the existing proxy files. Check if these are up to date.')
+        raise LookupError(
+            'Cant match the hostname and port in the existing proxy files. Check if these are up to date.')
 
     def update_proxy(self, update_dict):
         """
@@ -72,7 +74,7 @@ class Proxy:
         _check_location_nong_geosurf is called.
         """
         existing = f'{self._hostname}:{self._port}'
-        new_proxy= update_dict.get(existing)
+        new_proxy = update_dict.get(existing)
         if new_proxy is not None:
             self._history.pull_existing()
             self._hostname = new_proxy['host']
@@ -102,6 +104,8 @@ class Proxy:
 
     @classmethod
     def from_dict(cls, proxy_dict):
+        if type(proxy_dict) is list:
+            proxy_dict = proxy_dict[0]
         proxy_object = cls(name=proxy_dict.get('name'),
                            description=proxy_dict.get('description'),
                            username=proxy_dict.get('username'),
