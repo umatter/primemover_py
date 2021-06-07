@@ -168,7 +168,7 @@ def launch_experiment():
             'w') as file:
         json.dump(data_as_dict, file, indent='  ')
 
-    return f"exp_id = {exp_id}, default_crawler_path = /resources/crawlers/test_6_{datetime.now().date().isoformat()}.json'"
+    return f"exp_id = {exp_id}"
 
 
 if __name__ == "__main__":

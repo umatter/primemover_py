@@ -87,9 +87,9 @@ airflow users create \
     --lastname <LASTNAME> \
     --role Admin \
     --email <E-MAIL>
-
+ 
 ```
-
+ 
 Run the following code to launch airflow:
 ```
 airflow scheduler &

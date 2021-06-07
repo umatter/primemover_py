@@ -281,8 +281,8 @@ def process_results(set_reviewed=True, parser_dict=Parser.ParserDict,
 def fetch_results():
     with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
         keys = json.load(f)
-    access_token = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
-                                          KEYS['PRIMEMOVER']['password'])
+    access_token = api_wrapper.get_access(keys['PRIMEMOVER']['username'],
+                                          keys['PRIMEMOVER']['password'])
     try:
         api_wrapper.fetch_results(access_token=access_token)
     except FileExistsError:
@@ -291,6 +291,7 @@ def fetch_results():
 
 if __name__ == "__main__":
     date = datetime.now()
+    api_wrapper.fetch_results(access_token=ACCESS_TOKEN)
     process_results(set_reviewed=True, parser_dict=Parser.ParserDict,
                     path_end='all_data_', date=date)
 

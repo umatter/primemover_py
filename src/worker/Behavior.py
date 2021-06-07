@@ -171,7 +171,7 @@ class Text(Behavior):
 
 class SelectionType(Behavior):
     """
-    SelectionType behavior key value pair, used to share what type some selector
+    SelectionType behavior key value pair, used to share the type of some selector
     Public Attributes:
         - selector_type: string, one of "XPATH|CSS|CLASS|ID"
         - description: a description of the url, default: "Type of selection"
@@ -202,7 +202,7 @@ class Selector(Behavior):
     Selector behavior key value pair, used to share a html selector
     Public Attributes:
         - selector: string, a valid XPATH|CSS|CLASS|ID selector
-        - kind: string, what is the selector? use to specify purpose or type
+        - kind: string, what is the selector? use to specify purpose or type (optional)
     """
 
     def __init__(self, selector, kind=""):

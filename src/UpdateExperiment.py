@@ -18,7 +18,7 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
 
 
-def single_update(date, default_crawler_path, manual=False):
+def single_update(date, experiment_id, manual=False):
     "Fetch Neutral terms from s3 Bucket"
     neutral_path = PRIMEMOVER_PATH + '/resources/input_data/neutral_searchterms_pool.json'
     if not os.path.exists(neutral_path):
@@ -36,19 +36,12 @@ def single_update(date, default_crawler_path, manual=False):
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
-    if not os.path.exists(
-            f'{PRIMEMOVER_PATH}/resources/updates/{(date + timedelta(-1)).isoformat()}.json'):
-        existing_crawler_path = PRIMEMOVER_PATH + default_crawler_path
-    else:
-        existing_crawler_path = f'{PRIMEMOVER_PATH}/resources/updates/{(date + timedelta(-1)).isoformat()}.json'
+    key = api.get_access(KEYS['PRIMEMOVER']['username'],
+                         KEYS['PRIMEMOVER']['password'])
+    raw_crawlers = api_wrapper.fetch_crawlers_by_exp(access_token=key,
+                                                     experiment_id=experiment_id)
 
-    with open(existing_crawler_path, 'r') as file:
-        raw_crawlers = json.load(file)
-
-    crawler_list = Crawler.Crawler.from_dict(raw_crawlers, date=date)
-    crawler_list = UpdateObject(crawler_list, 'agent')
-    crawler_list = UpdateObject(crawler_list, 'proxy')
-    crawler_list = UpdateObject(crawler_list, 'config')
+    crawler_list = Crawler.Crawler.from_list(raw_crawlers, date=date)
 
     "Compute Proxy Changes"
     update_proxies_dict = update_all_proxies()
@@ -136,8 +129,6 @@ def single_update(date, default_crawler_path, manual=False):
     else:
         do = 'y'
     if do == 'y':
-        key = api.get_access(KEYS['PRIMEMOVER']['username'],
-                             KEYS['PRIMEMOVER']['password'])
 
         return_data = api.push_new(access_token=key,
                                    path=f'{PRIMEMOVER_PATH}/resources/updates/generated.json')
@@ -161,5 +152,5 @@ if __name__ == "__main__":
     #     single_update(day_delta=day)
     #     print((datetime.now().date() + timedelta(days=day)).isoformat())
     single_update(datetime.now(),
-                  default_crawler_path="/resources/crawlers/test_6_2021-06-01.json",
+                  experiment_id=22,
                   manual=True)

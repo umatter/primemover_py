@@ -39,7 +39,7 @@ def NoiseUtility():
     """
     Returns: epsilon: float, noise parameter when determining utility
     """
-    return float(gumbel(-0.4557735, 0.793006, 1)[0])
+    return float(gumbel(-0.4557735, 0.0793006, 1)[0])
 
 
 def SelectSearchTerms(pi, alpha_hat, tau_hat_ik, k=10):
@@ -96,7 +96,7 @@ def SelectMediaOutlets(alpha_tilde, tau_tilde_ij, state, pi=0, k=10):
 
     weighted_utilities = []
     for row in outlets.index:
-        epsilon_ij = NoiseUtility()
+        epsilon_ij = NoiseUtility()/10
         s_j = outlets.loc[row]['pub_state']
         if outlets.loc[row]['is_local'] and (type(s_j) is str):
             if state in s_j:
