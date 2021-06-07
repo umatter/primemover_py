@@ -55,9 +55,10 @@ class GoogleSearch(Queue):
                                      captcha_mode='always'))   # Add Job to select a result randomly
         if select_result:
             self.jobs.append(
-                Jobs.SingleSelect(selector='.//div[@class="yuRUbf"]/a',
-                                  selector_type='XPATH',
+                Jobs.SingleSelect(click_selector='.//div[@class="yuRUbf"]/a',
+                                  click_selector_type='XPATH',
                                   decision_type="CALCULATED",
+                                  criteria_extractor='^(?:https?\:\/\/)?(?:www.)?([^\/?#]+)(?:[\/?#]|$)',
                                   flag=search_type,
                                   task=name,
                                   captcha_mode='always'
@@ -117,8 +118,8 @@ class VisitViaGoogle(Queue):
                          )
 
         # Add Job to select the first result
-        self.jobs.append(Jobs.SingleSelect(selector='.//div[@class="yuRUbf"]/a',
-                                           selector_type='XPATH',
+        self.jobs.append(Jobs.SingleSelect(click_selector='.//div[@class="yuRUbf"]/a',
+                                           click_selector_type='XPATH',
                                            decision_type="FIRST"
                                            )
                          )
