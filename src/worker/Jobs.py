@@ -3,7 +3,6 @@ Jobs.py creates the base job class and a series of 'Jobs'. These are jobs as the
 can be run by the primemover_runner. Variables that the runner needs to execute and
 recognize these jobs are passed as 'behaviors', which are defined in Behavior.py.
 These behaviors parse input for validity.
-
 Classes:
     - Job: base job class
 """
@@ -139,14 +138,21 @@ class EnterText(Job):
 class SingleSelect(Job):
     """Click on an element of a website"""
 
-    def __init__(self, selector, selector_type='XPATH',
+    def __init__(self,
+                 click_selector,
+                 click_selector_type='XPATH',
+                 criteria_selector=None,
+                 criteria_selector_type=None,
                  decision_type='FIRST',
                  task=None,
                  flag=None,
+                 criteria_extractor=None,
                  captcha_mode='never'):
         """
-            - selector: string, a valid XPATH|CSS|CLASS|ID for a text field, default: 'XPATH'
-            - selector_type: One of "XPATH|CSS|CLASS|ID"
+            - click_selector: string, a valid XPATH|CSS|CLASS|ID for a text field, default: 'XPATH'
+            - click_selector_type: One of "XPATH|CSS|CLASS|ID"
+            - criteria_selector: (optional), string, a valid XPATH|CSS|CLASS|ID for a text field, default: None
+            - criteria_selector_type: (optional), one of "XPATH|CSS|CLASS|ID", default: None
             - decision_type: one of "FIRST|LAST|RANDOM|CALCULATED", Method of selecting a result if multiple elements match selector (default: First)
             - task: (optional) string,  task the job is a part of
             - flag: (optional) string,  some flag
@@ -158,9 +164,9 @@ class SingleSelect(Job):
                          flag=flag,
                          captcha_mode=captcha_mode)
         self.behaviors.append(
-            Behavior.SelectionType(selector_type))
+            Behavior.ClickSelectionType(click_selector_type))
         self.behaviors.append(
-            Behavior.Selector(selector))
+            Behavior.ClickSelector(click_selector))
         self.behaviors.append(
             Behavior.DecisionType(decision_type))
         if flag is not None:
@@ -172,6 +178,39 @@ class SingleSelect(Job):
             self.behaviors.append(
                 Behavior.TaskBehavior(f'{decision_type}/{task}')
             )
+
+        if criteria_extractor is None and decision_type == 'CALCULATED':
+            raise ValueError('Criteria extractor required for decision type CALCULATED.')
+
+        elif criteria_extractor is not None and decision_type == 'CALCULATED':
+            self.behaviors.append(
+                Behavior.CriteriaExtractorBehavior(criteria_extractor)
+            )
+
+        if decision_type == 'CALCULATED':
+            if criteria_selector_type is not None and criteria_selector is None:
+                raise ValueError('New criteria selector type given, but no new criteria selector was given.')
+            elif criteria_selector_type is None and criteria_selector is not None:
+                self.behaviors.append(
+                    Behavior.CriteriaSelectionType(click_selector_type)
+                )
+                self.behaviors.append(
+                    Behavior.CriteriaSelector(criteria_selector)
+                )
+            elif criteria_selector_type is None and criteria_selector is None:
+                self.behaviors.append(
+                    Behavior.CriteriaSelectionType(click_selector_type)
+                )
+                self.behaviors.append(
+                    Behavior.CriteriaSelector(click_selector)
+                )
+            else:
+                self.behaviors.append(
+                    Behavior.CriteriaSelectionType(criteria_selector_type)
+                )
+                self.behaviors.append(
+                    Behavior.CriteriaSelector(criteria_selector)
+                )
 
 
 class TryClick(Job):
@@ -263,3 +302,4 @@ class Scroll(Job):
 
         self.behaviors.append(
             Behavior.ScrollDirection(direction))
+
