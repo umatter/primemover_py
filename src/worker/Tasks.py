@@ -3,7 +3,7 @@
  TODO re-structure tasks into a folder system for different tasks. Perhaps a base folder for reoccouring tasks and separate folders for different experiments.
  J.L. 03/2021
  """
-from src.worker.Queue import Queue
+from src.worker.PrimemoverQueue import Queue
 from src.worker import Jobs
 import random as r
 import src.Preferences as Pref

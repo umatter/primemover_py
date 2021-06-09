@@ -156,4 +156,4 @@ def create_copy(experiment_id, date=datetime.now()):
 
 
 if __name__ == "__main__":
-    create_copy(22)
+    s3_wrapper.append_csv(f'selected_{22}/selections.csv',extract_selection_data(22, f'resources/cleaned_data/{"2021-06-07"}.json'))

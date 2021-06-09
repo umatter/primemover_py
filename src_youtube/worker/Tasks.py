@@ -4,7 +4,7 @@ Task(s) for Youtube Search.
 """
 
 from src.worker import Tasks
-from src.worker.Queue import Queue
+from src.worker.PrimemoverQueue import Queue
 from src.worker import Jobs
 
 

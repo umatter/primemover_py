@@ -223,12 +223,18 @@ def push_dict(filename, to_push):
 
 
 def append_csv(filename, data):
-    # If file existis on s3, download and append
+    # If file exists on s3, download and append
     temp_path = f"/resources/temp/{filename.replace('/', '_')}"
     path = PRIMEMOVER_PATH + temp_path
-    if  check_file(filename):
-        fetch_file(temp_path, filename)
-        data.to_csv(path, mode='a')
+    if check_file(filename):
+
+        try:
+            fetch_file(temp_path, filename)
+        except pd.errors.EmptyDataError:
+            print(Exception)
+            data.to_csv(path)
+
+        data.to_csv(path, mode='a', header=False)
     else:
         data.to_csv(path)
 
