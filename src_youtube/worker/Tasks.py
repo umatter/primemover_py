@@ -1,6 +1,5 @@
 """
 Task(s) for Youtube Search.
-
 """
 
 from src.worker import Tasks
@@ -30,7 +29,7 @@ class YouTubeSearch(Queue):
 
         # add job to click button (agree) (check if needed)
         self.jobs.append(
-            Jobs.SingleSelect(
+            Jobs.TryClick(
                 selector='(//*[@class="VfPpkd-LgbsSe VfPpkd-LgbsSe-OWXEXe-k8QpJ VfPpkd-LgbsSe-OWXEXe-dgl2Hf nCP5yc AjY5Oe DuMIQc IIdkle"])[2]',
                 selector_type='XPATH',
                 flag=search_type,
@@ -43,7 +42,7 @@ class YouTubeSearch(Queue):
 
         # add job to click button (no thanks) (check if needed)
         self.jobs.append(
-            Jobs.SingleSelect(
+            Jobs.TryClick(
                 selector='//*[@id="dismiss-button"]/yt-button-renderer',
                 selector_type='XPATH',
                 flag=search_type,
@@ -67,11 +66,14 @@ class YouTubeSearch(Queue):
         self.jobs.append(Jobs.Scroll(direction='UP',
                                      percentage=100))
 
-        # add job to select a result randomly
+        # add job to select a result randomly; select based on channel, click on video
         if select_result:
             self.jobs.append(
-                Jobs.SingleSelect(selector='//*[@id="contents"]/ytd-video-renderer',
-                                  selector_type='XPATH',
+                Jobs.SingleSelect(click_selector="//ytd-video-renderer//h3/a | //ytd-channel-renderer/div/div/a[@id='main-link']",
+                                  click_selector_type='XPATH',
+                                  criteria_extractor='/.*\/([.\w\W+]+)',
+                                  criteria_selector="//ytd-video-renderer//div[@id='channel-info']//yt-formatted-string/a | //ytd-channel-renderer/div/div/a[@id='main-link']",
+                                  criteria_selector_type='XPATH',
                                   decision_type="CALCULATED",
                                   flag=search_type,
                                   task=name
