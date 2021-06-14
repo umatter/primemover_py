@@ -22,7 +22,8 @@ Available Classes:
     - TypingMode: behavior controlling how text is entered
     - TaskBehavior: specifies a macro task that a job is part of
     - FlagBehavior: some additional parameter with the key: 'flag'
-    - CriteriaExtractorBehavior: additional parameter for extracting
+    - CriteriaExtractorBehavior: matching mechanism
+    - CriteriaBaseBehavior: source of text for matching
 J.L. 11.2020, N.A. 06.2021
 """
 
@@ -635,7 +636,7 @@ class CaptchaMode(Behavior):
 
 class CriteriaExtractorBehavior(Behavior):
     """
-    Description.
+    Behavior of criteriaExtractor (string describing matching mechanism).
     """
 
     def __init__(self, criteria_extractor):
@@ -651,3 +652,21 @@ class CriteriaExtractorBehavior(Behavior):
     def criteria_extractor(self, val):
         self._criteria_extractor = val
 
+
+class CriteriaBaseBehavior(Behavior):
+    """
+    Behavior of criteriaBase (string describing matching source (attribute or text)).
+    """
+
+    def __init__(self, criteria_base):
+        self.criteria_base = criteria_base
+        super().__init__(name='criteriaBase', value=self.criteria_base,
+                         description="Criteria base.")
+
+    @property
+    def criteria_base(self):
+        return self._criteria_base
+
+    @criteria_base.setter
+    def criteria_base(self, val):
+        self._criteria_base = val
