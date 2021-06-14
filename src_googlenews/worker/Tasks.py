@@ -66,7 +66,7 @@ class GoogleNewsSearch(Queue):
                                   click_selector_type='XPATH',
                                   criteria_selector="//c-wiz[@jsrenderer='vBVNjc']//a[@class='wEwyrc AVN2gc uQIVzc Sksgp'] | //c-wiz[@jsrenderer='vBVNjc']//a[@class='wEwyrc AVN2gc uQIVzc Sksgp']",
                                   criteria_selector_type='XPATH',
-                                  criteria_extractor="[^\n]+",
+                                  criteria_base='TEXT',
                                   decision_type="CALCULATED",
                                   flag=search_type,
                                   task=name
