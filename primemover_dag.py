@@ -46,7 +46,7 @@ dag = DAG(
     'update',
     default_args=default_args,
     description='update crawler config and tasks',
-    schedule_interval="30 9 * * *",
+    schedule_interval="30 7 * * *",
     catchup=False
 )
 

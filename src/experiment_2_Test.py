@@ -160,7 +160,7 @@ def launch_experiment():
                   indent='  ')
 
     return_data = api.push_new(access_token=key,
-                               path=PRIMEMOVER_PATH + "/resources/crawlers/test_6.json")
+                               path=PRIMEMOVER_PATH +   "/resources/crawlers/test_6.json")
     data_as_dict = json.loads(return_data.text)
 
     with open(

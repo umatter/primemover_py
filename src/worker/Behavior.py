@@ -523,4 +523,37 @@ class CaptchaMode(Behavior):
         elif val == "":
             self._mode = 'never'
         else:
-            raise ValueError(f'Mode must be one of: [ always, never, random] received {val}')
+            raise ValueError(
+                f'Mode must be one of: [ always, never, random] received {val}')
+
+
+class Action(Behavior):
+    """Controls the action for a handle alert job. Specifically whether to accept or reject the alert.
+    Public attributes:
+    -action: str, in {"ACCEPT","REJECT"}
+            ACCEPT: accept alert (default)
+            REJECT: reject alert
+
+    """
+
+    def __init__(self, action="ACCEPT"):
+        self.action = action
+        super().__init__(name='Action', value=self.action,
+                         description=f'Specify whether or not to accept an alert message')
+
+    @property
+    def action(self):
+        return self._action
+
+    @action.setter
+    def action(self, val):
+        if type(val) is str:
+            val.strip().upper()
+            if val in {"ACCEPT", "REJECT"}:
+                self._action = val
+            else:
+                raise ValueError(
+                    f'Action must be one of {{"ACCEPT","REJECT"}}, got {val}')
+        else:
+            raise TypeError(
+                f'action must be type str')

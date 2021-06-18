@@ -25,7 +25,7 @@ class Queue:
                  start_at,
                  name="",
                  description="A single browser session",
-                 delay_min=0,
+                 delay_min=1,
                  delay_max=10,
                  ):
         self.description = description

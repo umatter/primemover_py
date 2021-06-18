@@ -83,8 +83,8 @@ class Crawler:
         if schedule is None:
             self._schedule = TimeHandler(self.agent.location,
                                          interval=120,
-                                         wake_time=11 * 60 * 60,
-                                         bed_time=14 * 60 * 60,
+                                         wake_time=10 * 60 * 60,
+                                         bed_time=17 * 60 * 60,
                                          date=date)
         else:
             self._schedule = schedule

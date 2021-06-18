@@ -56,7 +56,7 @@ def SelectSearchTerms(pi, alpha_hat, tau_hat_ik, k=10):
     utilities = []
     for row in terms.index:
         term_k, pi_hat_k = terms.loc[row]
-        epsilon_ik = NoiseUtility() / 10
+        epsilon_ik = NoiseUtility()
         utilities.append((search_utility_v_ik(pi_i=pi,
                                               pi_hat_k=pi_hat_k,
                                               epsilon_ik=epsilon_ik,
@@ -96,7 +96,7 @@ def SelectMediaOutlets(alpha_tilde, tau_tilde_ij, state, pi=0, k=10):
 
     weighted_utilities = []
     for row in outlets.index:
-        epsilon_ij = NoiseUtility()/10
+        epsilon_ij = NoiseUtility()
         s_j = outlets.loc[row]['pub_state']
         if outlets.loc[row]['is_local'] and (type(s_j) is str):
             if state in s_j:

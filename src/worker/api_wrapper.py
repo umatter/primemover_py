@@ -351,5 +351,8 @@ def fetch_crawlers_by_exp(access_token, experiment_id):
     exp = Experiment.from_dict(exp)
     crawler_list = []
     for c in exp.crawler_ids:
-        crawler_list.append(fetch_crawler(c))
+        try:
+            crawler_list.append(fetch_crawler(c))
+        except:
+            return Exception(f'Crawler id was {c}')
     return crawler_list

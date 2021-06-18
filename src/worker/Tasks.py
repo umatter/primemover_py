@@ -33,7 +33,8 @@ class GoogleSearch(Queue):
                          name=name,
                          description=description)
         # Add Job to Visit a webpage (google)
-        self.jobs.append(Jobs.VisitJob(url='https://www.google.com', captcha_mode='always'))
+        self.jobs.append(
+            Jobs.VisitJob(url='https://www.google.com', captcha_mode='always'))
 
         # Add Job to select the search field via XPATH and type the search term
         self.jobs.append(Jobs.EnterText(text=term,
@@ -46,13 +47,13 @@ class GoogleSearch(Queue):
                                         captcha_mode='always'),
 
                          )
-        #Add Job to scroll to bottom
+        # Add Job to scroll to bottom
         self.jobs.append(Jobs.Scroll(direction='DOWN',
                                      duration=5,
                                      captcha_mode='always'))
         self.jobs.append(Jobs.Scroll(direction='UP',
                                      percentage=100,
-                                     captcha_mode='always'))   # Add Job to select a result randomly
+                                     captcha_mode='always'))  # Add Job to select a result randomly
         if select_result:
             self.jobs.append(
                 Jobs.SingleSelect(selector='.//div[@class="yuRUbf"]/a',
@@ -68,7 +69,6 @@ class GoogleSearch(Queue):
             self.jobs.append(Jobs.Scroll(direction='DOWN',
                                          percentage=80,
                                          captcha_mode='always'))
-
 
 
 class VisitDirect(Queue):
@@ -102,7 +102,8 @@ class VisitViaGoogle(Queue):
                          name='Visit via Googe',
                          description='Visit a media outlet via google and scroll for some time.')
         # Add Job to Visit a  Google
-        self.jobs.append(Jobs.VisitJob(url='https://www.google.com', captcha_mode='always'))
+        self.jobs.append(
+            Jobs.VisitJob(url='https://www.google.com', captcha_mode='always'))
 
         # Add Job to select the search field via XPATH and type the outlets name
         self.jobs.append(Jobs.EnterText(text=self._outlet_name,
@@ -349,3 +350,48 @@ class BrowserLeaks(Queue):
             Jobs.VisitJob(url="https://browserleaks.com/silverlight",
                           flag='leak_silverlight', task='BrowserLeaks'))
         self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+
+
+class SetNrResults(Queue):
+    PASS_CRAWLER = False
+    """
+    Visit Google and adjust the number of search results
+    """
+
+    def __init__(self, start_at, nr_results=50):
+        super().__init__(start_at=start_at,
+                         name='Set_Nr_Results',
+                         )
+
+        self.jobs.append(
+            Jobs.VisitJob(url="https://www.google.com", task=self.name,
+                          captcha_mode='always'))
+        self.jobs.append(Jobs.TryClick(selector_type="XPATH",
+                                       selector='//*[@id="Mses6b"]',
+                                       task=self.name,
+                                       captcha_mode='always'))
+
+        self.jobs.append(Jobs.TryClick(selector_type="XPATH",
+                                       selector='//*[@id="dEjpnf"]/li[1]',
+                                       task=self.name,
+                                       captcha_mode='always'))
+        nr_results = round(nr_results, -1)
+        click_dict = {10: (5, 1), 20: (4, 2), 30: (3, 3), 40: (3, 4),
+                      50: (4, 5), 100: (5, 6)}
+
+        if nr_results in click_dict.keys():
+            position = click_dict[nr_results][1]
+            nr_click = click_dict[nr_results][0]
+            click_list = nr_click * [Jobs.TryClick(selector_type="XPATH",
+                                                   selector=f'//*[@id="result_slider"]/ol/li[{position}]',
+                                                   task=self.name,
+                                                   captcha_mode='always')]
+
+            self.jobs = self.jobs + click_list
+        else:
+            raise ValueError('Can only set 10,20,30,40,50 or 100 results')
+        self.jobs.append(Jobs.TryClick(selector_type="XPATH",
+                                       selector='//*[@id="form-buttons"]/div[1]',
+                                       task=self.name,
+                                       captcha_mode='always'))
+        self.jobs.append(Jobs.TryHandleAlertJob("ACCEPT", task=self.name, captcha_mode='always'))
