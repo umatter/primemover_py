@@ -30,9 +30,6 @@ def single_update(date, experiment_id, manual=False):
         Neutral = s3_wrapper.fetch_neutral()
     neutral = Neutral[0:3]
 
-    "Generate Benign Terms TODO: "
-    GenerateBenignTerms()
-
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
@@ -49,7 +46,7 @@ def single_update(date, experiment_id, manual=False):
     crawler_list_neutral = []
     crawler_list_political = []
     for crawler in crawler_list:
-        if crawler.flag in {'right_test', 'left_test'}:
+        if crawler.flag in {'right', 'left'}:
             crawler_list_political.append(crawler)
         else:
             crawler_list_neutral.append(crawler)
@@ -67,51 +64,45 @@ def single_update(date, experiment_id, manual=False):
             crawler.update_crawler(results=cleaned_data,
                                    proxy_update=update_proxies_dict) for crawler
             in crawler_list_political]
+    crawler_list = crawler_list_political + crawler_list_neutral
 
-    with open(PATH_BENIGN_TERMS, 'r') as file:
-        benign = json.load(file)
-
-    for individual in crawler_list_political:
+    for individual in crawler_list:
         session_id = individual.add_task(Tasks.SetNrResults,
                                          to_session=True,
                                          params={'nr_results': 30})
-        individual.add_task(Tasks.BenignGoogleSearch,
-                                         to_session=session_id,
-                                         params={'term': r.choice(benign)})
-        individual.add_task(Tasks.PoliticalSearch,
-                            to_session=session_id)
+        if individual.flag in {'left', 'right'} and \
+                individual.configuration.usage_type in {'only_search', 'both',
+                                                        None}:
+            individual.add_task(Tasks.PoliticalSearch,
+                                to_session=session_id)
+            individual.add_task(Tasks.PoliticalSearch,
+                                to_session=session_id)
+        if individual.flag in {'left', 'right'} and \
+                individual.configuration.usage_type in {'only_direct', 'both',
+                                                        None}:
+            individual.add_task(Tasks.VisitMedia,
+                                to_session=session_id)
+            individual.add_task(Tasks.VisitMedia,
+                                to_session=session_id)
 
-        individual.add_task(Tasks.VisitMedia,
-                            to_session=session_id)
-        individual.add_task(Tasks.VisitFrequentDirect,
-                            to_session=session_id)
-
-        individual.add_task(Tasks.PoliticalSearch,
-                            to_session=session_id, )
-
-        individual.add_task(Tasks.VisitMedia,
-                            to_session=session_id)
-        individual.add_task(Tasks.VisitFrequentDirect,
-                            to_session=session_id)
+        if individual.configuration.usage_type in {'only_direct', 'both', None}:
+            individual.add_task(Tasks.VisitNeutralDirect,
+                                to_session=session_id)
+            individual.add_task(Tasks.VisitNeutralDirect,
+                                to_session=session_id)
 
         individual.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
                             params={'term': neutral[0]})
 
-    for individual in crawler_list_neutral:
-        session_id = individual.add_task(Tasks.SetNrResults,
-                                         to_session=True,
-                                         params={'nr_results': 30})
-        individual.add_task(Tasks.BenignGoogleSearch,
-                                         to_session=session_id,
-                                         params={'term': r.choice(benign)})
+    for c in crawler_list:
+        c.schedule = TimeHandler("US-CA-LOS_ANGELES",
+                                 interval=120,
+                                 wake_time=18 * 60 * 60,
+                                 bed_time=20 * 60 * 60,
+                                 date=date)
+        c.add_task(Tasks.NeutralGoogleSearch, to_session=True, params={'term': neutral[1]})
+        c.add_task(Tasks.NeutralGoogleSearch, to_session=True, params={'term': neutral[2]})
 
-        individual.add_tasks(Tasks.VisitFrequentDirect, nr=2,
-                             to_session=session_id)
-
-        individual.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
-                            params={'term': neutral[0]})
-
-    crawler_list = crawler_list_neutral + crawler_list_political
 
     with open(PRIMEMOVER_PATH + "/resources/updates/generated.json",
               'w') as file:

@@ -120,6 +120,10 @@ def fetch_outlets():
     return fetch_file(path, "outlets_pool.csv")
 
 
+def fetch_neutral_domains():
+    path = "/resources/input_data/neutraldomains_pool.csv"
+    return fetch_file(path, "neutraldomains_pool.csv")
+
 def fetch_private():
     path = "/resources/proxies/private_proxies_new.csv"
     return fetch_file(path, "private_proxies.csv")

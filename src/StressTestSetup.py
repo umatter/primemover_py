@@ -39,7 +39,7 @@ def launch_test():
                          KEYS['PRIMEMOVER']['password'])
     # exp_return = api.new_experiment(key, exp.as_dict())
     # exp_id = Experiment.from_dict(exp_return).id
-    exp_id = 28
+    exp_id = 29
     TimeHandler.GLOBAL_SCHEDULE = Schedule(start_at=10 * 60 * 60,
                                            end_at=(10 + 23) * 60 * 60,
                                            interval=600,
@@ -52,24 +52,22 @@ def launch_test():
     crawler_list = [
         Crawler(flag='stress_test',
                 experiment_id=exp_id,
-                agent=Agent(location='US-NY-NEW_YORK',
-                            identification="None"),
-                proxy=Proxy(username="None",
-                            password="None",
-                            port=8080,
-                            hostname="None",
-                            name="empty proxy",
-                            type="None")) for i in range(0, 350)]
+                agent=Agent(location='US-NY-NEW_YORK')
+                ) for i in range(0, 350)]
 
     for c in crawler_list:
         c.send_agent = True
         session_id = c.add_task(Tasks.VisitFrequentDirect)
         c.add_task(Tasks.VisitFrequentDirect, to_session=session_id)
         c.add_task(Tasks.VisitFrequentDirect, to_session=session_id)
-
+    crawler_dict = []
+    for c in crawler_list:
+        c_dict = c.as_dict()
+        c_dict.pop('proxy')
+        crawler_dict.append(c_dict)
     with open(PRIMEMOVER_PATH + "/resources/crawlers/stress_test.json",
               'w') as file:
-        json.dump([crawler.as_dict() for crawler in crawler_list], file,
+        json.dump(crawler_dict, file,
                   indent='  ')
 
     return_data = api.push_new(access_token=key,

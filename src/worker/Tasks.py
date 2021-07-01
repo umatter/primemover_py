@@ -11,6 +11,7 @@ from src.ConfigurationFunctions import NoiseUtility
 import numpy as np
 import json
 import pathlib
+import pandas as pd
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
@@ -231,6 +232,14 @@ class VisitFrequentDirect(VisitDirect):
         super().__init__(outlet_url=url, start_at=start_at)
 
 
+class VisitNeutralDirect(VisitDirect):
+    def __init__(self, start_at,
+                 file_path='/resources/input_data/neutraldomains_pool.csv'):
+        domains = pd.read_csv(PRIMEMOVER_PATH + file_path)
+        url = r.choice(domains['redirect_url'])
+        super().__init__(outlet_url=url, start_at=start_at)
+
+
 class PoliticalSearchNoUtility(GoogleSearch):
     PASS_CRAWLER = True
     """
@@ -394,4 +403,5 @@ class SetNrResults(Queue):
                                        selector='//*[@id="form-buttons"]/div[1]',
                                        task=self.name,
                                        captcha_mode='always'))
-        self.jobs.append(Jobs.TryHandleAlertJob("ACCEPT", task=self.name, captcha_mode='always'))
+        self.jobs.append(Jobs.TryHandleAlertJob("ACCEPT", task=self.name,
+                                                captcha_mode='always'))
