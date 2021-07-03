@@ -14,7 +14,7 @@ All relevant code can be found in src. The purpose of this library being the ini
 as well as the assignment of tasks implies that some aspects of this library are intended to be edited by the user.
 Code can be found in src, with a few high level programs in the main directory. The main five being
 - ConfigurationFunctions.py
-- experiment_2_Test.py (Some experiment file, this should be migrated to a dedicated sub folder in a future update)
+- experiment_2.py (Some experiment file, this should be migrated to a dedicated sub folder in a future update)
 - Preferences.py
 - Results.py
 - UpdateExperiment.py.

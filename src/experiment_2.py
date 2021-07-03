@@ -4,6 +4,7 @@ This file generates new crawlers, in particular the required config files
 
 J.L. 11.2020
 """
+
 from src.worker.Crawler import Crawler
 from src.worker.TimeHandler import Schedule, TimeHandler
 from src.worker.ConfigureProfile import Config
@@ -25,7 +26,7 @@ ROTATING_PATH = PRIMEMOVER_PATH + '/resources/proxies/rotating_proxies.csv'
 
 PRIVATE_PATH = PRIMEMOVER_PATH + '/resources/proxies/private_proxies.csv'
 
-
+GEOSURF_PATH = PRIMEMOVER_PATH + '/resources/proxies/geosurf_proxies.csv'
 with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
 
@@ -39,7 +40,7 @@ def distribute_proxies(location_groups,exp_id, proxy_type="rotating"):
         single_location = single_location[1].reset_index(drop=True)
         shift = r.sample([0, 1], 2)
         for idx in single_location.index:
-            if idx % 3 == shift[0]:
+            if (idx % 5) in {shift[0], 3 + shift[0]}:
                 if pi_right is not None:
                     if type(pi_right) == str:
                         print('string error occoured!')
@@ -52,7 +53,7 @@ def distribute_proxies(location_groups,exp_id, proxy_type="rotating"):
                     pi_left = config.pi
                 flag = 'left'
 
-            elif idx % 3 == shift[1]:
+            elif (idx % 5) in {shift[0], 3 + shift[0]}:
                 if pi_left is not None:
                     if type(pi_left) == str:
                         print('string error occoured!')
@@ -103,18 +104,27 @@ def launch_experiment():
                          KEYS['PRIMEMOVER']['password'])
     exp_return = api.new_experiment(key, exp.as_dict())
     exp_id = Experiment.from_dict(exp_return).id
-    # exp_id = 5
+
     TimeHandler.GLOBAL_SCHEDULE = Schedule(start_at=10 * 60 * 60,
                                            end_at=(10 + 23) * 60 * 60,
                                            interval=600,
                                            )
     # Generate GEOSURF based crawlers
-    GEO_SURF_PROXIES = 2 * ["US-CO-COLORADO_SPRINGS", "US-CA-SAN_FRANCISCO"]
+    GEO_SURF_PROXIES = ["US-CO-COLORADO_SPRINGS",
+                            "US-OK-OKLAHOMA_CITY",
+                            "US-KS-WICHITA",
+                            "US-CA-BAKERSFIELD",
+                            "US-FL-JACKSONVILLE",
+                            "US-CA-SAN_FRANCISCO",
+                            "US-WI-MADISON",
+                            "US-CA-SAN_JOSE",
+                            "US-DC-WASHINGTON",
+                            "US-TX-EL_PASO"]
 
     # generate neutral configurations
     config_list_neutral = [
         Config(name='Config/neutral', location=l, pi=0, media=[], terms=[]) for
-        l in GEO_SURF_PROXIES]
+        l in 2 * GEO_SURF_PROXIES]
     # generate crawlers from neutral configs
     crawler_list = [
         Crawler(flag='neutral_test', configuration=c, experiment_id=exp_id) for
@@ -122,7 +132,7 @@ def launch_experiment():
         config_list_neutral]
     # generate left and right configs with opposing pi in each location
     config_list_left = [Config(name='Config/left', location=l) for l in
-                        GEO_SURF_PROXIES]
+                        4 * GEO_SURF_PROXIES]
     config_list_right = [
         Config(name='Config/right', location=left_config.location,
                pi=-left_config.pi) for left_config in
@@ -155,17 +165,17 @@ def launch_experiment():
     location_groups = private_proxies.groupby('loc_id')
     crawler_list += distribute_proxies(location_groups, exp_id, "private")
 
-    with open(PRIMEMOVER_PATH + "/resources/crawlers/test_6.json",
+    with open(PRIMEMOVER_PATH + "/resources/crawlers/experiment_2.json",
               'w') as file:
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
     return_data = api.push_new(access_token=key,
-                               path=PRIMEMOVER_PATH +   "/resources/crawlers/test_6.json")
+                               path=PRIMEMOVER_PATH + "/resources/crawlers/experiment_2.json")
     data_as_dict = json.loads(return_data.text)
 
     with open(
-            f'{PRIMEMOVER_PATH}/resources/crawlers/test_6_{datetime.now().date().isoformat()}.json',
+            f'{PRIMEMOVER_PATH}/resources/crawlers/experiment_2{datetime.now().date().isoformat()}.json',
             'w') as file:
         json.dump(data_as_dict, file, indent='  ')
 

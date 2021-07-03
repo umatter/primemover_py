@@ -356,3 +356,7 @@ def fetch_crawlers_by_exp(access_token, experiment_id):
         except:
             return Exception(f'Crawler id was {c}')
     return crawler_list
+
+
+def delete_exp(access_token, id):
+    requests.delete(DOMAIN + f'experiments/{id}', headers={'authorization': f'Bearer {access_token}'})

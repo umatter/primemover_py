@@ -9,7 +9,7 @@ import warnings
 import re
 import pathlib
 import src.ConfigurationFunctions as Config
-
+import random
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 
@@ -49,26 +49,32 @@ class Profile:
         self.os = os
         self.name = name
         self.browser = browser
+
+        privacy_setting = random.choices([True, False], [0.2, 0.8])[0]
+        if privacy_setting:
+            option = random.choice(['geolocation', 'do_not_track', 'hardware_canvas', 'local_storage'])
+        else:
+            option = 'None'
         if language == 'PyDefault':
             self.language = Config.language()
         else:
             self.language = language
         self._fill_based_on_external_ip = None
         if geolocation == 'PyDefault':
-            self.geolocation = Config.geolocation()
+            self.geolocation = Config.geolocation(option)
         else:
             self.geolocation = geolocation
         if do_not_track == 'PyDefault':
-            self.do_not_track = Config.do_not_track()
+            self.do_not_track = Config.do_not_track(option)
         else:
             self.do_not_track = do_not_track
         if hardware_canvas == 'PyDefault':
-            self.hardware_canvas = Config.hardware_canvas()
+            self.hardware_canvas = Config.hardware_canvas(option)
         else:
             self.hardware_canvas = hardware_canvas
 
         if local_storage == 'PyDefault':
-            self.local_storage = Config.local_storage()
+            self.local_storage = Config.local_storage(option)
         else:
             self.local_storage = local_storage
 

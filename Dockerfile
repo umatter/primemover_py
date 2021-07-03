@@ -31,6 +31,7 @@ RUN . primemover_py/primemover_env/bin/activate && pip3 install -r primemover_py
  --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.1.0/constraints-3.8.txt" && airflow db init&& mkdir /root/airflow/dags
 
 COPY primemover_test_dag.py /root/airflow/dags
+COPY primemover_dag_BrowserLeaks.py /root/airflow/dags
 COPY primemover_dag_emergency.py /root/airflow/dags
 COPY primemover_dag.py /root/airflow/dags
 COPY new_experiment_dag.py /root/airflow/dags

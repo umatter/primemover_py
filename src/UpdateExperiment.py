@@ -1,7 +1,6 @@
 from src.worker import Crawler, Tasks, ConfigureProfile, s3_wrapper, Experiment
 from src.worker.UpdateObject import *
 from src.worker.ReplaceProxies import update_all_proxies
-from src.auxiliary.GenerateBenignTerms import GenerateBenignTerms
 from src.worker.TimeHandler import Schedule, TimeHandler
 from datetime import datetime, timedelta
 import src.worker.api_wrapper as api
@@ -11,8 +10,6 @@ import pathlib
 import os
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
-
-PATH_BENIGN_TERMS = PRIMEMOVER_PATH + '/resources/other/benign_terms.json'
 
 with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
@@ -35,10 +32,11 @@ def single_update(date, experiment_id, manual=False):
                                            end_at=(9 + 24) * 60 * 60)
     key = api.get_access(KEYS['PRIMEMOVER']['username'],
                          KEYS['PRIMEMOVER']['password'])
-    raw_crawlers = api_wrapper.fetch_crawlers_by_exp(access_token=key,
-                                                     experiment_id=experiment_id)
+    raw_experiment = api_wrapper.fetch_experiment(access_token=key, id=
+    experiment_id)
 
-    crawler_list = Crawler.Crawler.from_list(raw_crawlers, date=date)
+    crawler_list = Crawler.Crawler.from_list(raw_experiment['crawlers'],
+                                             date=date)
 
     "Compute Proxy Changes"
     update_proxies_dict = update_all_proxies()
@@ -98,11 +96,12 @@ def single_update(date, experiment_id, manual=False):
         c.schedule = TimeHandler("US-CA-LOS_ANGELES",
                                  interval=120,
                                  wake_time=18 * 60 * 60,
-                                 bed_time=20 * 60 * 60,
+                                 bed_time=21 * 60 * 60,
                                  date=date)
-        c.add_task(Tasks.NeutralGoogleSearch, to_session=True, params={'term': neutral[1]})
-        c.add_task(Tasks.NeutralGoogleSearch, to_session=True, params={'term': neutral[2]})
-
+        c.add_task(Tasks.NeutralGoogleSearch, to_session=True,
+                   params={'term': neutral[1]})
+        c.add_task(Tasks.NeutralGoogleSearch, to_session=True,
+                   params={'term': neutral[2]})
 
     with open(PRIMEMOVER_PATH + "/resources/updates/generated.json",
               'w') as file:
