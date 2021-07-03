@@ -49,7 +49,7 @@ dag = DAG(
 # t1, t2 and t3 are examples of tasks created by instantiating operators
 t1 = PythonOperator(
     task_id='create_experiment',
-    python_callable=src.experiment_2_Test.launch_experiment,
+    python_callable=src.experiment_2.launch_experiment,
     dag=dag,
 )
 
