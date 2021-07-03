@@ -228,7 +228,7 @@ def hardware_canvas(option_choice = 'random'):
     elif option_choice == 'hardware_canvas':
         choice = 'BLOCK'
     else:
-        choice = 'ALLOW'
+        choice = 'NOISE'
     return choice
 
 
