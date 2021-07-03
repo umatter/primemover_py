@@ -52,7 +52,7 @@ dag = DAG(
 
 
 t1 = PythonOperator(
-    task_id='Add Browser Leaks',
+    task_id='addTasks',
     python_callable=src.BrowserLeaks.single_update,
     op_kwargs={'date': datetime.now(),
                'experiment_id': Variable.get("experiment_id", 'id_missing')},

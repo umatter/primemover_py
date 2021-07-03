@@ -1,6 +1,6 @@
 import os
 import json
-from src.worker.ConfigAirflow import SetPassword
+
 if __name__ == "__main__":
     input_val = input('Have you installed all requirements from requirements.txt? (y/n): ')
     if input_val != 'y':
