@@ -34,8 +34,8 @@ def single_update(experiment_id, date = datetime.now()):
     for individual in crawler_list:
         individual.schedule = TimeHandler(individual.configuration.location,
                                      interval=120,
-                                     wake_time=15.5 * 60 * 60,
-                                     bed_time=20 * 60 * 60,
+                                     wake_time=18 * 60 * 60,
+                                     bed_time=21 * 60 * 60,
                                      date=date)
         individual.add_task(BrowserLeaks)
     with open(PRIMEMOVER_PATH + "/resources/updates/generated.json", 'w') as file:

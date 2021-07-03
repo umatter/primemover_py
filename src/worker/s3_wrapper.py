@@ -124,13 +124,12 @@ def fetch_neutral_domains():
     path = "/resources/input_data/neutraldomains_pool.csv"
     return fetch_file(path, "neutraldomains_pool.csv")
 
-def fetch_private():
-    path = "/resources/proxies/private_proxies_new.csv"
+def fetch_private(path = "/resources/proxies/private_proxies_new.csv"):
     return fetch_file(path, "private_proxies.csv")
 
 
-def fetch_rotating():
-    path = "/resources/proxies/rotating_proxies_new.csv"
+def fetch_rotating(path = "/resources/proxies/rotating_proxies_new.csv"):
+
     return fetch_file(path, "rotating_proxies.csv")
 
 

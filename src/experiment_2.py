@@ -90,8 +90,8 @@ def launch_experiment():
         description='A test of all systems based on a future experiment set up',
         contact='JLadwig',
     )
-    s3_wrapper.fetch_private()
-    s3_wrapper.fetch_rotating()
+    s3_wrapper.fetch_private("/resources/proxies/private_proxies.csv")
+    s3_wrapper.fetch_rotating("/resources/proxies/rotating_proxies.csv")
     s3_wrapper.fetch_geosurf()
 
     s3_wrapper.update_valid_cities()
