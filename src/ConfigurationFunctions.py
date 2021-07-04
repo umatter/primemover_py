@@ -39,7 +39,7 @@ def NoiseUtility():
     """
     Returns: epsilon: float, noise parameter when determining utility
     """
-    return float(gumbel(-0.4557735, 0.0793006, 1)[0])
+    return float(gumbel(-0.4557735, 0.793006, 1)[0])/10
 
 
 def SelectSearchTerms(pi, alpha_hat, tau_hat_ik, k=40):

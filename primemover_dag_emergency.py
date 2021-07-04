@@ -51,38 +51,38 @@ dag = DAG(
 # t1, t2 and t3 are examples of tasks created by instantiating operators
 
 
-t2 = PythonOperator(
-    task_id='parse_all_results',
-    python_callable=src.Results.process_results,
-    op_kwargs={'set_reviewed': True,
-               'parser_dict': src.worker.s3_parser.ParserDict,
-               'path_end': 'all_data_',
-               'date': datetime.now()},
-    dag=dag)
-
-t3 = PythonOperator(
-    task_id='upload_results',
-    python_callable=src.worker.s3_wrapper.upload_data,
-    op_kwargs={'filename': f'output/{datetime.now().date().isoformat()}.json',
-               'path': f'/resources/cleaned_data/all_data_{datetime.now().date().isoformat()}.json'},
-    dag=dag)
-
-t4 = PythonOperator(
-    task_id='parse_search_results',
-    python_callable=src.Results.process_results,
-    op_kwargs={'set_reviewed': False,
-               'parser_dict': src.worker.s3_parser.UpdateParser,
-               'date': datetime.now()},
-    dag=dag)
-
-
-
-t5 = PythonOperator(
-    task_id = 'csv_hist',
-    python_callable = src.worker.DataCopy.create_copy,
-    op_kwargs={'experiment_id': Variable.get("experiment_id", 'id_missing')},
-    dag =dag
-)
+# t2 = PythonOperator(
+#     task_id='parse_all_results',
+#     python_callable=src.Results.process_results,
+#     op_kwargs={'set_reviewed': True,
+#                'parser_dict': src.worker.s3_parser.ParserDict,
+#                'path_end': 'all_data_',
+#                'date': datetime.now()},
+#     dag=dag)
+#
+# t3 = PythonOperator(
+#     task_id='upload_results',
+#     python_callable=src.worker.s3_wrapper.upload_data,
+#     op_kwargs={'filename': f'output/{datetime.now().date().isoformat()}.json',
+#                'path': f'/resources/cleaned_data/all_data_{datetime.now().date().isoformat()}.json'},
+#     dag=dag)
+#
+# t4 = PythonOperator(
+#     task_id='parse_search_results',
+#     python_callable=src.Results.process_results,
+#     op_kwargs={'set_reviewed': False,
+#                'parser_dict': src.worker.s3_parser.UpdateParser,
+#                'date': datetime.now()},
+#     dag=dag)
+#
+#
+#
+# t5 = PythonOperator(
+#     task_id = 'csv_hist',
+#     python_callable = src.worker.DataCopy.create_copy,
+#     op_kwargs={'experiment_id': Variable.get("experiment_id", 'id_missing')},
+#     dag =dag
+# )
 
 t6 = PythonOperator(
     task_id='update_crawlers',
@@ -99,4 +99,4 @@ t7 = PythonOperator(
                'nr_days': 5},
     dag=dag)
 
-t2 >> t3 >> t4 >> t5 >> t6 >> t7
+t6 >> t7

@@ -53,14 +53,14 @@ def distribute_proxies(location_groups,exp_id, proxy_type="rotating"):
                     pi_left = config.pi
                 flag = 'left'
 
-            elif (idx % 5) in {shift[0], 3 + shift[0]}:
+            elif (idx % 5) in {shift[1], 3 + shift[1]}:
                 if pi_left is not None:
                     if type(pi_left) == str:
                         print('string error occoured!')
                         print(crawler_list[-1].as_dict())
 
                     config = Config(name='Config/right', location=location,
-                                    pi= - pi_left)
+                                    pi=-pi_left)
                     pi_left = None
                 else:
                     config = Config(name='Config/right', location=location,
@@ -139,11 +139,11 @@ def launch_experiment():
         config_list_left]
 
     crawler_list += [
-        Crawler(flag='left_test', configuration=c, experiment_id=exp_id) for c
+        Crawler(flag='left', configuration=c, experiment_id=exp_id) for c
         in
         config_list_left]
     crawler_list += [
-        Crawler(flag='right_test', configuration=c, experiment_id=exp_id) for c
+        Crawler(flag='right', configuration=c, experiment_id=exp_id) for c
         in
         config_list_right]
 

@@ -27,15 +27,18 @@ def single_update(experiment_id, date = datetime.now()):
     raw_experiment = api_wrapper.fetch_experiment(access_token=key, id=
     experiment_id)
 
-    crawler_list = Crawler.Crawler.from_list(raw_experiment['crawlers'],
+    crawler_list = Crawler.from_list(raw_experiment['crawlers'],
                                              date=date)
-
-
+    temp_list = []
+    for c in crawler_list:
+        if c.crawler_info.crawler_id in [994, 1012, 1032, 1040, 1086, 1089, 1163, 1167, 1190, 1191, 1194, 1198, 1199, 1202, 1208, 1213, 1215, 1218, 1219, 1226]:
+            temp_list.append(c)
+    crawler_list = temp_list
     for individual in crawler_list:
-        individual.schedule = TimeHandler(individual.configuration.location,
+        individual.schedule = TimeHandler("US-NY-NEW_YORK",
                                      interval=120,
-                                     wake_time=18 * 60 * 60,
-                                     bed_time=21 * 60 * 60,
+                                     wake_time=9 * 60 * 60,
+                                     bed_time=10 * 60 * 60,
                                      date=date)
         individual.add_task(BrowserLeaks)
     with open(PRIMEMOVER_PATH + "/resources/updates/generated.json", 'w') as file:
@@ -52,4 +55,4 @@ def single_update(experiment_id, date = datetime.now()):
 
 
 if __name__ == "__main__":
-    single_update(experiment_id=1, date=datetime.now())
+    single_update(experiment_id=36, date=datetime.now())
