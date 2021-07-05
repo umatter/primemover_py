@@ -37,7 +37,7 @@ def single_update(date, experiment_id, manual=False):
 
     crawler_list = Crawler.Crawler.from_list(raw_experiment['crawlers'],
                                              date=date)
-
+    crawler_list = UpdateObject(crawler_list, 'config')
     "Compute Proxy Changes"
     update_proxies_dict = update_all_proxies()
 
@@ -148,5 +148,5 @@ if __name__ == "__main__":
     #     single_update(day_delta=day)
     #     print((datetime.now().date() + timedelta(days=day)).isoformat())
     single_update(datetime.now(),
-                  experiment_id=22,
+                  experiment_id=41,
                   manual=True)

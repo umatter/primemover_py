@@ -7,6 +7,7 @@ import pandas as pd
 from src.worker import s3_wrapper
 import src.auxiliary.result_select as result_select
 import src.worker.api_wrapper as api_wrapper
+from src.worker.UpdateObject import UpdateObject
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
@@ -30,6 +31,8 @@ def extract_data(experiment_id: int):
                                                     experiment_id)
 
     crawler_list = Crawler.from_list(crawler_list_raw['crawlers'])
+    crawler_list = UpdateObject(crawler_list, 'config')
+
     data_restructure = []
     date = datetime.today().date().isoformat()
     for c in crawler_list:
@@ -62,6 +65,7 @@ def extract_list_params(object_name, experiment_id):
                                                     experiment_id)
 
     crawler_list = Crawler.from_list(crawler_list_raw['crawlers'])
+    crawler_list = UpdateObject(crawler_list, 'config')
 
     data_restructure = []
     date = datetime.today().date().isoformat()
@@ -98,6 +102,7 @@ def extract_selection_data(experiment_id, path_cleaned_data):
                                                     experiment_id)
 
     crawler_list = Crawler.from_list(crawler_list_raw['crawlers'])
+    crawler_list = UpdateObject(crawler_list, 'config')
 
     crawler_data_dict = {}
     for c in crawler_list:
