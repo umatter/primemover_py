@@ -25,11 +25,9 @@ def extract_data(experiment_id: int):
     output: pandas DataFrame, columns all parameters set in the configuration functions
     """
 
-    key = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
-                         KEYS['PRIMEMOVER']['password'])
-
-    crawler_list_raw = api_wrapper.fetch_experiment(access_token=key, id=
-    experiment_id)
+    crawler_list_raw = api_wrapper.fetch_experiment(access_token=ACCESS_TOKEN,
+                                                    id=
+                                                    experiment_id)
 
     crawler_list = Crawler.from_list(crawler_list_raw['crawlers'])
     data_restructure = []
@@ -93,9 +91,11 @@ def extract_selection_data(experiment_id, path_cleaned_data):
     with open(path_jobs) as f:
         raw_data = json.load(f)
 
-    crawler_list_raw = api_wrapper.fetch_crawlers_by_exp(ACCESS_TOKEN,
-                                                         experiment_id)
-    crawler_list = Crawler.from_list(crawler_list_raw)
+    crawler_list_raw = api_wrapper.fetch_experiment(access_token=ACCESS_TOKEN,
+                                                    id=
+                                                    experiment_id)
+
+    crawler_list = Crawler.from_list(crawler_list_raw['crawlers'])
 
     crawler_data_dict = {}
     for c in crawler_list:
