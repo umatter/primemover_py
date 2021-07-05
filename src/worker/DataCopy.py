@@ -57,9 +57,11 @@ def extract_list_params(object_name, experiment_id):
     input:
         object_name: str, one of media or terms
     """
-    crawler_list_raw = api_wrapper.fetch_crawlers_by_exp(ACCESS_TOKEN,
-                                                         experiment_id)
-    crawler_list = Crawler.from_list(crawler_list_raw)
+    crawler_list_raw = api_wrapper.fetch_experiment(access_token=ACCESS_TOKEN,
+                                                    id=
+                                                    experiment_id)
+
+    crawler_list = Crawler.from_list(crawler_list_raw['crawlers'])
 
     data_restructure = []
     date = datetime.today().date().isoformat()
