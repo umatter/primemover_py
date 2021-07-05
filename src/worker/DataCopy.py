@@ -27,7 +27,7 @@ def extract_data(experiment_id: int):
 
     key = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
                          KEYS['PRIMEMOVER']['password'])
-    experiment_id = 41
+
     crawler_list_raw = api_wrapper.fetch_experiment(access_token=key, id=
     experiment_id)
 
