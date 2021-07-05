@@ -77,12 +77,12 @@ dag = DAG(
 #
 #
 #
-# t5 = PythonOperator(
-#     task_id = 'csv_hist',
-#     python_callable = src.worker.DataCopy.create_copy,
-#     op_kwargs={'experiment_id': Variable.get("experiment_id", 'id_missing')},
-#     dag =dag
-# )
+t5 = PythonOperator(
+    task_id = 'csv_hist',
+    python_callable = src.worker.DataCopy.create_copy,
+    op_kwargs={'experiment_id': Variable.get("experiment_id", 'id_missing')},
+    dag =dag
+)
 
 t6 = PythonOperator(
     task_id='update_crawlers',
@@ -99,4 +99,4 @@ t7 = PythonOperator(
                'nr_days': 5},
     dag=dag)
 
-t6 >> t7
+t5 >> t6 >> t7

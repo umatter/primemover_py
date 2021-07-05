@@ -291,8 +291,8 @@ def fetch_results():
 
 if __name__ == "__main__":
     date = datetime.now()
-    api_wrapper.fetch_results(access_token=ACCESS_TOKEN)
-    process_results(set_reviewed=True, parser_dict=Parser.ParserDict,
+    api_wrapper.fetch_results(access_token=ACCESS_TOKEN, date=date)
+    process_results(set_reviewed=False, parser_dict=Parser.ParserDict,
                     path_end='all_data_', date=date)
 
     s3.upload_data(f'output/{date.date().isoformat()}.json',
