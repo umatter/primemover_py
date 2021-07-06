@@ -127,7 +127,7 @@ def launch_experiment():
         l in 2 * GEO_SURF_PROXIES]
     # generate crawlers from neutral configs
     crawler_list = [
-        Crawler(flag='neutral_test', configuration=c, experiment_id=exp_id) for
+        Crawler(flag='neutral', configuration=c, experiment_id=exp_id) for
         c in
         config_list_neutral]
     # generate left and right configs with opposing pi in each location

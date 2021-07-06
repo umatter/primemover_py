@@ -30,12 +30,14 @@ def single_update(experiment_id, date = datetime.now()):
 
     crawler_list = Crawler.from_list(raw_experiment['crawlers'], date=date)
     crawler_list = UpdateObject(crawler_list, 'config')
-
-    for individual in crawler_list:
+    ids_processed = [1646, 1653, 1660, 1670, 1681, 1701, 1708, 1728, 1740, 1741, 1747, 1750, 1752, 1761, 1769, 1770, 1799, 1807, 1814, 1817, 1843, 1847, 1854, 1856, 1863, 1875]
+    for individual in crawler_list[0:150]:
+        if id in ids_processed:
+            continue
         individual.schedule = TimeHandler("US-CA-LOS_ANGELES",
                                      interval=120,
                                      wake_time=21.5 * 60 * 60,
-                                     bed_time= 24.5 * 60 * 60,
+                                     bed_time= 24 * 60 * 60,
                                      date=date)
         individual.add_task(BrowserLeaks)
     with open(PRIMEMOVER_PATH + "/resources/updates/generated.json", 'w') as file:

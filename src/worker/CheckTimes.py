@@ -11,7 +11,7 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
 key = api.get_access(KEYS['PRIMEMOVER']['username'],
                      KEYS['PRIMEMOVER']['password'])
 try:
-    res = api.fetch_results(key, 36)['data']
+    res = api.fetch_results(key, 41)['data']
 except FileExistsError:
     path = f'{PRIMEMOVER_PATH}/resources/raw_data/{datetime.now().date().isoformat()}.json'
 
@@ -37,12 +37,25 @@ for i, t in enumerate(all_times[1:]):
 failure = []
 failure_times = []
 success = []
+success_times= []
+success_jobs = []
+failure_jobs = []
 for r in res:
+    if r['name'] == 'BrowserLeaks':
+        continue
+    for j in r['jobs']:
+        if j['name']!='Select':
+            continue
+        if j['status_code'] == 'success':
+            success_jobs.append(j['id'])
+        else:
+            failure_jobs.append(j['id'])
     if r['status_code'] == 'success':
         success.append({'crawler_id':r['crawler_id'], 'queue_id':r['id']})
+        success_times.append(to_datetime(r['start_at']))
     else:
-        failure.append(
-            r['crawler_id'])
+        failure.append((
+                r['crawler_id'], r['status_message']))
         failure_times.append(to_datetime(r['start_at']))
 
 failure_times.sort()

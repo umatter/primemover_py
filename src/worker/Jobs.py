@@ -178,6 +178,7 @@ class SingleSelect(Job):
 class TryClick(Job):
     """
     click some element (differs from select, as no choices are made)
+    This Job does not scroll to the element! It will do nothing if the element is not visible
     """
 
     def __init__(self, selector, selector_type='XPATH',
