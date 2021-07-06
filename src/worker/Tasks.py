@@ -50,7 +50,7 @@ class GoogleSearch(Queue):
                          )
         # Add Job to scroll to bottom
         self.jobs.append(Jobs.Scroll(direction='DOWN',
-                                     duration=5,
+                                     percentage=100,
                                      captcha_mode='always'))
         self.jobs.append(Jobs.Scroll(direction='UP',
                                      percentage=100,
