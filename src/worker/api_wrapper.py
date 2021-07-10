@@ -365,7 +365,7 @@ def fetch_crawlers_by_exp(access_token, experiment_id):
 
 
 def delete_exp(access_token, id):
-    requests.delete(DOMAIN + f'experiments/{id}', headers={'authorization': f'Bearer {access_token}'})
-def delete_queues(access_token):
-    resp = requests.get(DOMAIN + f'queues-unprocessed', headers={'authorization': f'Bearer {access_token}'})
+    requests.delete(DOMAIN + f'crawler/{id}', headers={'authorization': f'Bearer {access_token}'})
+def delete_queues_2(access_token,i):
+    resp = requests.delete(DOMAIN + f'queues/{i}', headers={'authorization': f'Bearer {access_token}'})
     return resp

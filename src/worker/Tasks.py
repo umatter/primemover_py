@@ -300,65 +300,65 @@ class BrowserLeaks(Queue):
         self.jobs.append(
             Jobs.VisitJob(url="https://browserleaks.com/ip", flag='leak_ip',
                           task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
 
         # JavaScript
         self.jobs.append(
             Jobs.VisitJob(url="https://browserleaks.com/javascript",
                           flag='leak_javascript', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
 
         # Webrtc
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/webrtc",
                                        flag='leak_webrtc', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
 
         # Canvas
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/canvas",
                                        flag='leak_canvas', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
 
         # Webgl
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/webgl",
                                        flag='leak_webgl', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
         # Fonts
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/fonts",
                                        flag='leak_fonts', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
         # SSL
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/ssl",
                                        flag='leak_ssl', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
         # GeoLocation
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/geo",
                                        flag='leak_geo', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
         # Features
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/features",
                                        flag='leak_features',
                                        task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
         # Proxy
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/proxy",
                                        flag='leak_proxy', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
 
         # Java system
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/java",
                                        flag='leak_java', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
 
         # Flash
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/flash",
                                        flag='leak_flash', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
 
         # Silverlight
         self.jobs.append(
             Jobs.VisitJob(url="https://browserleaks.com/silverlight",
                           flag='leak_silverlight', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
 
 
 class SetNrResults(Queue):

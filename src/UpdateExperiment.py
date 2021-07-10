@@ -23,10 +23,12 @@ def single_update(date, experiment_id, manual=False):
     else:
         with open(neutral_path) as file:
             Neutral = json.load(file)
-    if len(Neutral) == 0:
-        Neutral = s3_wrapper.fetch_neutral()
-    neutral = Neutral[0:3]
-
+    neutral = []
+    for i in range(3):
+        if len(Neutral) == 0:
+            Neutral = s3_wrapper.fetch_neutral()
+        else:
+            neutral.append(Neutral.pop(0))
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
@@ -96,7 +98,7 @@ def single_update(date, experiment_id, manual=False):
         c.schedule = TimeHandler("US-CA-LOS_ANGELES",
                                  interval=120,
                                  wake_time=18 * 60 * 60,
-                                 bed_time=21 * 60 * 60,
+                                  bed_time=21 * 60 * 60,
                                  date=date)
         c.add_task(Tasks.NeutralGoogleSearch, to_session=True,
                    params={'term': neutral[1]})
@@ -135,7 +137,7 @@ def single_update(date, experiment_id, manual=False):
                 json.dump(return_data.json(), file, indent='  ')
             # Delete neutral terms if push was successful
             with open(neutral_path, 'w') as file:
-                json.dump(Neutral[3:], file)
+                json.dump(Neutral, file)
         else:
             print(return_data)
 

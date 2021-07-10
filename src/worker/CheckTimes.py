@@ -40,6 +40,7 @@ success = []
 success_times= []
 success_jobs = []
 failure_jobs = []
+failure_2 = []
 for r in res:
     if r['name'] == 'BrowserLeaks':
         continue
@@ -51,11 +52,12 @@ for r in res:
         else:
             failure_jobs.append(j['id'])
     if r['status_code'] == 'success':
-        success.append({'crawler_id':r['crawler_id'], 'queue_id':r['id']})
+        success.append(r['crawler_id'])
         success_times.append(to_datetime(r['start_at']))
     else:
         failure.append((
                 r['crawler_id'], r['status_message']))
+        failure_2.append({'crawler_id': r['crawler_id'], 'queue_id':r['id'], 'started_at': r['started_at'],'finished_at': r['finished_at']})
         failure_times.append(to_datetime(r['start_at']))
 
 failure_times.sort()
@@ -70,6 +72,7 @@ for j,t in enumerate(deltas):
 
 deltas_started = []
 all_times_started = [to_datetime(r['started_at']) for r in res]
+duration = [(to_datetime(r['finished_at'])-to_datetime(r['started_at']) ).total_seconds()for r in success]
 all_times_started.sort()
 running_sum_started = []
 for i, t in enumerate(all_times_started[1:]):
