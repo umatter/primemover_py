@@ -79,7 +79,7 @@ class VisitDirect(Queue):
 
     def __init__(self, outlet_url, start_at):
         self._outlet_url = outlet_url
-        self._duration = r.randint(60, 180)  # choose scroll time in seconds
+        self._duration = r.randint(30, 60)  # choose scroll time in seconds
         super().__init__(start_at=start_at,
                          name='Visit Direct',
                          description='Visit a media outlet and scroll for 2-3 minutes.')
@@ -98,7 +98,7 @@ class VisitViaGoogle(Queue):
 
     def __init__(self, outlet_name, start_time):
         self._outlet_name = outlet_name
-        self._duration = r.randint(60, 180)  # choose scroll time in seconds
+        self._duration = r.randint(30, 60)  # choose scroll time in seconds
         super().__init__(start_at=start_time,
                          name='Visit via Googe',
                          description='Visit a media outlet via google and scroll for some time.')

@@ -56,9 +56,10 @@ for r in res:
         success_times.append(to_datetime(r['start_at']))
     else:
         failure.append((
-                r['crawler_id'], r['status_message']))
+                r['crawler_id'], r['status_message'], r['name']))
         failure_2.append({'crawler_id': r['crawler_id'], 'queue_id':r['id'], 'started_at': r['started_at'],'finished_at': r['finished_at']})
         failure_times.append(to_datetime(r['start_at']))
+
 
 failure_times.sort()
 deltas_failure = []
