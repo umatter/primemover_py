@@ -27,8 +27,7 @@ def single_update(date, experiment_id, manual=False):
     for i in range(3):
         if len(Neutral) == 0:
             Neutral = s3_wrapper.fetch_neutral()
-        else:
-            neutral.append(Neutral.pop(0))
+        neutral.append(Neutral.pop(0))
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
