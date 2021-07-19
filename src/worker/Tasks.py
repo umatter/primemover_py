@@ -407,6 +407,6 @@ class SetNrResults(Queue):
         self.jobs.append(Jobs.TryClick(selector_type="XPATH",
                                        selector='//*[@id="form-buttons"]/div[1]',
                                        task=self.name,
-                                       captcha_mode='always'))
+                                       captcha_mode='never'))
         self.jobs.append(Jobs.TryHandleAlertJob("ACCEPT", task=self.name,
                                                 captcha_mode='always'))

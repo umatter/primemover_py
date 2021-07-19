@@ -285,6 +285,7 @@ class HandleAlertJob(Job):
                          task=task,
                          flag=flag,
                          captcha_mode=captcha_mode)
+
 class TryHandleAlertJob(Job):
     """Handle some browser alert, e.g. upon changing search settings in google.
         These are browser specific and are therefore navigated differently,

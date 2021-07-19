@@ -35,7 +35,7 @@ def single_update(experiment_id, date=datetime.now()):
                      1668, 1675, 1689, 1691, 1695, 1703, 1723, 1724, 1725, 1727,
                      1731, 1732, 1735, 1738]
     re_do = [59, 124]
-    i = 192
+    i = 246
     crawler_list_2 = []
     while len(crawler_list_2) < 50 and i < len(crawler_list):
         individual = crawler_list[i]
