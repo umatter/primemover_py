@@ -314,7 +314,7 @@ class Crawler:
         return crawlers
 
     @classmethod
-    def from_dict(cls, crawler_dict, date=datetime.now()):
+    def from_dict(cls, crawler_dict: dict, date=datetime.now()):
         """
         Initialize crawler objects from dictionary of crawlers in dictionary format by checking
             for two plausible keys.

@@ -400,10 +400,6 @@ class SetNrResults(Queue):
         else:
             raise ValueError('Can only set 10,20,30,40,50 or 100 results')
 
-        self.jobs.append(
-            Jobs.Scroll(direction='DOWN', percentage=100, task=self.name,
-                        captcha_mode='always'))
-
         self.jobs.append(Jobs.TryClick(selector_type="XPATH",
                                        selector='//*[@id="form-buttons"]/div[1]',
                                        task=self.name,
