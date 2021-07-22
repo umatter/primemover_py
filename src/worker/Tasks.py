@@ -374,16 +374,16 @@ class SetNrResults(Queue):
 
         self.jobs.append(
             Jobs.VisitJob(url="https://www.google.com", task=self.name,
-                          captcha_mode='always'))
+                          captcha_mode='never'))
         self.jobs.append(Jobs.TryClick(selector_type="XPATH",
                                        selector='//*[@id="Mses6b"]',
                                        task=self.name,
-                                       captcha_mode='always'))
+                                       captcha_mode='never'))
 
         self.jobs.append(Jobs.TryClick(selector_type="XPATH",
                                        selector='//*[@id="dEjpnf"]/li[1]',
                                        task=self.name,
-                                       captcha_mode='always'))
+                                       captcha_mode='never'))
         nr_results = round(nr_results, -1)
         click_dict = {10: (5, 1), 20: (4, 2), 30: (3, 3), 40: (3, 4),
                       50: (4, 5), 100: (5, 6)}
@@ -394,7 +394,7 @@ class SetNrResults(Queue):
             click_list = nr_click * [Jobs.TryClick(selector_type="XPATH",
                                                    selector=f'//*[@id="result_slider"]/ol/li[{position}]',
                                                    task=self.name,
-                                                   captcha_mode='always')]
+                                                   captcha_mode='never')]
 
             self.jobs = self.jobs + click_list
         else:
@@ -405,4 +405,4 @@ class SetNrResults(Queue):
                                        task=self.name,
                                        captcha_mode='never'))
         self.jobs.append(Jobs.TryHandleAlertJob("ACCEPT", task=self.name,
-                                                captcha_mode='always'))
+                                                captcha_mode='never'))
