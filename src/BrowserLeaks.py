@@ -18,7 +18,7 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
 
 def single_update(experiment_id, date=datetime.now()):
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
-                                           start_at=14 * 60 * 60,
+                                           start_at=12 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
 
     key = api.get_access(KEYS['PRIMEMOVER']['username'],
@@ -28,24 +28,20 @@ def single_update(experiment_id, date=datetime.now()):
 
     crawler_list = Crawler.from_list(raw_experiment['crawlers'], date=date)
     crawler_list = UpdateObject(crawler_list, 'config')
-    ids_processed = [1646, 1653, 1660, 1670, 1681, 1701, 1708, 1728, 1740, 1741,
-                     1747, 1750, 1752, 1761, 1769, 1770, 1799, 1807, 1814, 1817,
-                     1843, 1847, 1854, 1856, 1863, 1875,
-                     1593, 1601, 1611, 1613, 1632, 1635, 1639, 1641, 1663, 1665,
-                     1668, 1675, 1689, 1691, 1695, 1703, 1723, 1724, 1725, 1727,
-                     1731, 1732, 1735, 1738]
-    re_do = [59, 124]
-    i = 246
+    with open(PRIMEMOVER_PATH + '/resources/other/processed.json', 'r') as file:
+        ids_processed = json.load(file)
+
+    i = 242
     crawler_list_2 = []
-    while len(crawler_list_2) < 50 and i < len(crawler_list):
+    while len(crawler_list_2) < 35 and i < len(crawler_list):
         individual = crawler_list[i]
         if individual.crawler_info.crawler_id in ids_processed:
             i += 1
             continue
-        individual.schedule = TimeHandler("US-CA-LOS_ANGELES",
+        individual.schedule = TimeHandler("US-NY-NEW_YORK",
                                           interval=120,
-                                          wake_time=21.5 * 60 * 60,
-                                          bed_time=24 * 60 * 60,
+                                          wake_time=8 * 60 * 60,
+                                          bed_time=9.5 * 60 * 60,
                                           date=date)
         individual.add_task(BrowserLeaks)
         crawler_list_2.append(individual)
