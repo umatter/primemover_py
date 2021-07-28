@@ -500,6 +500,7 @@ class CaptchaMode(Behavior):
             always -> always attempt to solve captchas when they occur
             never -> never attempt to solve captchas, proceed as if none exists
             random -> randomly attempt solve
+            after -> solve captcha after task is completed
         can be appended to any job, is not required?
     """
 
@@ -518,13 +519,13 @@ class CaptchaMode(Behavior):
             val = val.strip().lower()
         else:
             raise TypeError('Expected string')
-        if val in {'always', 'never', 'random'}:
+        if val in {'always', 'never', 'random', 'after'}:
             self._mode = val
         elif val == "":
             self._mode = 'never'
         else:
             raise ValueError(
-                f'Mode must be one of: [ always, never, random] received {val}')
+                f'Mode must be one of: [ always, never, random, after] received {val}')
 
 
 class Action(Behavior):

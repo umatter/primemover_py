@@ -31,7 +31,7 @@ def single_update(experiment_id, date=datetime.now()):
     with open(PRIMEMOVER_PATH + '/resources/other/processed.json', 'r') as file:
         ids_processed = json.load(file)
 
-    i = 242
+    i = 300
     crawler_list_2 = []
     while len(crawler_list_2) < 35 and i < len(crawler_list):
         individual = crawler_list[i]
