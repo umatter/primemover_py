@@ -31,11 +31,11 @@ def single_update(experiment_id, date=datetime.now()):
     with open(PRIMEMOVER_PATH + '/resources/other/processed.json', 'r') as file:
         ids_processed = json.load(file)
 
-    i = 300
+    i = 0
     crawler_list_2 = []
     while len(crawler_list_2) < 35 and i < len(crawler_list):
         individual = crawler_list[i]
-        if individual.crawler_info.crawler_id in ids_processed:
+        if individual.crawler_info.crawler_id not in ids_processed:
             i += 1
             continue
         individual.schedule = TimeHandler("US-NY-NEW_YORK",
