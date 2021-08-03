@@ -3,13 +3,16 @@ Behavior class and subclasses. These classes represent key value pairs, with
     a created_at and updated_at parameter that is not usually set as well as an optional description.
     The intent is to mirror the behaviors required by primemover_runner and check
     parameter validty and output shape.
-
 Available Classes:
     - Behavior: base class
     - URL: behavior containing a URL
     - Text: behavior containing Text (Type Job)
     - SelectionType: behavior containing the type of html selector to be used
+    - ClickSelectionType: analogous to SelectionType, different variable names
+    - CriteriaSelectionType: analogous to SelectionType, different variable names
     - Selector: behavior containing some selector
+    - ClickSelector: analogous to Selector, different variable names
+    - CriteriaSelector: analogous to Selector, different variable names
     - DecisionType: behavior specifying how a result is selected
     - ScrollDuration: behavior specifying the time for which to scroll
     - ScrollDirection: behavior controlling scroll direction
@@ -19,8 +22,9 @@ Available Classes:
     - TypingMode: behavior controlling how text is entered
     - TaskBehavior: specifies a macro task that a job is part of
     - FlagBehavior: some additional parameter with the key: 'flag'
-
-J.L. 11.2020
+    - CriteriaExtractorBehavior: matching mechanism
+    - CriteriaBaseBehavior: source of text for matching
+J.L. 11.2020, N.A. 06.2021
 """
 
 from urllib.parse import urlparse
@@ -197,9 +201,65 @@ class SelectionType(Behavior):
                 f'selector type must be in {{"XPATH", "CSS, "CLASS", "ID"}} got {value} instead.')
 
 
+class ClickSelectionType(Behavior):
+    """
+    ClickSelectionType behavior key value pair, used to share what type some selector
+    Public Attributes:
+        - click_selector_type: string, one of "XPATH|CSS|CLASS|ID"
+        - description: a description of the url, default: "Type of click selection"
+    """
+
+    def __init__(self, click_selector_type):
+
+        self.click_selector_type = click_selector_type
+        super().__init__(name='clickSelectionType', value=self.click_selector_type,
+                         description=f'Type of click selection')
+
+    @property
+    def click_selector_type(self):
+        return self._click_selector_type
+
+    @click_selector_type.setter
+    def click_selector_type(self, value):
+        value = value.upper().strip()
+        if value in {'XPATH', 'CSS', 'CLASS', 'ID'}:
+            self._click_selector_type = value
+        else:
+            raise ValueError(
+                f'click selector type must be in {{"XPATH", "CSS, "CLASS", "ID"}} got {value} instead.')
+
+
+class CriteriaSelectionType(Behavior):
+    """
+    CriteriaSelectionType behavior key value pair, used to share what type some selector
+    Public Attributes:
+        - criteria_selector_type: string, one of "XPATH|CSS|CLASS|ID"
+        - description: a description of the url, default: "Type of criteria selection"
+    """
+
+    def __init__(self, criteria_selector_type):
+
+        self.criteria_selector_type = criteria_selector_type
+        super().__init__(name='criteriaSelectionType', value=self.criteria_selector_type,
+                         description=f'Type of criteria selection')
+
+    @property
+    def criteria_selector_type(self):
+        return self._criteria_selector_type
+
+    @criteria_selector_type.setter
+    def criteria_selector_type(self, value):
+        value = value.upper().strip()
+        if value in {'XPATH', 'CSS', 'CLASS', 'ID'}:
+            self._criteria_selector_type = value
+        else:
+            raise ValueError(
+                f'criteria selector type must be in {{"XPATH", "CSS, "CLASS", "ID"}} got {value} instead.')
+
+
 class Selector(Behavior):
     """
-    Selector behavior key value pair, used to share a html selector
+    selector behavior key value pair, used to share a html selector
     Public Attributes:
         - selector: string, a valid XPATH|CSS|CLASS|ID selector
         - kind: string, what is the selector? use to specify purpose or type (optional)
@@ -220,6 +280,54 @@ class Selector(Behavior):
     def selector(self, value):
         # self._selector = EscapeStrings(value)
         self._selector = value
+
+
+class ClickSelector(Behavior):
+    """
+    Click selector behavior key value pair, used to share a html selector
+    Public Attributes:
+        - selector: string, a valid XPATH|CSS|CLASS|ID selector
+        - kind: string, what is the selector? use to specify purpose or type
+    """
+
+    def __init__(self, click_selector, kind=""):
+        self.click_selector = click_selector
+        self.kind = kind
+
+        super().__init__(name='clickSelector', value=self.click_selector,
+                         description=f'{kind} click selector')
+
+    @property
+    def click_selector(self):
+        return self._click_selector
+
+    @click_selector.setter
+    def click_selector(self, value):
+        self._click_selector = value
+
+
+class CriteriaSelector(Behavior):
+    """
+    Criteria selector behavior key value pair, used to share a html selector
+    Public Attributes:
+        - selector: string, a valid XPATH|CSS|CLASS|ID selector
+        - kind: string, what is the selector? use to specify purpose or type
+    """
+
+    def __init__(self, criteria_selector, kind=""):
+        self.criteria_selector = criteria_selector
+        self.kind = kind
+
+        super().__init__(name='criteriaSelector', value=self.criteria_selector,
+                         description=f'{kind} criteria selector')
+
+    @property
+    def criteria_selector(self):
+        return self._criteria_selector
+
+    @criteria_selector.setter
+    def criteria_selector(self, value):
+        self._criteria_selector = value
 
 
 class DecisionType(Behavior):
@@ -524,8 +632,44 @@ class CaptchaMode(Behavior):
         elif val == "":
             self._mode = 'never'
         else:
-            raise ValueError(
-                f'Mode must be one of: [ always, never, random, after] received {val}')
+            raise ValueError(f'Mode must be one of: [ always, never, random] received {val}')
+
+class CriteriaExtractorBehavior(Behavior):
+    """
+    Behavior of criteriaExtractor (string describing matching mechanism).
+    """
+
+    def __init__(self, criteria_extractor):
+        self.criteria_extractor = criteria_extractor
+        super().__init__(name='criteriaExtractor', value=self.criteria_extractor,
+                         description="Criteria extractor.")
+
+    @property
+    def criteria_extractor(self):
+        return self._criteria_extractor
+
+    @criteria_extractor.setter
+    def criteria_extractor(self, val):
+        self._criteria_extractor = val
+
+
+class CriteriaBaseBehavior(Behavior):
+    """
+    Behavior of criteriaBase (string describing matching source (attribute or text)).
+    """
+
+    def __init__(self, criteria_base):
+        self.criteria_base = criteria_base
+        super().__init__(name='criteriaBase', value=self.criteria_base,
+                         description="Criteria base.")
+
+    @property
+    def criteria_base(self):
+        return self._criteria_base
+
+    @criteria_base.setter
+    def criteria_base(self, val):
+        self._criteria_base = val
 
 
 class Action(Behavior):
@@ -558,3 +702,4 @@ class Action(Behavior):
         else:
             raise TypeError(
                 f'action must be type str')
+
