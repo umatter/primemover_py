@@ -14,7 +14,7 @@ All relevant code can be found in src. The purpose of this library being the ini
 as well as the assignment of tasks implies that some aspects of this library are intended to be edited by the user.
 Code can be found in src, with a few high level programs in the main directory. The main five being
 - ConfigurationFunctions.py
-- experiment_2_Test.py (Some experiment file, this should be migrated to a dedicated sub folder in a future update)
+- experiment_2.py (Some experiment file, this should be migrated to a dedicated sub folder in a future update)
 - Preferences.py
 - Results.py
 - UpdateExperiment.py.
@@ -87,14 +87,21 @@ airflow users create \
     --lastname <LASTNAME> \
     --role Admin \
     --email <E-MAIL>
-
+ 
 ```
-
+ 
 Run the following code to launch airflow:
 ```
-airflow scheduler &
 airflow webserver
 ```
+Connect a second terminal window and run:
+```
+airflow scheduler
+```
+You can run both from the same terminal by running the webserver with the option -D.
+This is risky as quitting one of the two processes will not end the other.
+If two schedulers are running errors will occur!
+
 The airflow UI is now accessible via your browser under localhost:<PORT>.
 If no bots are setup unpause the dag "primemover_test_dag" and execute a dag run without configurations.
 Once the run is complete visit "Admin" -> "XComs" and set the return values of the "create_experiment" task

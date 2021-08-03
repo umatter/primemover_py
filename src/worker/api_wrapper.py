@@ -93,6 +93,7 @@ def push_new(access_token,
 
 
 def fetch_results(access_token,
+                  experiment_id = None,
                   path=f'{PRIMEMOVER_PATH}/resources/raw_data/{datetime.today().date().isoformat()}.json'):
     """
     Wrapper for the queues-unreviewed method of the primemover api. These are all
@@ -106,7 +107,12 @@ def fetch_results(access_token,
     """
     if os.path.exists(path):
         raise FileExistsError('file already exists')
-    raw_data = requests.get(DOMAIN + 'queues-unreviewed',
+    if experiment_id is not None:
+        raw_data = requests.get(DOMAIN + f'experiments/{experiment_id}/queues-unreviewed',
+                                headers={
+                                    'authorization': 'Bearer ' + access_token})
+    else:
+        raw_data = requests.get(DOMAIN + 'queues-unreviewed',
                             headers={'authorization': 'Bearer ' + access_token})
     raw_dict = raw_data.json()
     with open(path, 'w') as f:
@@ -351,5 +357,15 @@ def fetch_crawlers_by_exp(access_token, experiment_id):
     exp = Experiment.from_dict(exp)
     crawler_list = []
     for c in exp.crawler_ids:
-        crawler_list.append(fetch_crawler(c))
+        try:
+            crawler_list.append(c)
+        except:
+            return Exception(f'Crawler id was {c}')
     return crawler_list
+
+
+def delete_exp(access_token, id):
+    requests.delete(DOMAIN + f'crawler/{id}', headers={'authorization': f'Bearer {access_token}'})
+def delete_queues_2(access_token,i):
+    resp = requests.delete(DOMAIN + f'queues/{i}', headers={'authorization': f'Bearer {access_token}'})
+    return resp

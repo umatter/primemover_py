@@ -9,14 +9,6 @@ import pandas as pd
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 
-def initialize_proxy_csv():
-    rotating = s3.fetch_rotating()
-    rotating.to_csv(PRIMEMOVER_PATH + "/resources/proxies/rotating_proxies.csv")
-
-    private = s3.fetch_rotating()
-    private.to_csv(PRIMEMOVER_PATH + "/resources/proxies/private_proxies.csv")
-
-
 def update_proxies(proxy_type='rotating'):
     # Check if files exist and fetch otherwhise.
     proxy_type = proxy_type.lower().strip()
@@ -44,7 +36,7 @@ def update_proxies(proxy_type='rotating'):
          'zip', 'lat', 'long', 'geoname_id', 'time_zone_id',
          'time_zone_code', 'proxy_asn', 'proxy_isp', 'loc_id',
          'active']]
-    existing_proxies = pd.read_csv(existing_path, index_col=0)
+    existing_proxies = pd.read_csv(existing_path)
     existing_proxies = existing_proxies.loc[existing_proxies['active'] == 1][
         ['provider', 'gateway_ip', 'gateway_ip_port', 'ip', 'type',
          'country_code', 'country_name', 'region_code', 'region_name', 'city',
@@ -78,7 +70,7 @@ def update_proxies(proxy_type='rotating'):
     if len(un_matched) != 0:
         raise Exception("something is wrong with the proxies!! pls fix")
 
-    in_proxies.to_csv(existing_path)
+    in_proxies.to_csv(existing_path, index=False)
 
     return update_dict
 

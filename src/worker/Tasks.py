@@ -3,7 +3,7 @@
  TODO re-structure tasks into a folder system for different tasks. Perhaps a base folder for reoccouring tasks and separate folders for different experiments.
  J.L. 03/2021
  """
-from src.worker.Queue import Queue
+from src.worker.PrimemoverQueue import Queue
 from src.worker import Jobs
 import random as r
 import src.Preferences as Pref
@@ -11,6 +11,7 @@ from src.ConfigurationFunctions import NoiseUtility
 import numpy as np
 import json
 import pathlib
+import pandas as pd
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
@@ -33,7 +34,8 @@ class GoogleSearch(Queue):
                          name=name,
                          description=description)
         # Add Job to Visit a webpage (google)
-        self.jobs.append(Jobs.VisitJob(url='https://www.google.com', captcha_mode='always'))
+        self.jobs.append(
+            Jobs.VisitJob(url='https://www.google.com', captcha_mode='always'))
 
         # Add Job to select the search field via XPATH and type the search term
         self.jobs.append(Jobs.EnterText(text=term,
@@ -46,13 +48,13 @@ class GoogleSearch(Queue):
                                         captcha_mode='always'),
 
                          )
-        #Add Job to scroll to bottom
+        # Add Job to scroll to bottom
         self.jobs.append(Jobs.Scroll(direction='DOWN',
-                                     duration=5,
+                                     percentage=100,
                                      captcha_mode='always'))
         self.jobs.append(Jobs.Scroll(direction='UP',
                                      percentage=100,
-                                     captcha_mode='always'))   # Add Job to select a result randomly
+                                     captcha_mode='always'))  # Add Job to select a result randomly
         if select_result:
             self.jobs.append(
                 Jobs.SingleSelect(click_selector='.//div[@class="yuRUbf"]/a',
@@ -71,7 +73,6 @@ class GoogleSearch(Queue):
                                          captcha_mode='always'))
 
 
-
 class VisitDirect(Queue):
     """
         Visit a media outlet and scroll for 2-3 minutes
@@ -79,7 +80,7 @@ class VisitDirect(Queue):
 
     def __init__(self, outlet_url, start_at):
         self._outlet_url = outlet_url
-        self._duration = r.randint(60, 180)  # choose scroll time in seconds
+        self._duration = r.randint(30, 60)  # choose scroll time in seconds
         super().__init__(start_at=start_at,
                          name='Visit Direct',
                          description='Visit a media outlet and scroll for 2-3 minutes.')
@@ -98,12 +99,13 @@ class VisitViaGoogle(Queue):
 
     def __init__(self, outlet_name, start_time):
         self._outlet_name = outlet_name
-        self._duration = r.randint(60, 180)  # choose scroll time in seconds
+        self._duration = r.randint(30, 60)  # choose scroll time in seconds
         super().__init__(start_at=start_time,
                          name='Visit via Googe',
                          description='Visit a media outlet via google and scroll for some time.')
         # Add Job to Visit a  Google
-        self.jobs.append(Jobs.VisitJob(url='https://www.google.com', captcha_mode='always'))
+        self.jobs.append(
+            Jobs.VisitJob(url='https://www.google.com', captcha_mode='always'))
 
         # Add Job to select the search field via XPATH and type the outlets name
         self.jobs.append(Jobs.EnterText(text=self._outlet_name,
@@ -231,6 +233,14 @@ class VisitFrequentDirect(VisitDirect):
         super().__init__(outlet_url=url, start_at=start_at)
 
 
+class VisitNeutralDirect(VisitDirect):
+    def __init__(self, start_at,
+                 file_path='/resources/input_data/neutraldomains_pool.csv'):
+        domains = pd.read_csv(PRIMEMOVER_PATH + file_path)
+        url = r.choice(domains['redirect_url'])
+        super().__init__(outlet_url=url, start_at=start_at)
+
+
 class PoliticalSearchNoUtility(GoogleSearch):
     PASS_CRAWLER = True
     """
@@ -291,62 +301,116 @@ class BrowserLeaks(Queue):
         self.jobs.append(
             Jobs.VisitJob(url="https://browserleaks.com/ip", flag='leak_ip',
                           task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
 
         # JavaScript
         self.jobs.append(
             Jobs.VisitJob(url="https://browserleaks.com/javascript",
                           flag='leak_javascript', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
 
         # Webrtc
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/webrtc",
                                        flag='leak_webrtc', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
 
         # Canvas
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/canvas",
                                        flag='leak_canvas', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
 
         # Webgl
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/webgl",
                                        flag='leak_webgl', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
         # Fonts
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/fonts",
                                        flag='leak_fonts', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
         # SSL
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/ssl",
                                        flag='leak_ssl', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
         # GeoLocation
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/geo",
                                        flag='leak_geo', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
         # Features
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/features",
                                        flag='leak_features',
                                        task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
         # Proxy
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/proxy",
                                        flag='leak_proxy', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
 
         # Java system
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/java",
                                        flag='leak_java', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
 
         # Flash
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/flash",
                                        flag='leak_flash', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
 
         # Silverlight
         self.jobs.append(
             Jobs.VisitJob(url="https://browserleaks.com/silverlight",
                           flag='leak_silverlight', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(5, 10)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
+
+
+class SetNrResults(Queue):
+    PASS_CRAWLER = False
+    """
+    Visit Google and adjust the number of search results
+    """
+
+    def __init__(self, start_at, nr_results=50):
+        super().__init__(start_at=start_at,
+                         name='Set_Nr_Results',
+                         )
+
+        self.jobs.append(
+            Jobs.VisitJob(url="https://www.google.com", task=self.name,
+                          captcha_mode='never'))
+        self.jobs.append(Jobs.TryClick(selector_type="XPATH",
+                                       selector='//*[@id="Mses6b"]',
+                                       task=self.name,
+                                       captcha_mode='never'))
+
+        self.jobs.append(Jobs.TryClick(selector_type="XPATH",
+                                       selector='//*[@id="dEjpnf"]/li[1]',
+                                       task=self.name,
+                                       captcha_mode='never'))
+        nr_results = round(nr_results, -1)
+        click_dict = {10: (5, 1), 20: (4, 2), 30: (3, 3), 40: (2, 4),
+                      50: (1, 5), 100: (0, 6)}
+
+        if nr_results in click_dict.keys():
+            position = click_dict[nr_results][1]
+            nr_click = click_dict[nr_results][0]
+            click_list = 5 * [Jobs.TryClick(selector_type="XPATH",
+                                                   selector=f'//*[@id="result_slider"]/ol/li[{6}]',
+                                                   task=self.name,
+                                                   captcha_mode='never')]
+            click_list += nr_click * [Jobs.TryClick(selector_type="XPATH",
+                                                   selector=f'//*[@id="result_slider"]/ol/li[{position}]',
+                                                   task=self.name,
+                                                   captcha_mode='never')]
+
+            self.jobs = self.jobs + click_list
+        else:
+            raise ValueError('Can only set 10,20,30,40,50 or 100 results')
+
+
+        self.jobs.append(Jobs.TryClick(selector_type="XPATH",
+                                       selector='//*[@id="form-buttons"]/div[1]',
+                                       task=self.name,
+                                       captcha_mode='never'))
+        self.jobs.append(Jobs.TryHandleAlertJob("ACCEPT", task=self.name,
+                                                captcha_mode='never'))
+
+        self.jobs.append(Jobs.Wait(5, task = self.name, captcha_mode='after'))

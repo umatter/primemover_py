@@ -68,7 +68,8 @@ class VisitJob(Job):
             - captcha_mode: str, one of {'always', 'never', 'random'}
         """
         super().__init__(job_type='visitjob', name='Visit',
-                         description=f'Visit {url}', task=task, flag=flag, captcha_mode=captcha_mode)
+                         description=f'Visit {url}', task=task, flag=flag,
+                         captcha_mode=captcha_mode)
         self.behaviors.append(Behavior.URL(url))
 
 
@@ -261,6 +262,7 @@ class SingleSelect(Job):
 class TryClick(Job):
     """
     click some element (differs from select, as no choices are made)
+    This Job does not scroll to the element! It will do nothing if the element is not visible
     """
 
     def __init__(self, selector, selector_type='XPATH',
@@ -348,3 +350,42 @@ class Scroll(Job):
         self.behaviors.append(
             Behavior.ScrollDirection(direction))
 
+class HandleAlertJob(Job):
+    """Handle some browser alert, e.g. upon changing search settings in google.
+        These are browser specific and are therefore navigated differently"""
+    def __init__(self, action='ACCEPT',
+                 task=None,
+                 flag=None,
+                 captcha_mode='never'):
+        """
+        Arguments:
+            - action: string, ACCEPT or REJECT. Specifies how to handle an alert
+            """
+
+        super().__init__(job_type=f'HandleAlertJob',
+                         name=f'Handle Alert Job',
+                         description=f'{action.lower().capitalize()} an alert',
+                         task=task,
+                         flag=flag,
+                         captcha_mode=captcha_mode)
+
+
+class TryHandleAlertJob(Job):
+    """Handle some browser alert, e.g. upon changing search settings in google.
+        These are browser specific and are therefore navigated differently,
+        same as HandleAlertJob, but doesnt raise an error on failure"""
+    def __init__(self, action='ACCEPT',
+                 task=None,
+                 flag=None,
+                 captcha_mode='never'):
+        """
+        Arguments:
+            - action: string, ACCEPT or REJECT. Specifies how to handle an alert
+            """
+
+        super().__init__(job_type=f'HandleAlertJob',
+                         name=f'TryHandle Alert Job',
+                         description=f'{action.lower().capitalize()} an alert',
+                         task=task,
+                         flag=flag,
+                         captcha_mode=captcha_mode)

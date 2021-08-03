@@ -175,7 +175,7 @@ class Text(Behavior):
 
 class SelectionType(Behavior):
     """
-    SelectionType behavior key value pair, used to share what type some selector
+    SelectionType behavior key value pair, used to share the type of some selector
     Public Attributes:
         - selector_type: string, one of "XPATH|CSS|CLASS|ID"
         - description: a description of the url, default: "Type of selection"
@@ -262,7 +262,7 @@ class Selector(Behavior):
     selector behavior key value pair, used to share a html selector
     Public Attributes:
         - selector: string, a valid XPATH|CSS|CLASS|ID selector
-        - kind: string, what is the selector? use to specify purpose or type
+        - kind: string, what is the selector? use to specify purpose or type (optional)
     """
 
     def __init__(self, selector, kind=""):
@@ -608,6 +608,7 @@ class CaptchaMode(Behavior):
             always -> always attempt to solve captchas when they occur
             never -> never attempt to solve captchas, proceed as if none exists
             random -> randomly attempt solve
+            after -> solve captcha after task is completed
         can be appended to any job, is not required?
     """
 
@@ -626,13 +627,12 @@ class CaptchaMode(Behavior):
             val = val.strip().lower()
         else:
             raise TypeError('Expected string')
-        if val in {'always', 'never', 'random'}:
+        if val in {'always', 'never', 'random', 'after'}:
             self._mode = val
         elif val == "":
             self._mode = 'never'
         else:
             raise ValueError(f'Mode must be one of: [ always, never, random] received {val}')
-
 
 class CriteriaExtractorBehavior(Behavior):
     """
@@ -670,3 +670,36 @@ class CriteriaBaseBehavior(Behavior):
     @criteria_base.setter
     def criteria_base(self, val):
         self._criteria_base = val
+
+
+class Action(Behavior):
+    """Controls the action for a handle alert job. Specifically whether to accept or reject the alert.
+    Public attributes:
+    -action: str, in {"ACCEPT","REJECT"}
+            ACCEPT: accept alert (default)
+            REJECT: reject alert
+
+    """
+
+    def __init__(self, action="ACCEPT"):
+        self.action = action
+        super().__init__(name='Action', value=self.action,
+                         description=f'Specify whether or not to accept an alert message')
+
+    @property
+    def action(self):
+        return self._action
+
+    @action.setter
+    def action(self, val):
+        if type(val) is str:
+            val.strip().upper()
+            if val in {"ACCEPT", "REJECT"}:
+                self._action = val
+            else:
+                raise ValueError(
+                    f'Action must be one of {{"ACCEPT","REJECT"}}, got {val}')
+        else:
+            raise TypeError(
+                f'action must be type str')
+

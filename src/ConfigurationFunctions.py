@@ -39,10 +39,10 @@ def NoiseUtility():
     """
     Returns: epsilon: float, noise parameter when determining utility
     """
-    return float(gumbel(-0.4557735, 0.793006, 1)[0])
+    return float(gumbel(-0.4557735, 0.793006, 1)[0])/10
 
 
-def SelectSearchTerms(pi, alpha_hat, tau_hat_ik, k=10):
+def SelectSearchTerms(pi, alpha_hat, tau_hat_ik, k=40):
     """
     Select a subset of all search terms. Terms come from two sepparate pools of terms.
     Arguments:
@@ -56,7 +56,7 @@ def SelectSearchTerms(pi, alpha_hat, tau_hat_ik, k=10):
     utilities = []
     for row in terms.index:
         term_k, pi_hat_k = terms.loc[row]
-        epsilon_ik = NoiseUtility() / 10
+        epsilon_ik = NoiseUtility()
         utilities.append((search_utility_v_ik(pi_i=pi,
                                               pi_hat_k=pi_hat_k,
                                               epsilon_ik=epsilon_ik,
@@ -177,6 +177,12 @@ def location():
     return "US-AL-AUBURN"
 
 
+def usage_type():
+    choice = \
+    r.choices(['only_search', 'only_direct', 'both'], [0.25, 0.25, 0.5])[0]
+    return choice
+
+
 """
 Profile configuration functions
 """
@@ -196,29 +202,43 @@ def language():
     return choice
 
 
-def geolocation():
-    choice = r.choices(['BLOCK', 'ALLOW'], [0.2, 0.8])[0]
+def geolocation(option_choice = 'random'):
+    if option_choice == 'random':
+        choice = r.choices(['BLOCK', 'ALLOW'], [0.2, 0.8])[0]
+    elif option_choice == 'geolocation':
+        choice = 'BLOCK'
+    else:
+        choice = 'ALLOW'
     return choice
 
 
-def do_not_track():
-    choice = r.choices([0, 1], [0.8, 0.2])[0]
+def do_not_track(option_choice = 'random'):
+    if option_choice == 'random':
+        choice = r.choices([0, 1], [0.8, 0.2])[0]
+    elif option_choice == 'do_not_track':
+        choice = 1
+    else:
+        choice = 0
     return choice
 
 
-def hardware_canvas():
-    choice = r.choices(['BLOCK', 'NOISE'], [0.2, 0.8])[0]
+def hardware_canvas(option_choice = 'random'):
+    if option_choice == 'random':
+        choice = r.choices(['BLOCK', 'NOISE'], [0.2, 0.8])[0]
+    elif option_choice == 'hardware_canvas':
+        choice = 'BLOCK'
+    else:
+        choice = 'NOISE'
     return choice
 
 
-def local_storage():
-    choice = r.choices([True, False], [0.8, 0.2])[0]
-    return choice
-
-
-def usage_type():
-    choice = \
-    r.choices(['only_search', 'only_direct', 'both'], [0.25, 0.25, 0.5])[0]
+def local_storage(option_choice = 'random'):
+    if option_choice == 'random':
+        choice = r.choices([True, False], [0.8, 0.2])[0]
+    elif option_choice == 'local_storage':
+        choice = False
+    else:
+        choice = True
     return choice
 
 

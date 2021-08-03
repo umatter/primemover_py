@@ -42,7 +42,7 @@ def UpdateObject(crawler_list, object_name='agent'):
     elif object_name == 'config':
         for c in crawler_list:
             location = c.agent.location
-            c.config = ConfigureProfile.Config.from_dict(updated_dict[c.configuration.info.configuration_id], location)
+            c.configuration = ConfigureProfile.Config.from_dict(updated_dict[c.configuration.info.configuration_id], location)
     else:
         raise Exception('This should not happen!')
     return crawler_list

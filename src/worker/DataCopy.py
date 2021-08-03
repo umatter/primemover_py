@@ -7,6 +7,7 @@ import pandas as pd
 from src.worker import s3_wrapper
 import src.auxiliary.result_select as result_select
 import src.worker.api_wrapper as api_wrapper
+from src.worker.UpdateObject import UpdateObject
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
@@ -24,9 +25,14 @@ def extract_data(experiment_id: int):
     input: str, path to json containing generated crawlers
     output: pandas DataFrame, columns all parameters set in the configuration functions
     """
-    crawler_list_raw = api_wrapper.fetch_crawlers_by_exp(ACCESS_TOKEN,
-                                                         experiment_id)
-    crawler_list = Crawler.from_list(crawler_list_raw)
+
+    crawler_list_raw = api_wrapper.fetch_experiment(access_token=ACCESS_TOKEN,
+                                                    id=
+                                                    experiment_id)
+
+    crawler_list = Crawler.from_list(crawler_list_raw['crawlers'])
+    crawler_list = UpdateObject(crawler_list, 'config')
+
     data_restructure = []
     date = datetime.today().date().isoformat()
     for c in crawler_list:
@@ -54,9 +60,12 @@ def extract_list_params(object_name, experiment_id):
     input:
         object_name: str, one of media or terms
     """
-    crawler_list_raw = api_wrapper.fetch_crawlers_by_exp(ACCESS_TOKEN,
-                                                         experiment_id)
-    crawler_list = Crawler.from_list(crawler_list_raw)
+    crawler_list_raw = api_wrapper.fetch_experiment(access_token=ACCESS_TOKEN,
+                                                    id=
+                                                    experiment_id)
+
+    crawler_list = Crawler.from_list(crawler_list_raw['crawlers'])
+    crawler_list = UpdateObject(crawler_list, 'config')
 
     data_restructure = []
     date = datetime.today().date().isoformat()
@@ -81,16 +90,19 @@ def extract_list_params(object_name, experiment_id):
     return pd.DataFrame(data=data_restructure)
 
 
-def extract_selection_data( experiment_id, path_cleaned_data):
+def extract_selection_data(experiment_id, path_cleaned_data):
     # Run with results, not after update!!! Relevant parameters will otherwhise be different.
     path_jobs = f'{PRIMEMOVER_PATH}/{path_cleaned_data}'
 
     with open(path_jobs) as f:
         raw_data = json.load(f)
 
-    crawler_list_raw = api_wrapper.fetch_crawlers_by_exp(ACCESS_TOKEN,
-                                                         experiment_id)
-    crawler_list = Crawler.from_list(crawler_list_raw)
+    crawler_list_raw = api_wrapper.fetch_experiment(access_token=ACCESS_TOKEN,
+                                                    id=
+                                                    experiment_id)
+
+    crawler_list = Crawler.from_list(crawler_list_raw['crawlers'])
+    crawler_list = UpdateObject(crawler_list, 'config')
 
     crawler_data_dict = {}
     for c in crawler_list:
@@ -149,11 +161,18 @@ def extract_selection_data( experiment_id, path_cleaned_data):
 
 def create_copy(experiment_id, date=datetime.now()):
     date = date.date().isoformat()
-    s3_wrapper.append_csv(f'config_{experiment_id}/single_params.csv', extract_data(experiment_id))
-    s3_wrapper.append_csv(f'config_{experiment_id}/terms.csv', extract_list_params('terms', experiment_id))
-    s3_wrapper.append_csv(f'config_{experiment_id}/media.csv', extract_list_params('media', experiment_id))
-    s3_wrapper.append_csv(f'selected_{experiment_id}/selections.csv', extract_selection_data(experiment_id, f'resources/cleaned_data/{date}.json'))
+    s3_wrapper.append_csv(f'config_{experiment_id}/single_params.csv',
+                          extract_data(experiment_id))
+    s3_wrapper.append_csv(f'config_{experiment_id}/terms.csv',
+                          extract_list_params('terms', experiment_id))
+    s3_wrapper.append_csv(f'config_{experiment_id}/media.csv',
+                          extract_list_params('media', experiment_id))
+    s3_wrapper.append_csv(f'selected_{experiment_id}/selections.csv',
+                          extract_selection_data(experiment_id,
+                                                 f'resources/cleaned_data/{date}.json'))
 
 
 if __name__ == "__main__":
-    create_copy(12)
+    s3_wrapper.append_csv(f'selected_{22}/selections.csv',
+                          extract_selection_data(22,
+                                                 f'resources/cleaned_data/{"2021-06-07"}.json'))

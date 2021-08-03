@@ -9,6 +9,7 @@ import warnings
 import re
 import pathlib
 import src.ConfigurationFunctions as Config
+import random
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
@@ -27,7 +28,8 @@ class Profile:
                  service_worker_cache='MultiloginDefault',
                  user_agent='MultiloginDefault',
                  platform='MultiloginDefault',
-                 hardware_concurrency='MultiloginDefault'
+                 hardware_concurrency='MultiloginDefault',
+                 base_dict=None
                  ):
         """
         ArgumentsTo
@@ -46,29 +48,38 @@ class Profile:
             - local_storage: boolean, default:'MultiloginDefault' will allow multilogin to set. If local_storage is False, service_worker_cache is set to False
             - service_worker_cache: boolean, default: 'MultiloginDefault' will allow multilogin to set. If local_storage is False, service_worker_cache can not be set to True
         """
+
         self.os = os
         self.name = name
         self.browser = browser
+
+        privacy_setting = random.choices([True, False], [0.75, 0.25])[0]
+        if privacy_setting:
+            option = random.choice(
+                ['geolocation', 'do_not_track', 'hardware_canvas',
+                 'local_storage'])
+        else:
+            option = 'None'
         if language == 'PyDefault':
             self.language = Config.language()
         else:
             self.language = language
         self._fill_based_on_external_ip = None
         if geolocation == 'PyDefault':
-            self.geolocation = Config.geolocation()
+            self.geolocation = Config.geolocation(option)
         else:
             self.geolocation = geolocation
         if do_not_track == 'PyDefault':
-            self.do_not_track = Config.do_not_track()
+            self.do_not_track = Config.do_not_track(option)
         else:
             self.do_not_track = do_not_track
         if hardware_canvas == 'PyDefault':
-            self.hardware_canvas = Config.hardware_canvas()
+            self.hardware_canvas = Config.hardware_canvas(option)
         else:
             self.hardware_canvas = hardware_canvas
 
         if local_storage == 'PyDefault':
-            self.local_storage = Config.local_storage()
+            self.local_storage = Config.local_storage(option)
         else:
             self.local_storage = local_storage
 
@@ -77,6 +88,8 @@ class Profile:
         self.resolution = resolution
         self.user_agent = user_agent
         self.platform = platform
+
+        self.base_dict = base_dict
 
     @property
     def os(self):
@@ -173,7 +186,7 @@ class Profile:
         else:
             self._fill_based_on_external_ip = None
             raise ValueError(
-                f'os must be one off {valid_settings}, received {string}')
+                f'geolocation must be one off {valid_settings}, received {string}')
 
     @property
     def do_not_track(self):
@@ -274,24 +287,47 @@ class Profile:
             raise ValueError(
                 f'Invalid hardware_canvas setting, should be one of REAL,BLOCK, NOISE')
 
-    def as_dict(self):
-        base_dict = {
-            "name": self.name,
-            "os": self.os,
-            "browser": self.browser,
-            "network": {
-                "proxy": {
-                    "type": "%%PROXYTYPE%%",
-                    "host": "%%PROXYHOST%%",
-                    "port": "%%PROXYPORT%%",
-                    "username": "%%PROXYUSERNAME%%",
-                    "password": "%%PROXYPASSWORD%%"
-                },
-                "dns": []
+    @property
+    def base_dict(self):
+        return self._base_dict
+
+    @base_dict.setter
+    def base_dict(self, val):
+
+        if type(val) is dict and len(
+                {'name', 'os', 'browser', 'network'}.intersection(val)) == 4:
+
+            val['network']['proxy'] = {
+                "type": "%%PROXYTYPE%%",
+                "host": "%%PROXYHOST%%",
+                "port": "%%PROXYPORT%%",
+                "username": "%%PROXYUSERNAME%%",
+                "password": "%%PROXYPASSWORD%%"
             }
-        }
+            val['network']['dns'] = []
+
+            self._base_dict = val
+        else:
+            self._base_dict = {
+                "name": self.name,
+                "os": self.os,
+                "browser": self.browser,
+                "network": {
+                    "proxy": {
+                        "type": "%%PROXYTYPE%%",
+                        "host": "%%PROXYHOST%%",
+                        "port": "%%PROXYPORT%%",
+                        "username": "%%PROXYUSERNAME%%",
+                        "password": "%%PROXYPASSWORD%%"
+                    },
+                    "dns": []
+                }
+            }
+
+    def as_dict(self):
+        base_dict = self.base_dict
         navigator = not (
-                    self.language is None and self.do_not_track is None and self.user_agent is None and self.hardware_concurrency is None and self.platform is None)
+                self.language is None and self.do_not_track is None and self.user_agent is None and self.hardware_concurrency is None and self.platform is None)
         if navigator:
             base_dict['navigator'] = {}
             if self.language not in [None, 'MultiloginDefault']:
@@ -325,6 +361,36 @@ class Profile:
 
         return base_dict
 
+    @classmethod
+    def from_dict(cls, profile_dict: dict):
+        navigator = profile_dict.get('navigator', {})
+
+
+        profile_object = cls(
+            name=profile_dict.get('name', "%%AGENTID%%"),
+            os=profile_dict.get('os', 'win'),
+            browser=profile_dict.get('browser', 'mimic'),
+            language=navigator.get('language',
+                                   "PyDefault"),
+            # UPDATE Once Resolution is fully implemented
+            resolution='MultiloginDefault',
+
+            geolocation=profile_dict.get('geolocation', {}).get('mode',
+                                                              "PyDefault"),
+            do_not_track=navigator.get('doNotTrack',
+                                       "PyDefault"),
+            hardware_canvas=profile_dict.get('canvas', {}).get('mode',
+                                                              "PyDefault"),
+            local_storage=profile_dict.get('storage', {}).get('local',
+                                                              "PyDefault"),
+            service_worker_cache=profile_dict.get('storage', {}).get(
+                'serviceWorkerCache', 'MultiloginDefault'),
+            user_agent=navigator.get('user_agent', 'MultiloginDefault'),
+            platform=navigator.get('platform', 'MultiloginDefault'),
+            hardware_concurrency=navigator.get('hardware_concurrency', 'MultiloginDefault'),
+            base_dict=profile_dict
+        )
+        return profile_object
 
 
 if __name__ == '__main__':
@@ -339,12 +405,3 @@ if __name__ == '__main__':
               'w') as file:
         json.dump(profile_base.as_dict(), file, indent='  ')
 
-    profile_full = Profile(language="en-us;q=0.6, en-uk;q=0.3, it;q=0.1",
-                           geolocation='ALLOW',
-                           do_not_track=0,
-                           hardware_canvas='BLOCK',
-                           local_storage=True
-                           )
-    with open(PRIMEMOVER_PATH + '/resources/examples/example_profile_1.json',
-              'w') as file:
-        json.dump(profile_full.as_dict(), file, indent='  ')

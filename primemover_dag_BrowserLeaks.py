@@ -3,7 +3,9 @@ import sys
 
 PATH_MODULES = '/primemover_py'
 sys.path += [PATH_MODULES]
+
 # The DAG object; we'll need this to instantiate a DAG
+from airflow.models import Variable
 
 from airflow import DAG
 # Operators; we need this to operate!
@@ -15,7 +17,7 @@ from airflow.utils.dates import days_ago
 import src
 
 default_args = {
-    'owner': 'johannes',
+    'owner': 'johannesl',
     'depends_on_past': False,
     'start_date': datetime(2021, 1, 1),
     'email': ['johannesl@me.com'],
@@ -39,18 +41,29 @@ default_args = {
     # 'trigger_rule': 'all_success'
 }
 dag = DAG(
-    'new_experiment',
+    'BrowserLeaks',
     default_args=default_args,
-    description='create new crawlers',
+    description='Add Browser Leaks tasks',
     schedule_interval=None,
     catchup=False
 )
 
 # t1, t2 and t3 are examples of tasks created by instantiating operators
+
+
 t1 = PythonOperator(
-    task_id='create_experiment',
-    python_callable=src.experiment_2.launch_experiment,
-    dag=dag,
+    task_id='addTasks',
+    python_callable=src.BrowserLeaks.single_update,
+    op_kwargs={'date': datetime.now(),
+               'experiment_id': Variable.get("experiment_id", 'id_missing')},
+    dag=dag
 )
+
+t2 = PythonOperator(
+    task_id='cleanup',
+    python_callable=src.worker.CleanUp.cleanup,
+    op_kwargs={'date': datetime.now(),
+               'nr_days': 5},
+    dag=dag)
 
 
