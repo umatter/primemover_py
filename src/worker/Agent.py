@@ -126,8 +126,21 @@ class Agent:
                            description=agent_dict.get('description'),
                            identification=agent_dict.get('identification'),
                            multilogin_id=agent_dict.get('multilogin_id'),
-                           multilogin_profile=agent_dict.get(
-                               'multilogin_profile'),
+                           multilogin_profile=Profile.from_dict(json.loads(agent_dict.get(
+                               'multilogin_profile'))),
                            location=agent_dict.get('location'),
                            info=AgentInfo.from_dict(agent_dict))
         return agent_object
+
+if __name__ == '__main__':
+    from src.worker import api_wrapper as api
+    with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
+        KEYS = json.load(f)
+    key = api.get_access(KEYS['PRIMEMOVER']['username'],
+                         KEYS['PRIMEMOVER']['password'])
+    for id in range(1550, 1800):
+        file = api.fetch_agent(id)
+        test = Agent.from_dict(file)
+        comp = json.loads(file['multilogin_profile'])
+        prof = Profile.from_dict(json.loads(file['multilogin_profile']))
+        assert comp == prof.as_dict(), f'Oh No! {id},\n {comp} \n {prof}'
