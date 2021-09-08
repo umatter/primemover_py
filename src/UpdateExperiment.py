@@ -74,15 +74,15 @@ def single_update(date, experiment_id, manual=False):
                                                         None}:
             individual.add_task(Tasks.PoliticalSearch,
                                 to_session=session_id)
-            individual.add_task(Tasks.PoliticalSearch,
-                                to_session=session_id)
+            # individual.add_task(Tasks.PoliticalSearch,
+            #                     to_session=session_id)
         if individual.flag in {'left', 'right'} and \
                 individual.configuration.usage_type in {'only_direct', 'both',
                                                         None}:
             individual.add_task(Tasks.VisitMedia,
                                 to_session=session_id)
-            individual.add_task(Tasks.VisitMedia,
-                                to_session=session_id)
+            # individual.add_task(Tasks.VisitMedia,
+            #                     to_session=session_id)
 
         if individual.configuration.usage_type in {'only_direct', 'both', None}:
             individual.add_task(Tasks.VisitNeutralDirect,
