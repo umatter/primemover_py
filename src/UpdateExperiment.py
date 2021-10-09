@@ -15,7 +15,7 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
 
 
-def single_update(date, experiment_id, manual=False):
+def single_update(date_time, experiment_id, manual=False):
     "Fetch Neutral terms from s3 Bucket"
     neutral_path = PRIMEMOVER_PATH + '/resources/input_data/neutral_searchterms_pool.json'
     if not os.path.exists(neutral_path):
@@ -37,10 +37,10 @@ def single_update(date, experiment_id, manual=False):
     experiment_id)
 
     crawler_list = Crawler.Crawler.from_list(raw_experiment['crawlers'],
-                                             date=date)
+                                             date_time=date_time)
     crawler_list = UpdateObject(crawler_list, 'config')
     "Compute Proxy Changes"
-    update_proxies_dict = update_all_proxies()
+    update_proxies_dict = None
 
     crawler_list_neutral = []
     crawler_list_political = []
@@ -51,9 +51,9 @@ def single_update(date, experiment_id, manual=False):
             crawler_list_neutral.append(crawler)
 
     if os.path.exists(
-            f'{PRIMEMOVER_PATH}/resources/cleaned_data/{date.isoformat()}.json'):
+            f'{PRIMEMOVER_PATH}/resources/cleaned_data/{date_time.date().isoformat()}.json'):
         with open(
-                f'{PRIMEMOVER_PATH}/resources/cleaned_data/{date.isoformat()}.json',
+                f'{PRIMEMOVER_PATH}/resources/cleaned_data/{date_time.date().isoformat()}.json',
                 'r') as file:
             cleaned_data = json.load(file)
         crawler_list_neutral = [
@@ -97,8 +97,8 @@ def single_update(date, experiment_id, manual=False):
         c.schedule = TimeHandler("US-CA-LOS_ANGELES",
                                  interval=120,
                                  wake_time=18 * 60 * 60,
-                                  bed_time=21 * 60 * 60,
-                                 date=date)
+                                 bed_time=21 * 60 * 60,
+                                 date_time=date_time)
         c.add_task(Tasks.NeutralGoogleSearch, to_session=True,
                    params={'term': neutral[1]})
         c.add_task(Tasks.NeutralGoogleSearch, to_session=True,
@@ -131,7 +131,7 @@ def single_update(date, experiment_id, manual=False):
                                    path=f'{PRIMEMOVER_PATH}/resources/updates/generated.json')
         if return_data.status_code == 200:
             with open(
-                    f'{PRIMEMOVER_PATH}/resources/updates/{date.date().isoformat()}.json',
+                    f'{PRIMEMOVER_PATH}/resources/updates/{date_time.date().isoformat()}.json',
                     'w') as file:
                 json.dump(return_data.json(), file, indent='  ')
             # Delete neutral terms if push was successful
@@ -148,6 +148,6 @@ if __name__ == "__main__":
     # for day in range(13):
     #     single_update(day_delta=day)
     #     print((datetime.now().date() + timedelta(days=day)).isoformat())
-    single_update(datetime.now(),
+    single_update(date_time=datetime.now(),
                   experiment_id=41,
                   manual=True)

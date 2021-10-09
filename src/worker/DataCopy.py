@@ -36,7 +36,7 @@ def extract_data(experiment_id: int):
     data_restructure = []
     date = datetime.today().date().isoformat()
     for c in crawler_list:
-        new_row = {'date': date, 'flag': c.flag}
+        new_row = {'date_time': date, 'flag': c.flag}
         if c.crawler_info is not None:
             new_row['crawler_id'] = c.crawler_info.crawler_id
         else:
@@ -70,7 +70,7 @@ def extract_list_params(object_name, experiment_id):
     data_restructure = []
     date = datetime.today().date().isoformat()
     for c in crawler_list:
-        base_row = {'date': date, 'flag': c.flag}
+        base_row = {'date_time': date, 'flag': c.flag}
         if c.crawler_info is not None:
             base_row['crawler_id'] = c.crawler_info.crawler_id
         else:

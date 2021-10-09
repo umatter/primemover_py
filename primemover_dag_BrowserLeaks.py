@@ -54,7 +54,7 @@ dag = DAG(
 t1 = PythonOperator(
     task_id='addTasks',
     python_callable=src.BrowserLeaks.single_update,
-    op_kwargs={'date': datetime.now(),
+    op_kwargs={'date_time': datetime.now(),
                'experiment_id': Variable.get("experiment_id", 'id_missing')},
     dag=dag
 )
@@ -62,7 +62,7 @@ t1 = PythonOperator(
 t2 = PythonOperator(
     task_id='cleanup',
     python_callable=src.worker.CleanUp.cleanup,
-    op_kwargs={'date': datetime.now(),
+    op_kwargs={'date_time': datetime.now(),
                'nr_days': 5},
     dag=dag)
 

@@ -65,7 +65,7 @@ class Proxy:
             if len(proxies) >= 1:
                 return proxies.iloc[0]['loc_id']
         raise LookupError(
-            'Cant match the hostname and port in the existing proxy files. Check if these are up to date.')
+            'Cant match the hostname and port in the existing proxy files. Check if these are up to date_time.')
 
     def update_proxy(self, update_dict):
         """

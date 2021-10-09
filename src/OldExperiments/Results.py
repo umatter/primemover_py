@@ -217,7 +217,7 @@ class SessionResult:
 
 
 def export_results(results, date=datetime.today().date().isoformat()):
-    # existing_crawler_path = f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date() + timedelta(days=-1)).isoformat()}.json'
+    # existing_crawler_path = f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date_time() + timedelta(days=-1)).isoformat()}.json'
     existing_crawler_path = PRIMEMOVER_PATH + '/resources/updates/test_2020-12-22.json'
     out_path = f'{PRIMEMOVER_PATH}/resources/cleaned_data/with_crawler_{date}.json'
     with open(existing_crawler_path, 'r') as file:
@@ -300,4 +300,4 @@ if __name__ == "__main__":
     #         f'resources/cleaned_data/2020-10-16.json',
     #         'w') as file:
     #     json.dump(combined_session_2, file, indent='  ')
-    # export_results(combined_session_2, date='2020-10-16')
+    # export_results(combined_session_2, date_time='2020-10-16')

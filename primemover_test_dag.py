@@ -29,7 +29,7 @@ default_args = {
     # 'queue': 'bash_queue',
     # 'pool': 'backfill',
     # 'priority_weight': 10,
-    # 'end_ date': datetime(2020, 1, 1),
+    # 'end_ date_time': datetime(2020, 1, 1),
     # 'wait_for_downstream': False,
     # 'dag': dag,
     # 'sla': timedelta(hours=2),

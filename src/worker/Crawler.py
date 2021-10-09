@@ -67,7 +67,7 @@ class Crawler:
                  crawler_info=None,
                  flag=None,
                  experiment_id=None,
-                 date=datetime.now()
+                 date_time=datetime.now()
                  ):
         self.flag = flag
         self._description = description
@@ -79,7 +79,7 @@ class Crawler:
         self.configuration = configuration
         self.send_agent = False
         self.agent = agent
-        self._date = date
+        self._date_time = date_time
         self.schedule = schedule
         self.queues = {}
         self.proxy = proxy
@@ -125,7 +125,7 @@ class Crawler:
                                          interval=120,
                                          wake_time=10 * 60 * 60,
                                          bed_time=17 * 60 * 60,
-                                         date=self._date)
+                                         date_time=self._date_time)
         else:
             self._schedule = val
 
@@ -298,56 +298,56 @@ class Crawler:
         return to_session
 
     @classmethod
-    def from_list(cls, crawler_list, date=datetime.now()):
+    def from_list(cls, crawler_list, date_time = datetime.now()):
         """
         Initialize crawler objects from list of crawlers in dictionary format
         Arguments:
             crawler_list: list of dictionaries
-            date: day datetime for crawler TimeHandler
+            date_time: day datetime for crawler TimeHandler
                 default: current datetime
         Returns:
             list of crawlers
         """
 
-        crawlers = [cls._single_crawler(ind_crawler, date) for
+        crawlers = [cls._single_crawler(ind_crawler, date_time) for
                     ind_crawler in crawler_list]
         return crawlers
 
     @classmethod
-    def from_dict(cls, crawler_dict: dict, date=datetime.now()):
+    def from_dict(cls, crawler_dict: dict, date_time=datetime.now()):
         """
         Initialize crawler objects from dictionary of crawlers in dictionary format by checking
             for two plausible keys.
         Arguments:
             crawler_dict: list of dictionaries
-            date: day datetime for crawler TimeHandler
+            date_time: day datetime for crawler TimeHandler
                 default: current datetime
         Returns:
             list of crawlers
         """
         if 'crawlers' in crawler_dict.keys():
-            crawlers = [cls._single_crawler(ind_crawler, date) for
+            crawlers = [cls._single_crawler(ind_crawler, date_time) for
                         ind_crawler in crawler_dict['crawlers']]
         elif 'data' in crawler_dict.keys():
-            crawlers = [cls._single_crawler(ind_crawler, date) for
+            crawlers = [cls._single_crawler(ind_crawler, date_time) for
                         ind_crawler in crawler_dict['data']]
         else:
-            crawlers = [cls._single_crawler(crawler_dict, date)]
+            crawlers = [cls._single_crawler(crawler_dict, date_time)]
         return crawlers
 
     @classmethod
-    def _single_crawler(cls, crawler_dict, date):
+    def _single_crawler(cls, crawler_dict, date_time):
         agent = Agent.from_dict(crawler_dict.get('agent'))
         crawler_object = cls(name=crawler_dict.get('name'),
                              description=crawler_dict.get('description'),
                              configuration=Config.from_dict(
                                  crawler_dict.get('configuration'),
-                                 location=agent.location, date=date),
+                                 location=agent.location, date_time=date_time),
                              agent=agent,
                              proxy=Proxy.from_dict(crawler_dict.get('proxy')),
                              crawler_info=CrawlerInfo.from_dict(crawler_dict),
                              experiment_id=crawler_dict.get('experiment_id'),
-                             date=date
+                             date_time=date_time
                              )
         crawler_object.send_agent = False
         return crawler_object
@@ -382,3 +382,5 @@ class Crawler:
                 self.configuration.update_config(results_valid, update_location)
 
         return self
+
+

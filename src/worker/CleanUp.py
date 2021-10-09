@@ -16,11 +16,12 @@ def check_and_delete(path):
 
 def cleanup(date, nr_days):
     """
-    date: datetime object
+    date_time: datetime object
     nr_days: int, indicates the number of days for which data is to be stored
 
-    deletes files for date - nr_days
+    deletes files for date_time - nr_days
     """
+
     to_delete = date + timedelta(days=-nr_days)
     to_delete = to_delete.date().isoformat()
     # Delete api response

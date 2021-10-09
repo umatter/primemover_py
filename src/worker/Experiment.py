@@ -62,7 +62,7 @@ class Experiment:
         if self.neutral_terms is not None:
             preferences.append(
                 {'name': 'neutral_terms', 'value': self.neutral_terms,
-                 'description': 'this lists all neutral terms used by date'})
+                 'description': 'this lists all neutral terms used by date_time'})
         if len(preferences) > 0:
             return_dict['preferences'] = preferences
         return return_dict

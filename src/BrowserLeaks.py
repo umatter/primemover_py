@@ -26,7 +26,7 @@ def single_update(experiment_id, date=datetime.now()):
     raw_experiment = api_wrapper.fetch_experiment(access_token=key, id=
     experiment_id)
 
-    crawler_list = Crawler.from_list(raw_experiment['crawlers'], date=date)
+    crawler_list = Crawler.from_list(raw_experiment['crawlers'], date_time=date)
     crawler_list = UpdateObject(crawler_list, 'config')
     with open(PRIMEMOVER_PATH + '/resources/other/processed.json', 'r') as file:
         ids_processed = json.load(file)

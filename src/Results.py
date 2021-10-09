@@ -236,7 +236,7 @@ class SessionResult:
 
 
 def export_results(results, date=datetime.today().date().isoformat()):
-    # existing_crawler_path = f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date() + timedelta(days=-1)).isoformat()}.json'
+    # existing_crawler_path = f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date_time() + timedelta(days=-1)).isoformat()}.json'
     existing_crawler_path = PRIMEMOVER_PATH + '/resources/updates/test_2020-12-22.json'
     out_path = f'{PRIMEMOVER_PATH}/resources/cleaned_data/with_crawler_{date}.json'
     with open(existing_crawler_path, 'r') as file:

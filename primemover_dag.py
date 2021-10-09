@@ -63,7 +63,7 @@ t2 = PythonOperator(
     op_kwargs={'set_reviewed': True,
                'parser_dict': src.worker.s3_parser.ParserDict,
                'path_end': 'all_data_',
-               'date': datetime.now()},
+               'date_time': datetime.now()},
     dag=dag)
 
 t3 = PythonOperator(
@@ -78,7 +78,7 @@ t4 = PythonOperator(
     python_callable=src.Results.process_results,
     op_kwargs={'set_reviewed': False,
                'parser_dict': src.worker.s3_parser.UpdateParser,
-               'date': datetime.now()},
+               'date_time': datetime.now()},
     dag=dag)
 
 t5 = PythonOperator(
@@ -91,7 +91,7 @@ t5 = PythonOperator(
 t6 = PythonOperator(
     task_id='update_crawlers',
     python_callable=src.UpdateExperiment.single_update,
-    op_kwargs={'date': datetime.now(),
+    op_kwargs={'date_time': datetime.now(),
                'experiment_id': Variable.get("experiment_id", 'id_missing')},
     dag=dag
 )
@@ -99,7 +99,7 @@ t6 = PythonOperator(
 t7 = PythonOperator(
     task_id='cleanup',
     python_callable=src.worker.CleanUp.cleanup,
-    op_kwargs={'date': datetime.now(),
+    op_kwargs={'date_time': datetime.now().date(),
                'nr_days': 5},
     dag=dag)
 

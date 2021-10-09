@@ -73,7 +73,7 @@ class Config:
                  location=None,
                  usage_type=None,
                  info=None,
-                 date=datetime.now()
+                 date_time=datetime.now()
                  ):
 
         self.name = name
@@ -97,10 +97,10 @@ class Config:
 
         self.media = media
         self.terms = terms
-        self._date = date
+        self._date_time = date_time
         self.usage_type = usage_type
         if self.info is not None:
-            self._history = S3History(self, date)
+            self._history = S3History(self, date_time)
         else:
             self._history = None
 
@@ -328,7 +328,7 @@ class Config:
         self.history.push()
 
     @classmethod
-    def from_dict(cls, config_dict, location, date=datetime.now()):
+    def from_dict(cls, config_dict, location, date_time= datetime.now()):
         """
         Generate config object from single api return
         Parameters:
@@ -352,7 +352,7 @@ class Config:
                             terms=config_dict['params'][0].get('search_terms'),
                             info=ConfigurationInfo.from_dict(config_dict),
                             location=location,
-                            date=date,
+                            date_time=date_time,
                             usage_type=usage_type
                             )
         return config_object
