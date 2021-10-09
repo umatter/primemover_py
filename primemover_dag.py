@@ -99,7 +99,7 @@ t6 = PythonOperator(
 t7 = PythonOperator(
     task_id='cleanup',
     python_callable=src.worker.CleanUp.cleanup,
-    op_kwargs={'date_time': datetime.now().date(),
+    op_kwargs={'date': datetime.now().date(),
                'nr_days': 5},
     dag=dag)
 
