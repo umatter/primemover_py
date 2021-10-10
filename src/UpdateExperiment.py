@@ -19,15 +19,19 @@ def single_update(date_time, experiment_id, manual=False):
     "Fetch Neutral terms from s3 Bucket"
     neutral_path = PRIMEMOVER_PATH + '/resources/input_data/neutral_searchterms_pool.json'
     if not os.path.exists(neutral_path):
-        Neutral = s3_wrapper.fetch_neutral()
+        neutral_in = s3_wrapper.fetch_neutral()
     else:
         with open(neutral_path) as file:
-            Neutral = json.load(file)
+            neutral_in = json.load(file)
+    nr_neutral = 3
     neutral = []
-    for i in range(3):
-        if len(Neutral) == 0:
-            Neutral = s3_wrapper.fetch_neutral()
-        neutral.append(Neutral.pop(0))
+    if len(neutral_in) < nr_neutral:
+        neutral_in += s3_wrapper.fetch_neutral()
+        with open(neutral_path, 'w') as file:
+            json.dump(neutral_in, file)
+    for i in range(nr_neutral):
+        neutral.append(neutral_in.pop(0))
+
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
@@ -136,7 +140,7 @@ def single_update(date_time, experiment_id, manual=False):
                 json.dump(return_data.json(), file, indent='  ')
             # Delete neutral terms if push was successful
             with open(neutral_path, 'w') as file:
-                json.dump(Neutral, file)
+                json.dump(neutral_in, file)
         else:
             print(return_data)
 
