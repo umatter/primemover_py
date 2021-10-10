@@ -14,7 +14,7 @@ def check_and_delete(path):
         return False
 
 
-def cleanup(date, nr_days):
+def cleanup(date_time, nr_days):
     """
     date_time: datetime object
     nr_days: int, indicates the number of days for which data is to be stored
@@ -22,7 +22,7 @@ def cleanup(date, nr_days):
     deletes files for date_time - nr_days
     """
 
-    to_delete = date + timedelta(days=-nr_days)
+    to_delete = date_time + timedelta(days=-nr_days)
     to_delete = to_delete.date().isoformat()
     # Delete api response
     if check_and_delete('resources/updates/{to_delete}.json'):
