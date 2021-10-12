@@ -299,7 +299,7 @@ class Config:
                                                    self.history.history.keys()))})
         return return_dict
 
-    def update_config(self, results, new_location):
+    def update_config(self, results, new_location, terms=True):
         """
         Update self according to results
         """
@@ -309,26 +309,33 @@ class Config:
         if new_location is not None:
             self.location = new_location
         kappa_j_t = self.kappa
+        if len(results) > 0:
+            for outlet in results:
+                if 2 == self.kappa:
+                    if not outlet['known']:
+                        kappa_j_t = 1
+                    else:
+                        kappa_j_t = 0
 
-        for outlet in results:
-            if self.kappa == 2:
-                if not outlet['known']:
-                    kappa_j_t = 1
-                else:
-                    kappa_j_t = 0
+                self.pi = src.Preferences.political_orientation_pi_i_t(
+                    psi_i=self.psi, kappa_j_t_prev=kappa_j_t,
+                    pi_tilde_j_prev=outlet['pi'], pi_i_prev=self.pi)
 
-            self.pi = src.Preferences.political_orientation_pi_i_t(
-                psi_i=self.psi, kappa_j_t_prev=kappa_j_t,
-                pi_tilde_j_prev=outlet['pi'], pi_i_prev=self.pi)
-        self.media = ConfigurationFunctions.update_media_outlets(
-            outlets=self.media + results, alpha_tilde=self.alpha, pi=self.pi,
-            tau_tilde_ij=self.tau, k=10)
+            self.media = ConfigurationFunctions.update_media_outlets(
+                outlets=self.media + results, alpha_tilde=self.alpha,
+                pi=self.pi,
+                tau_tilde_ij=self.tau, k=10)
+
+        self.terms = ConfigurationFunctions.SelectSearchTerms(pi=self.pi,
+                                                              alpha_hat=self.alpha,
+                                                              tau_hat_ik=self.tau,
+                                                              k=40)
 
         self.history.update_current_status()
         self.history.push()
 
     @classmethod
-    def from_dict(cls, config_dict, location, date_time= datetime.now()):
+    def from_dict(cls, config_dict, location, date_time=datetime.now()):
         """
         Generate config object from single api return
         Parameters:

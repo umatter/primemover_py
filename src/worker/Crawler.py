@@ -355,7 +355,7 @@ class Crawler:
     def clear_day(self):
         self.queues = []
 
-    def update_crawler(self, results=None, proxy_update=None):
+    def update_crawler(self, results=None, proxy_update=None, terms=True):
         update_location = None
         if proxy_update is not None:
             update_location = self.proxy.update_proxy(proxy_update)
@@ -365,6 +365,7 @@ class Crawler:
         if update_location is not None:
             self.agent.location = update_location
             self.send_agent = True
+        results_valid = []
         if results is not None:
             relevant_results = results.get(str(self._crawler_info.crawler_id),
                                            'skip')
@@ -374,12 +375,11 @@ class Crawler:
                                 relevant_results]
 
             results_selected = list(filter(None, results_selected))
-            results_valid = []
             for res in results_selected:
                 if res.get('pi') is not None:
                     results_valid.append(res)
-            if len(results_valid) > 0:
-                self.configuration.update_config(results_valid, update_location)
+
+        self.configuration.update_config(results_valid, update_location, terms=terms)
 
         return self
 
