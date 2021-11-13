@@ -72,6 +72,7 @@ class Config:
                  terms=None,
                  location=None,
                  usage_type=None,
+                 cookie_pref=None,
                  info=None,
                  date_time=datetime.now()
                  ):
@@ -99,6 +100,7 @@ class Config:
         self.terms = terms
         self._date_time = date_time
         self.usage_type = usage_type
+        self.cookie_pref = cookie_pref
         if self.info is not None:
             self._history = S3History(self, date_time)
         else:
@@ -262,6 +264,24 @@ class Config:
         else:
             raise ValueError('Not a valid value for usage_type')
 
+    @property
+    def cookie_pref(self):
+        return self._cookie_pref
+
+    @cookie_pref.setter
+    def cookie_pref(self, val):
+        if (val is None) or (val == "Value not provided at update!"):
+            val = ConfigurationFunctions.cookie_pref()
+        elif type(val) is str:
+            try: val = json.loads(val)
+            except:
+                raise TypeError('cookie preferences should be a dictionary or at the very least a json containing "accept_all')
+
+        if type(val) is dict and 'accept_all' in val.keys():
+            self._cookie_pref = val
+        else:
+            raise ValueError('Not a valid value for cookie_pref')
+
     def as_dict(self, send_info=False):
         """
         Generate dictionary object from self, matching configurations in primemover api
@@ -287,8 +307,10 @@ class Config:
                 {
                     "name": 'usage_type',
                     "value": self.usage_type
-                }
-            ]
+                },
+                {"name": "cookie_pref",
+                 "value": json.dumps(self.cookie_pref)
+                 }]
         }
         if send_info and self._info is not None:
             for key, value in self._info.as_dict().items():
@@ -345,7 +367,8 @@ class Config:
         if type(config_dict) is list:
             config_dict = config_dict[0]
         pref = pref_as_dict(config_dict.get('preferences', []))
-        usage_type = pref.get('usage_type')
+        usage_type = pref.get('usage_type', None)
+        cookie_pref = pref.get('cookie_pref', None)
         config_object = cls(name=config_dict.get('name'),
                             description=config_dict.get('description'),
                             psi=config_dict['params'][0].get('psi'),
@@ -360,6 +383,7 @@ class Config:
                             info=ConfigurationInfo.from_dict(config_dict),
                             location=location,
                             date_time=date_time,
-                            usage_type=usage_type
+                            usage_type=usage_type,
+                            cookie_pref=cookie_pref
                             )
         return config_object

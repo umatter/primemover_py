@@ -70,8 +70,9 @@ def single_update(date_time, experiment_id, manual=False):
     crawler_list = crawler_list_political + crawler_list_neutral
 
     for individual in crawler_list:
+        session_id = individual.add_task(Tasks.HandleCookiesGoogle, to_session=True)
         session_id = individual.add_task(Tasks.SetNrResults,
-                                         to_session=True,
+                                         to_session=session_id,
                                          params={'nr_results': 30})
         if individual.flag in {'left', 'right'} and \
                 individual.configuration.usage_type in {'only_search', 'both',
@@ -103,9 +104,11 @@ def single_update(date_time, experiment_id, manual=False):
                                  wake_time=18 * 60 * 60,
                                  bed_time=21 * 60 * 60,
                                  date_time=date_time)
-        c.add_task(Tasks.NeutralGoogleSearch, to_session=True,
+        session_id = c.add_task(Tasks.HandleCookiesGoogle,
+                                         to_session=True)
+        c.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
                    params={'term': neutral[1]})
-        c.add_task(Tasks.NeutralGoogleSearch, to_session=True,
+        c.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
                    params={'term': neutral[2]})
 
     with open(PRIMEMOVER_PATH + "/resources/updates/generated.json",

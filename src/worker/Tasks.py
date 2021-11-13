@@ -300,65 +300,65 @@ class BrowserLeaks(Queue):
         self.jobs.append(
             Jobs.VisitJob(url="https://browserleaks.com/ip", flag='leak_ip',
                           task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
 
         # JavaScript
         self.jobs.append(
             Jobs.VisitJob(url="https://browserleaks.com/javascript",
                           flag='leak_javascript', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
 
         # Webrtc
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/webrtc",
                                        flag='leak_webrtc', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
 
         # Canvas
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/canvas",
                                        flag='leak_canvas', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
 
         # Webgl
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/webgl",
                                        flag='leak_webgl', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
         # Fonts
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/fonts",
                                        flag='leak_fonts', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
         # SSL
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/ssl",
                                        flag='leak_ssl', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
         # GeoLocation
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/geo",
                                        flag='leak_geo', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
         # Features
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/features",
                                        flag='leak_features',
                                        task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
         # Proxy
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/proxy",
                                        flag='leak_proxy', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
 
         # Java system
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/java",
                                        flag='leak_java', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
 
         # Flash
         self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/flash",
                                        flag='leak_flash', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
 
         # Silverlight
         self.jobs.append(
             Jobs.VisitJob(url="https://browserleaks.com/silverlight",
                           flag='leak_silverlight', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2,4)))
+        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
 
 
 class SetNrResults(Queue):
@@ -392,18 +392,17 @@ class SetNrResults(Queue):
             position = click_dict[nr_results][1]
             nr_click = click_dict[nr_results][0]
             click_list = 5 * [Jobs.TryClick(selector_type="XPATH",
-                                                   selector=f'//*[@id="result_slider"]/ol/li[{6}]',
-                                                   task=self.name,
-                                                   captcha_mode='never')]
+                                            selector=f'//*[@id="result_slider"]/ol/li[{6}]',
+                                            task=self.name,
+                                            captcha_mode='never')]
             click_list += nr_click * [Jobs.TryClick(selector_type="XPATH",
-                                                   selector=f'//*[@id="result_slider"]/ol/li[{position}]',
-                                                   task=self.name,
-                                                   captcha_mode='never')]
+                                                    selector=f'//*[@id="result_slider"]/ol/li[{position}]',
+                                                    task=self.name,
+                                                    captcha_mode='never')]
 
             self.jobs = self.jobs + click_list
         else:
             raise ValueError('Can only set 10,20,30,40,50 or 100 results')
-
 
         self.jobs.append(Jobs.TryClick(selector_type="XPATH",
                                        selector='//*[@id="form-buttons"]/div[1]',
@@ -412,4 +411,85 @@ class SetNrResults(Queue):
         self.jobs.append(Jobs.TryHandleAlertJob("ACCEPT", task=self.name,
                                                 captcha_mode='never'))
 
-        self.jobs.append(Jobs.Wait(5, task = self.name, captcha_mode='after'))
+        self.jobs.append(Jobs.Wait(5, task=self.name, captcha_mode='after'))
+
+
+class HandleCookiesGoogle(Queue):
+    PASS_CRAWLER = True
+
+    def __init__(self, crawler, start_at):
+        cookie_pref = crawler.configuration.cookie_pref
+        super().__init__(start_at=start_at,
+                         name='handle_google_cookies',
+                         description='handle google cookie pop up according to cookie pref object'
+                         )
+        self.jobs.append(Jobs.VisitJob(url='https://www.google.com',
+                                       task=self.name))
+        if cookie_pref['accept_all']:
+            self.jobs.append(Jobs.TryClick(selector_type='CSS',
+                                           selector='#L2AGLb > div:nth-child(1)',
+                                           captcha_mode='after',
+                                           task=self.name))
+        else:
+            self.jobs.append(Jobs.TryClick(selector_type='CSS',
+                                           selector='#VnjCcb > div:nth-child(1)',
+                                           captcha_mode='after',
+                                           task=self.name))
+            if cookie_pref.get('SearchCustom', True):
+                self.jobs.append(Jobs.TryClick(selector_type='CSS',
+                                               selector='#yDmH0d > c-wiz > div > div > div > div.VP4fnf > div:nth-child(4) > div.uScs5d > div > div.uScs5d > div:nth-child(2) > div > button > div.VfPpkd-RLmnJb',
+                                               captcha_mode='after',
+                                               task=self.name))
+            else:
+                self.jobs.append(Jobs.TryClick(selector_type='CSS',
+                                               selector='#yDmH0d > c-wiz > div > div > div > div.VP4fnf > div:nth-child(4) > div.uScs5d > div > div.uScs5d > div:nth-child(1) > div > button > div.VfPpkd-RLmnJb',
+                                               captcha_mode='after',
+                                               task=self.name))
+            if cookie_pref.get('YoutubeHist', True):
+                self.jobs.append(Jobs.TryClick(selector_type='CSS',
+                                               selector='#yDmH0d > c-wiz > div > div > div > div.VP4fnf > div:nth-child(5) > div.uScs5d > div > div.uScs5d > div:nth-child(2) > div > button > div.VfPpkd-RLmnJb',
+                                               captcha_mode='after',
+                                               task=self.name))
+            else:
+                self.jobs.append(Jobs.TryClick(selector_type='CSS',
+                                               selector='#yDmH0d > c-wiz > div > div > div > div.VP4fnf > div:nth-child(5) > div.uScs5d > div > div.uScs5d > div:nth-child(1) > div > button > div.VfPpkd-RLmnJb',
+                                               captcha_mode='after',
+                                               task=self.name))
+            if cookie_pref.get('AdCustom', True) == False:
+                self.jobs.append(Jobs.TryClick(selector_type='CSS',
+                                               selector='#yDmH0d > c-wiz > div > div > div > div.VP4fnf > div:nth-child(6) > div.IgeUeb > div.uScs5d > div > div.uScs5d > div:nth-child(1) > div > button > div.VfPpkd-RLmnJb',
+                                               captcha_mode='after',
+                                               task=self.name))
+            elif cookie_pref.get('AdCustom', True) == True:
+                self.jobs.append(Jobs.TryClick(selector_type='CSS',
+                                               selector='#yDmH0d > c-wiz > div > div > div > div.VP4fnf > div:nth-child(6) > div.IgeUeb > div.uScs5d > div > div.uScs5d > div:nth-child(2) > div > button > div.VfPpkd-RLmnJb',
+                                               captcha_mode='after',
+                                               task=self.name))
+            else:
+
+                self.jobs.append(Jobs.TryClick(selector_type='CSS',
+                                               selector='# yDmH0d > c-wiz > div > div > div > div.VP4fnf > div:nth-child(6) > div.IgeUeb > div.wIdmhb > div',
+                                               captcha_mode='after',
+                                               task=self.name))
+                cookie_pref['GoogleAds'] = False
+                cookie_pref['YoutubeAds'] = False
+                if cookie_pref.get('GoogleAds', True):
+                    self.jobs.append(Jobs.TryClick(selector_type='CSS',
+                                                   selector='#yDmH0d > c-wiz > div > div > div > div.VP4fnf > div:nth-child(6) > div.Iwf3xf.sMVRZe > div:nth-child(4) > div > div > div.uScs5d > div:nth-child(2) > div > button > div.VfPpkd-RLmnJb',
+                                                   captcha_mode='after',
+                                                   task=self.name))
+                else:
+                    self.jobs.append(Jobs.TryClick(selector_type='CSS',
+                                                   selector='#yDmH0d > c-wiz > div > div > div > div.VP4fnf > div:nth-child(6) > div.Iwf3xf.sMVRZe > div:nth-child(4) > div > div > div.uScs5d > div:nth-child(1) > div > button > div.VfPpkd-RLmnJb',
+                                                   captcha_mode='after',
+                                                   task=self.name))
+                if cookie_pref.get('YoutubeAds', True):
+                    self.jobs.append(Jobs.TryClick(selector_type='CSS',
+                                                   selector='#yDmH0d > c-wiz > div > div > div > div.VP4fnf > div:nth-child(6) > div.Iwf3xf.sMVRZe > div:nth-child(8) > div > div > div.uScs5d > div:nth-child(2) > div > button > div.VfPpkd-RLmnJb',
+                                                   captcha_mode='after',
+                                                   task=self.name))
+                else:
+                    self.jobs.append(Jobs.TryClick(selector_type='CSS',
+                                                   selector='#yDmH0d > c-wiz > div > div > div > div.VP4fnf > div:nth-child(6) > div.Iwf3xf.sMVRZe > div:nth-child(8) > div > div > div.uScs5d > div:nth-child(1) > div > button > div.VfPpkd-RLmnJb',
+                                                   captcha_mode='after',
+                                                   task=self.name))

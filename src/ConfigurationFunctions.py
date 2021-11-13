@@ -39,7 +39,7 @@ def NoiseUtility():
     """
     Returns: epsilon: float, noise parameter when determining utility
     """
-    return float(gumbel(-0.4557735, 0.793006, 1)[0])/10
+    return float(gumbel(-0.4557735, 0.793006, 1)[0]) / 10
 
 
 def SelectSearchTerms(pi, alpha_hat, tau_hat_ik, k=40):
@@ -183,6 +183,17 @@ def usage_type():
     return choice
 
 
+def cookie_pref():
+    pref = {'accept_all': True}
+    if not pref['accept_all']:
+        pref['SearchCustom'] = r.choice([True, False])
+        pref['YoutubeHist'] = r.choice([True, False])
+        pref['AdCustom'] = r.choice([True, False, 'More'])
+        if pref['AdCustom'] == 'More':
+            pref['GoogleAds'] = False
+            pref['YoutubeAds'] = False
+    return pref
+
 """
 Profile configuration functions
 """
@@ -202,7 +213,7 @@ def language():
     return choice
 
 
-def geolocation(option_choice = 'random'):
+def geolocation(option_choice='random'):
     if option_choice == 'random':
         choice = r.choices(['BLOCK', 'ALLOW'], [0.2, 0.8])[0]
     elif option_choice == 'geolocation':
@@ -212,7 +223,7 @@ def geolocation(option_choice = 'random'):
     return choice
 
 
-def do_not_track(option_choice = 'random'):
+def do_not_track(option_choice='random'):
     if option_choice == 'random':
         choice = r.choices([0, 1], [0.8, 0.2])[0]
     elif option_choice == 'do_not_track':
@@ -222,7 +233,7 @@ def do_not_track(option_choice = 'random'):
     return choice
 
 
-def hardware_canvas(option_choice = 'random'):
+def hardware_canvas(option_choice='random'):
     if option_choice == 'random':
         choice = r.choices(['BLOCK', 'NOISE'], [0.2, 0.8])[0]
     elif option_choice == 'hardware_canvas':
@@ -232,7 +243,7 @@ def hardware_canvas(option_choice = 'random'):
     return choice
 
 
-def local_storage(option_choice = 'random'):
+def local_storage(option_choice='random'):
     if option_choice == 'random':
         choice = r.choices([True, False], [0.8, 0.2])[0]
     elif option_choice == 'local_storage':
