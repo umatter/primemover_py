@@ -3,6 +3,7 @@ import json
 from src.worker import api_wrapper as api
 import pathlib
 import src.worker.Crawler as Crawler
+import numpy as np
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
 
