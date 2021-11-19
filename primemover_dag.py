@@ -93,7 +93,9 @@ t6 = PythonOperator(
     python_callable=src.UpdateExperiment.single_update,
     op_kwargs={'date_time': datetime.now(),
                'experiment_id': Variable.get("experiment_id", 'id_missing'),
-               'fixed_times': Variable.get("fixed_times", False)},
+               'fixed_times': Variable.get("fixed_times", False),
+               'delta_t_1': Variable.get("delta_t_1", 120),
+               'delta_t_2': Variable.get("delta_t_2", 36)},
     dag=dag
 )
 
