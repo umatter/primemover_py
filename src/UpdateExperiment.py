@@ -16,7 +16,7 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
 
 
 def single_update(date_time, experiment_id, manual=False, fixed_times=False,
-                  delta_t_1=32, delta_t_2=110):
+                  delta_t_1=120, delta_t_2=36):
     "Fetch Neutral terms from s3 Bucket"
     neutral_path = PRIMEMOVER_PATH + '/resources/input_data/neutral_searchterms_pool.json'
     if not os.path.exists(neutral_path):
