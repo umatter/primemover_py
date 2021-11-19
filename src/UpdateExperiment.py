@@ -15,7 +15,8 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
 
 
-def single_update(date_time, experiment_id, manual=False, fixed_times = False):
+def single_update(date_time, experiment_id, manual=False, fixed_times=False,
+                  delta_t_1=32, delta_t_2=110):
     "Fetch Neutral terms from s3 Bucket"
     neutral_path = PRIMEMOVER_PATH + '/resources/input_data/neutral_searchterms_pool.json'
     if not os.path.exists(neutral_path):
@@ -70,7 +71,8 @@ def single_update(date_time, experiment_id, manual=False, fixed_times = False):
     crawler_list = crawler_list_political + crawler_list_neutral
 
     for individual in crawler_list:
-        session_id = individual.add_task(Tasks.HandleCookiesGoogle, to_session=True)
+        session_id = individual.add_task(Tasks.HandleCookiesGoogle,
+                                         to_session=True)
         session_id = individual.add_task(Tasks.SetNrResults,
                                          to_session=session_id,
                                          params={'nr_results': 30})
@@ -82,7 +84,7 @@ def single_update(date_time, experiment_id, manual=False, fixed_times = False):
             # individual.add_task(Tasks.PoliticalSearch,
             #                     to_session=session_id)
         if individual.flag in {'left', 'right'} and \
-                individual.configuration.usage_type in {'only_direct'   , 'both',
+                individual.configuration.usage_type in {'only_direct', 'both',
                                                         None}:
             individual.add_task(Tasks.VisitMedia,
                                 to_session=session_id)
@@ -105,30 +107,25 @@ def single_update(date_time, experiment_id, manual=False, fixed_times = False):
                                  bed_time=21 * 60 * 60,
                                  date_time=date_time)
         session_id = c.add_task(Tasks.HandleCookiesGoogle,
-                                         to_session=True)
+                                to_session=True)
         c.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
                    params={'term': neutral[1]})
         c.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
                    params={'term': neutral[2]})
-    if fixed_times != False:
-        if type(fixed_times) is not  int:
-            delta_t = 30
-        else:
-            delta_t = fixed_times
+    if fixed_times:
         queues_1 = [c.queues[0] for c in crawler_list]
         queues_1.sort(key=lambda q: q.start_at)
         t_0 = datetime.fromisoformat(queues_1[0].start_at)
         for q in queues_1[1:]:
-            t_0 += timedelta(seconds=delta_t)
+            t_0 += timedelta(seconds=delta_t_1)
             q.start_at = t_0.isoformat()
 
         queues_2 = [c.queues[1] for c in crawler_list]
         queues_2.sort(key=lambda q: q.start_at)
         t_0 = datetime.fromisoformat(queues_2[0].start_at)
         for q in queues_2[1:]:
-            t_0 += timedelta(seconds=delta_t)
+            t_0 += timedelta(seconds=delta_t_2)
             q.start_at = t_0.isoformat()
-
 
     with open(PRIMEMOVER_PATH + "/resources/updates/generated.json",
               'w') as file:
