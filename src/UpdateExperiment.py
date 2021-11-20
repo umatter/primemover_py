@@ -45,7 +45,7 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False,
                                              date_time=date_time)
     crawler_list = UpdateObject(crawler_list, 'config')
     "Compute Proxy Changes"
-    update_proxies_dict = update_all_proxies()
+    # update_proxies_dict = update_all_proxies()
 
     crawler_list_neutral = []
     crawler_list_political = []
@@ -116,6 +116,7 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False,
         queues_1 = [c.queues[0] for c in crawler_list]
         queues_1.sort(key=lambda q: q.start_at)
         t_0 = datetime.fromisoformat(queues_1[0].start_at)
+        delta_t_1 = int(delta_t_1)
         for q in queues_1[1:]:
             t_0 += timedelta(seconds=delta_t_1)
             q.start_at = t_0.isoformat()
@@ -124,6 +125,7 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False,
         queues_2.sort(key=lambda q: q.start_at)
         t_0 = datetime.fromisoformat(queues_2[0].start_at)
         for q in queues_2[1:]:
+            delta_t_2 = int(delta_t_2)
             t_0 += timedelta(seconds=delta_t_2)
             q.start_at = t_0.isoformat()
 
@@ -173,4 +175,5 @@ if __name__ == "__main__":
     #     print((datetime.now().date() + timedelta(days=day)).isoformat())
     single_update(date_time=datetime.now(),
                   experiment_id=41,
-                  manual=True)
+                  manual=True,
+                  fixed_times=True)
