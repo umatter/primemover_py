@@ -24,6 +24,7 @@ default_args = {
     'start_date': datetime(2021, 1, 1),
     'email': ['johannesl@me.com'],
     'email_on_failure': True,
+    'email_on_success': True,
     'email_on_retry': False,
     'retries': 0,
     'retry_delay': timedelta(minutes=15),
