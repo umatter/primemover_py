@@ -43,9 +43,9 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False,
 
     crawler_list = Crawler.Crawler.from_list(raw_experiment['crawlers'],
                                              date_time=date_time)
-    # crawler_list = UpdateObject(crawler_list, 'config')
-    # "Compute Proxy Changes"
-    # update_proxies_dict = update_all_proxies()
+    crawler_list = UpdateObject(crawler_list, 'config')
+    "Compute Proxy Changes"
+    update_proxies_dict = update_all_proxies()
 
     crawler_list_neutral = []
     crawler_list_political = []
