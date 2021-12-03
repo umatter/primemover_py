@@ -58,6 +58,20 @@ Use Tasks.py to define new taks for a bot to execute. Examples of existing tasks
 are google searches for specific terms and website visits.
 Tasks can be concatenated and are sent as queues, which represent a single browser session.
 
+#### Data Copy
+The module Data copy.py creates copies of key components of the running experiment and creates a backup
+in an S3 Bucket. The function create_copy generates the following three e-mails
+-   'config_{experiment_id}/single_params.csv'
+     (copy of crawler configurations containing only single valued parameters)
+-   'config_{experiment_id}/terms.csv'
+    (copy of the list of search terms each crawler uses)
+-   'config_{experiment_id}/media.csv'
+    (copy of the list of media outlets each crawler knows)
+-   'selected_{experiment_id}/selections.csv',
+    (Table containing the searches run and the sites selected, columns: `````['crawler_id', 'name', 'beta', 'alpha', 'pi', 'tau', 'job_id',
+       'finished_at', 'rank', 'skiped', 'url', 'normalizedUrl',
+       'd_tilde_i_j_t', 'u_raw', 'u_final', 'exp_u', 'probability', 'epsilon',
+       'prob_LowerEnd', 'prob_UpperEnd', 'selected', 'known', 'u_py']`````)
 
 ## Docker Image
 Steps to launch, navigate to primemover_py using the terminal and run 
