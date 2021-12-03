@@ -60,7 +60,7 @@ Tasks can be concatenated and are sent as queues, which represent a single brows
 
 #### Data Copy
 The module Data copy.py creates copies of key components of the running experiment and creates a backup
-in an S3 Bucket. The function create_copy generates the following three e-mails
+in an S3 Bucket. The function create_copy generates the following four tables:
 -   'config_{experiment_id}/single_params.csv'
      (copy of crawler configurations containing only single valued parameters)
 -   'config_{experiment_id}/terms.csv'
