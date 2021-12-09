@@ -15,7 +15,8 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
 
 
-def single_update(date_time, experiment_id, manual=False, fixed_times=False,
+def single_update(date_time, experiment_id, manual=False, fixed_times=False, update_preferences =True,
+                  update_proxies=True,
                   delta_t_1=120, delta_t_2=36):
     "Fetch Neutral terms from s3 Bucket"
     neutral_path = PRIMEMOVER_PATH + '/resources/input_data/neutral_searchterms_pool.json'
@@ -45,8 +46,10 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False,
                                              date_time=date_time)
     crawler_list = UpdateObject(crawler_list, 'config')
     "Compute Proxy Changes"
-    update_proxies_dict = update_all_proxies()
-
+    if update_proxies:
+        update_proxies_dict = update_all_proxies()
+        crawler_list = [
+            crawler.update_crawler(proxy_update=update_proxies_dict) for crawler in crawler_list]
     crawler_list_neutral = []
     crawler_list_political = []
     for crawler in crawler_list:
@@ -54,28 +57,25 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False,
             crawler_list_political.append(crawler)
         else:
             crawler_list_neutral.append(crawler)
+    if update_preferences:
+        if os.path.exists(
+                f'{PRIMEMOVER_PATH}/resources/cleaned_data/{date_time.date().isoformat()}.json'):
+            with open(
+                    f'{PRIMEMOVER_PATH}/resources/cleaned_data/{date_time.date().isoformat()}.json',
+                    'r') as file:
+                cleaned_data = json.load(file)
+            crawler_list_political = [
+                crawler.update_crawler(results=cleaned_data) for crawler
+                in crawler_list_political]
 
-    if os.path.exists(
-            f'{PRIMEMOVER_PATH}/resources/cleaned_data/{date_time.date().isoformat()}.json'):
-        with open(
-                f'{PRIMEMOVER_PATH}/resources/cleaned_data/{date_time.date().isoformat()}.json',
-                'r') as file:
-            cleaned_data = json.load(file)
-        crawler_list_neutral = [
-            crawler.update_crawler(proxy_update=update_proxies_dict) for crawler
-            in crawler_list_neutral]
-        crawler_list_political = [
-            crawler.update_crawler(results=cleaned_data,
-                                   proxy_update=update_proxies_dict) for crawler
-            in crawler_list_political]
     crawler_list = crawler_list_political + crawler_list_neutral
 
     for individual in crawler_list:
         session_id = individual.add_task(Tasks.HandleCookiesGoogle,
                                          to_session=True)
-        session_id = individual.add_task(Tasks.SetNrResults,
-                                         to_session=session_id,
-                                         params={'nr_results': 30})
+        # session_id = individual.add_task(Tasks.SetNrResults,
+        #                                  to_session=session_id,
+        #                                  params={'nr_results': 30})
         if individual.flag in {'left', 'right'} and \
                 individual.configuration.usage_type in {'only_search', 'both',
                                                         None}:
