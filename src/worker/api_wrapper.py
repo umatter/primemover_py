@@ -36,11 +36,15 @@ def get_access(e_mail, password):
     Returns:
         access_token
     """
+    try:
+        params = {'email': e_mail, 'password': password}
+        post_login = requests.post(DOMAIN + 'login', params=params)
+        returned = post_login.json()
+        token = returned['access_token']
+    except:
+        raise ConnectionRefusedError("Could not login to api")
 
-    params = {'email': e_mail, 'password': password}
-    post_login = requests.post(DOMAIN + 'login', params=params)
-    returned = post_login.json()
-    return returned['access_token']
+    return token
 
 
 def push_new(access_token,
