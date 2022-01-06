@@ -14,6 +14,10 @@ PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
 
+ACCESS_TOKEN = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
+                                      KEYS['PRIMEMOVER']['password'])
+
+
 def extract_data(experiment_id: int):
     """
     Extract_data reads crawlers as seen in the file "resources/updates/generated.csv"
@@ -21,10 +25,8 @@ def extract_data(experiment_id: int):
     input: str, path to json containing generated crawlers
     output: pandas DataFrame, columns all parameters set in the configuration functions
     """
-    access_token = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
-                                          KEYS['PRIMEMOVER']['password'])
 
-    crawler_list_raw = api_wrapper.fetch_experiment(access_token=access_token,
+    crawler_list_raw = api_wrapper.fetch_experiment(access_token=ACCESS_TOKEN,
                                                     id=
                                                     experiment_id)
 
@@ -58,10 +60,7 @@ def extract_list_params(object_name, experiment_id):
     input:
         object_name: str, one of media or terms
     """
-    access_token = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
-                                          KEYS['PRIMEMOVER']['password'])
-
-    crawler_list_raw = api_wrapper.fetch_experiment(access_token=access_token,
+    crawler_list_raw = api_wrapper.fetch_experiment(access_token=ACCESS_TOKEN,
                                                     id=
                                                     experiment_id)
 
@@ -97,10 +96,7 @@ def extract_selection_data(experiment_id, path_cleaned_data):
     with open(path_jobs) as f:
         raw_data = json.load(f)
 
-    access_token = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
-                                          KEYS['PRIMEMOVER']['password'])
-
-    crawler_list_raw = api_wrapper.fetch_experiment(access_token=access_token,
+    crawler_list_raw = api_wrapper.fetch_experiment(access_token=ACCESS_TOKEN,
                                                     id=
                                                     experiment_id)
 

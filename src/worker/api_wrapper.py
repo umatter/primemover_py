@@ -25,6 +25,7 @@ import pathlib
 from src.worker.Experiment import Experiment
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
+
 DOMAIN = "https://primemoverswitch.wimando.ch/api/v1/"
 
 
@@ -38,7 +39,8 @@ def get_access(e_mail, password):
 
     params = {'email': e_mail, 'password': password}
     post_login = requests.post(DOMAIN + 'login', params=params)
-    return post_login.json()['access_token']
+    returned = post_login.json()
+    return returned['access_token']
 
 
 def push_new(access_token,
