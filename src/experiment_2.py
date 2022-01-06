@@ -193,11 +193,11 @@ def launch_experiment():
                   indent='  ')
 
     return_data = api.push_new(access_token=key,
-                               path=PRIMEMOVER_PATH + "/resources/crawlers/experiment_2.json")
+                               path=PRIMEMOVER_PATH + "/resources/crawlers/experiment_3.json")
     data_as_dict = json.loads(return_data.text)
 
     with open(
-            f'{PRIMEMOVER_PATH}/resources/crawlers/experiment_2{datetime.now().date().isoformat()}.json',
+            f'{PRIMEMOVER_PATH}/resources/crawlers/experiment_3{datetime.now().date().isoformat()}.json',
             'w') as file:
         json.dump(data_as_dict, file, indent='  ')
 
