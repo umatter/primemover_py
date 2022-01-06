@@ -30,7 +30,6 @@ PRIVATE_PATH = PRIMEMOVER_PATH + '/resources/proxies/private_proxies.csv'
 PATH_OUTLETS = PRIMEMOVER_PATH + '/resources/input_data/outlets_pool.csv'
 PATH_OUTLETS_LOCAL = PRIMEMOVER_PATH + '/resources/input_data/outlets_pool_local.csv'
 
-
 GEOSURF_PATH = PRIMEMOVER_PATH + '/resources/proxies/geosurf_proxies.csv'
 with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
@@ -77,7 +76,8 @@ def distribute_proxies(location_groups, exp_id, proxy_type="rotating"):
                                 media=[],
                                 terms=[])
                 flag = 'neutral_test'
-            proxy = Proxy(name=f'{proxy_type.lower().capitalize()} Proxy', type='HTTP',
+            proxy = Proxy(name=f'{proxy_type.lower().capitalize()} Proxy',
+                          type='HTTP',
                           hostname=single_location.loc[idx]['gateway_ip'],
                           port=int(single_location.loc[idx]['gateway_ip_port']),
                           username=KEYS[proxy_type.upper()]['username'],
@@ -119,15 +119,15 @@ def launch_experiment():
                                            )
     # Generate GEOSURF based crawlers
     GEO_SURF_PROXIES = ["US-CO-COLORADO_SPRINGS",
-                            "US-OK-OKLAHOMA_CITY",
-                            "US-KS-WICHITA",
-                            "US-CA-BAKERSFIELD",
-                            "US-FL-JACKSONVILLE",
-                            "US-CA-SAN_FRANCISCO",
-                            "US-WI-MADISON",
-                            "US-CA-SAN_JOSE",
-                            "US-DC-WASHINGTON",
-                            "US-TX-EL_PASO"]
+                        "US-OK-OKLAHOMA_CITY",
+                        "US-KS-WICHITA",
+                        "US-CA-BAKERSFIELD",
+                        "US-FL-JACKSONVILLE",
+                        "US-CA-SAN_FRANCISCO",
+                        "US-WI-MADISON",
+                        "US-CA-SAN_JOSE",
+                        "US-DC-WASHINGTON",
+                        "US-TX-EL_PASO"]
 
     # generate neutral configurations
     config_list_neutral = [
@@ -161,7 +161,7 @@ def launch_experiment():
     rotating_proxies['gateway_ip_port'] = rotating_proxies[
         'gateway_ip_port'].astype(str)
     location_groups = rotating_proxies.groupby('loc_id')
-    crawler_list += distribute_proxies(location_groups,exp_id, "rotating" )
+    crawler_list += distribute_proxies(location_groups, exp_id, "rotating")
 
     # Distribute Private Proxies
     private_proxies = pd.read_csv(PRIVATE_PATH)
@@ -185,7 +185,6 @@ def launch_experiment():
         elif i < 80:
             crawler.agent.multilogin_profile.local_storage = False
             crawler.agent.multilogin_profile.service_worker_cache = False
-
 
     with open(PRIMEMOVER_PATH + "/resources/crawlers/experiment_3.json",
               'w') as file:
