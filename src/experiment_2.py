@@ -1,5 +1,5 @@
 """
-Experiment partisan google elections 2020-10-21
+Experiment partisan google elections 2022-01-03
 This file generates new crawlers, in particular the required config files
 
 J.L. 11.2020
@@ -8,6 +8,7 @@ J.L. 11.2020
 from src.worker.Crawler import Crawler
 from src.worker.TimeHandler import Schedule, TimeHandler
 from src.worker.ConfigureProfile import Config
+from src.ConfigurationFunctions import select_local_outlets
 from src.worker import api_wrapper as api
 from src.worker import s3_wrapper
 import json
@@ -26,12 +27,16 @@ ROTATING_PATH = PRIMEMOVER_PATH + '/resources/proxies/rotating_proxies.csv'
 
 PRIVATE_PATH = PRIMEMOVER_PATH + '/resources/proxies/private_proxies.csv'
 
+PATH_OUTLETS = PRIMEMOVER_PATH + '/resources/input_data/outlets_pool.csv'
+PATH_OUTLETS_LOCAL = PRIMEMOVER_PATH + '/resources/input_data/outlets_pool_local.csv'
+
+
 GEOSURF_PATH = PRIMEMOVER_PATH + '/resources/proxies/geosurf_proxies.csv'
 with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
 
 
-def distribute_proxies(location_groups,exp_id, proxy_type="rotating"):
+def distribute_proxies(location_groups, exp_id, proxy_type="rotating"):
     crawler_list = []
     for single_location in location_groups:
         pi_left = None
@@ -98,6 +103,9 @@ def launch_experiment():
 
     s3_wrapper.fetch_neutral_domains()
     s3_wrapper.fetch_outlets()
+
+    select_local_outlets(PATH_OUTLETS, PATH_OUTLETS_LOCAL, nr_per_state=2)
+
     s3_wrapper.fetch_terms()
 
     key = api.get_access(KEYS['PRIMEMOVER']['username'],
@@ -165,7 +173,21 @@ def launch_experiment():
     location_groups = private_proxies.groupby('loc_id')
     crawler_list += distribute_proxies(location_groups, exp_id, "private")
 
-    with open(PRIMEMOVER_PATH + "/resources/crawlers/experiment_2.json",
+    # Set privacy
+    with_privacy = r.sample(crawler_list, k=80)
+    for i, crawler in enumerate(with_privacy):
+        if i < 20:
+            crawler.agent.multilogin_profile.geolocation = 'BLOCK'
+        elif i < 40:
+            crawler.agent.multilogin_profile.do_not_track = 1
+        elif i < 60:
+            crawler.agent.multilogin_profile.hardware_canvas = "BLOCK"
+        elif i < 80:
+            crawler.agent.multilogin_profile.local_storage = False
+            crawler.agent.multilogin_profile.service_worker_cache = False
+
+
+    with open(PRIMEMOVER_PATH + "/resources/crawlers/experiment_3.json",
               'w') as file:
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')

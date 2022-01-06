@@ -16,8 +16,6 @@ from airflow.utils.dates import days_ago
 # You can override them on a per-task basis during operator initialization
 import src
 
-
-
 default_args = {
     'owner': 'johannesl',
     'depends_on_past': False,
@@ -55,6 +53,7 @@ dag = DAG(
 t1 = PythonOperator(
     task_id='fetch_results',
     python_callable=src.Results.fetch_results,
+    op_kwargs={'date': datetime.now().date()},
     dag=dag,
 )
 
@@ -64,7 +63,8 @@ t2 = PythonOperator(
     op_kwargs={'set_reviewed': True,
                'parser_dict': src.worker.s3_parser.ParserDict,
                'path_end': 'all_data_',
-               'date_time': datetime.now()},
+               'date_time': datetime.now().date,
+               'process': 'ALL'},
     dag=dag)
 
 t3 = PythonOperator(
@@ -79,14 +79,16 @@ t4 = PythonOperator(
     python_callable=src.Results.process_results,
     op_kwargs={'set_reviewed': False,
                'parser_dict': src.worker.s3_parser.UpdateParser,
-               'date_time': datetime.now()},
+               'date_time': datetime.now(),
+               'process': 'neutral search'
+               },
     dag=dag)
 
 t5 = PythonOperator(
-    task_id = 'csv_hist',
-    python_callable = src.worker.DataCopy.create_copy,
+    task_id='csv_hist',
+    python_callable=src.worker.DataCopy.create_copy,
     op_kwargs={'experiment_id': Variable.get("experiment_id", 'id_missing')},
-    dag =dag
+    dag=dag
 )
 
 t6 = PythonOperator(
@@ -95,16 +97,25 @@ t6 = PythonOperator(
     op_kwargs={'date_time': datetime.now(),
                'experiment_id': Variable.get("experiment_id", 'id_missing'),
                'fixed_times': Variable.get("fixed_times", False),
+               'update_preferences': Variable.get('update_preferences', True),
                'delta_t_1': Variable.get("delta_t_1", 120),
                'delta_t_2': Variable.get("delta_t_2", 36)},
     dag=dag
 )
 
 t7 = PythonOperator(
+    task_id='send_mail',
+    python_callable=src.worker.Notify.send_update,
+    op_kwargs={'receiver_email': Variable.get("receiver_email", "[johannesl@me.com]"),
+               'password': Variable.get("email_password", 'password_missing'),
+               'date': datetime.now().date(),},
+    dag=dag)
+
+t8 = PythonOperator(
     task_id='cleanup',
     python_callable=src.worker.CleanUp.cleanup,
     op_kwargs={'date_time': datetime.now(),
                'nr_days': 5},
     dag=dag)
 
-t1 >> t2 >> t3 >> t4 >> t5 >> t6 >> t7
+t1 >> t2 >> t3 >> t4 >> t5 >> t6 >> t7 >> t8

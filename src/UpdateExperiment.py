@@ -73,23 +73,23 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
     for individual in crawler_list:
         session_id = individual.add_task(Tasks.HandleCookiesGoogle,
                                          to_session=True)
-        # session_id = individual.add_task(Tasks.SetNrResults,
-        #                                  to_session=session_id,
-        #                                  params={'nr_results': 30})
+        session_id = individual.add_task(Tasks.SetNrResults,
+                                         to_session=session_id,
+                                         params={'nr_results': 30})
         if individual.flag in {'left', 'right'} and \
                 individual.configuration.usage_type in {'only_search', 'both',
                                                         None}:
             individual.add_task(Tasks.PoliticalSearch,
                                 to_session=session_id)
-            # individual.add_task(Tasks.PoliticalSearch,
-            #                     to_session=session_id)
+            individual.add_task(Tasks.PoliticalSearch,
+                                to_session=session_id)
         if individual.flag in {'left', 'right'} and \
                 individual.configuration.usage_type in {'only_direct', 'both',
                                                         None}:
             individual.add_task(Tasks.VisitMedia,
                                 to_session=session_id)
-            # individual.add_task(Tasks.VisitMedia,
-            #                     to_session=session_id)
+            individual.add_task(Tasks.VisitMedia,
+                                to_session=session_id)
 
         if individual.configuration.usage_type in {'only_direct', 'both', None}:
             individual.add_task(Tasks.VisitNeutralDirect,
@@ -152,6 +152,9 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
         do = input('push data? (y/n): ')
     else:
         do = 'y'
+
+    message = 'success'
+    error_code = None
     if do == 'y':
 
         return_data = api.push_new(access_token=key,
@@ -165,10 +168,22 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
             with open(neutral_path, 'w') as file:
                 json.dump(neutral_in, file)
         else:
+            message = {return_data.text}
+            error_code = return_data.content
             print(return_data)
 
         # experiment = api.update_experiment(key, [exp.as_dict()], exp.id)
-        # print(experiment)
+    # print(experiment)
+    try:
+        with open(PRIMEMOVER_PATH + f'/resources/log/log_{date_time.date().isoformat()}.json', 'r') as f:
+            log = json.load(f)
+    except FileNotFoundError:
+        log = {"Tasks": {}}
+    with open(PRIMEMOVER_PATH + f'/resources/log/log_{date_time.date().isoformat()}.json', 'w') as f:
+        log["Tasks"]["Update_Crawler"] = message
+        if error_code is not None:
+            log["Update_error"] = error_code
+        json.dump(log, f, indent='  ')
 
 
 if __name__ == "__main__":

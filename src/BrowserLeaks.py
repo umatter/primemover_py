@@ -28,28 +28,32 @@ def single_update(experiment_id, date=datetime.now()):
 
     crawler_list = Crawler.from_list(raw_experiment['crawlers'], date_time=date)
     crawler_list = UpdateObject(crawler_list, 'config')
-    with open(PRIMEMOVER_PATH + '/resources/other/processed.json', 'r') as file:
-        ids_processed = json.load(file)
+    # with open(PRIMEMOVER_PATH + '/resources/other/processed.json', 'r') as file:
+    #     ids_processed = json.load(file)
 
-    i = 0
-    crawler_list_2 = []
-    while len(crawler_list_2) < 35 and i < len(crawler_list):
-        individual = crawler_list[i]
-        if individual.crawler_info.crawler_id not in ids_processed:
-            i += 1
-            continue
-        individual.schedule = TimeHandler("US-NY-NEW_YORK",
-                                          interval=120,
-                                          wake_time=8 * 60 * 60,
-                                          bed_time=9.5 * 60 * 60,
-                                          date=date)
-        individual.add_task(BrowserLeaks)
-        crawler_list_2.append(individual)
-        i += 1
-    print(i)
+    # i = 0
+    # crawler_list_2 = []
+    # while len(crawler_list_2) < 35 and i < len(crawler_list):
+    #     individual = crawler_list[i]
+    #     if individual.crawler_info.crawler_id not in ids_processed:
+    #         i += 1
+    #         continue
+    #     individual.add_task(BrowserLeaks)
+    #     crawler_list_2.append(individual)
+    #     i += 1
+    # print(i)
+    crawler_list = [c.add_task(BrowserLeaks) for c in crawler_list]
+
+    queues = [c.queues[0] for c in crawler_list]
+    t_0 = datetime.fromisoformat(queues[60].start_at)
+    print(t_0)
+    delta_t_1 = int(120)
+    for q in queues[1:]:
+        t_0 += timedelta(seconds=delta_t_1)
+        q.start_at = t_0.isoformat()
     with open(PRIMEMOVER_PATH + "/resources/updates/generated.json",
               'w') as file:
-        json.dump([crawler.as_dict() for crawler in crawler_list_2], file,
+        json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
     return_data = api.push_new(access_token=key,

@@ -189,8 +189,8 @@ class Config:
             self._media = ConfigurationFunctions.SelectMediaOutlets(pi=self._pi,
                                                                     alpha_tilde=self.alpha,
                                                                     tau_tilde_ij=self.tau,
-                                                                    state=self._state,
-                                                                    k=10)
+                                                                    k=10,
+                                                                    local=2)
         elif type(media_in) in {list, dict}:
             self._media = media_in
         elif type(media_in) is str and media_in != "":
@@ -273,9 +273,11 @@ class Config:
         if (val is None) or (val == "Value not provided at update!"):
             val = ConfigurationFunctions.cookie_pref()
         elif type(val) is str:
-            try: val = json.loads(val)
+            try:
+                val = json.loads(val)
             except:
-                raise TypeError('cookie preferences should be a dictionary or at the very least a json containing "accept_all')
+                raise TypeError(
+                    'cookie preferences should be a dictionary or at the very least a json containing "accept_all')
 
         if type(val) is dict and 'accept_all' in val.keys():
             self._cookie_pref = val
@@ -315,10 +317,10 @@ class Config:
         if send_info and self._info is not None:
             for key, value in self._info.as_dict().items():
                 return_dict[key] = value
-        if self.history is not None and len(self.history.history) != 0:
-            return_dict["preferences"].append({"name": "history",
-                                               "value": str(list(
-                                                   self.history.history.keys()))})
+        # if self.history is not None and len(self.history.history) != 0:
+        #     return_dict["preferences"].append({"name": "history",
+        #                                        "value": str(list(
+        #                                            self.history.history.keys()))})
         return return_dict
 
     def update_config(self, results, new_location, terms=True):

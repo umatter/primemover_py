@@ -33,7 +33,7 @@ def prob_i(utilities):
     return probabilities
 
 
-def result_utility_w_i_j_t(r_j,beta_i, known=0, d_tilde_i_j_t=0,
+def result_utility_w_i_j_t(r_j, beta_i, known=0, d_tilde_i_j_t=0,
                            alpha_tilde=1,
                            tau_tilde=1):
     """
@@ -48,7 +48,6 @@ def result_utility_w_i_j_t(r_j,beta_i, known=0, d_tilde_i_j_t=0,
         ideologically distant news
     :return: float utility of selecting result
     """
-
 
     w = (1 - beta_i * (
             r_j - 1)) + known * (
@@ -126,7 +125,6 @@ def choose_result(raw_html,
             else:
                 d_tilde_i_j_t = abs(pi - float(pi_outlet))
 
-
             # calculate utility of the result
             u = result_utility_w_i_j_t(r_j=result['rank'],
                                        known=known,
@@ -162,7 +160,7 @@ if __name__ == "__main__":
                "beta": "0.62368980888047",
                "alpha": "0",
                "search_terms": "{\"bigrams\":[\"reproductive health services\",\"equal rights amendment\",\"white supremacist\",\"violence women\",\"law of one\",\"gun safety course\",\"heart attack women\",\"children and family\",\"gun safety course\",\"the dream act\"],\"instagram\":[\"#impeachtrump\",\"#feelthebern\",\"#communism\",\"#impeachtrump\",\"#democracy\",\"#bidenharris\",\"#democracy\",\"#socialism\",\"#bidenharris\",\"#voteblue\"]}",
-               "media_outlet_urls": '[{"domain": "hillreporter.com", "url": "https://hillreporter.com:443/", "pi": -0.9}, {"domain": "nbcnews.com", "url": "https://www.nbcnews.com/", "pi": 0.1}, {"domain": "pbs.org", "url": "https://www.pbs.org/", "pi": -0.3}, {"domain": "opednews.com", "url": "https://www.opednews.com/", "pi": -0.4}, {"domain": "doinmytoons.blogspot.com", "url": "http://doinmytoons.blogspot.com/", "pi": -0.2}, {"domain": "news.yahoo.com", "url": "https://news.yahoo.com/", "pi": 0.0}, {"domain": "cbsnews.com", "url": "https://www.cbsnews.com/", "pi": 0.1}, {"domain": "esquire.com", "url": "https://www.esquire.com/", "pi": 0.01}]',
+               "media_outlet_urls": '[{"domain": "hillreporter.com", "url": "https://hillreporter.com:443/", "pi": -0.9}, {"domain": "nbcnews.com", "url": "https://www.nbcnews.com/", "pi": 0.1}, {"domain": "pbs.org", "url": "https://www.pbs.org/", "pi": -0.3}, {"domain": "opednews.com", "url": "https://www.opednews.com/", "pi": -0.4}, {"domain": "doinmytoons.blogspot.com", "url": "http://doinmytoons.blogspot.com/", "pi": -0.2}, {"domain": "news.yahoo.com", "url": "https://news.yahoo.com/", "pi": 0.0}, {"domain": "cbsnews.com", "url": "https://www.cbsnews.com/", "pi": 0.1}, {"domain": "esquire.com", "url": "https://www.esquire.com/", "pi": 0.01}]'
                }
     google_data_1 = api_wrapper.fetch_html(
         "https://siaw.qlick.ch/api/v1/file/228072")

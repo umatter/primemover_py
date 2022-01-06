@@ -80,10 +80,10 @@ dag = DAG(
 #
 
 t5 = PythonOperator(
-    task_id = 'csv_hist',
-    python_callable = src.worker.DataCopy.create_copy,
+    task_id='csv_hist',
+    python_callable=src.worker.DataCopy.create_copy,
     op_kwargs={'experiment_id': Variable.get("experiment_id", 'id_missing')},
-    dag =dag
+    dag=dag
 )
 
 t6 = PythonOperator(
@@ -92,16 +92,24 @@ t6 = PythonOperator(
     op_kwargs={'date_time': datetime.now(),
                'experiment_id': Variable.get("experiment_id", 'id_missing'),
                'fixed_times': Variable.get("fixed_times", False),
+               'update_preferences': Variable.get('update_preferences', True),
                'delta_t_1': Variable.get("delta_t_1", 120),
                'delta_t_2': Variable.get("delta_t_2", 36)},
     dag=dag
 )
 
 t7 = PythonOperator(
+    task_id='send_mail',
+    python_callable=src.worker.Notify.send_update,
+    op_kwargs={'receiver_email': Variable.get("receiver_email", ["johannesl@me.com"]),
+               'password': Variable.get("email_password", 'password_missing'),
+               'date': datetime.now().date(),},
+    dag=dag)
+
+t8 = PythonOperator(
     task_id='cleanup',
     python_callable=src.worker.CleanUp.cleanup,
     op_kwargs={'date_time': datetime.now(),
                'nr_days': 5},
     dag=dag)
-
-t5 >> t6 >> t7
+t5 >> t6 >> t7 >> t8

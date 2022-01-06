@@ -53,7 +53,7 @@ class Profile:
         self.name = name
         self.browser = browser
 
-        privacy_setting = random.choices([True, False], [0.75, 0.25])[0]
+        privacy_setting = False
         if privacy_setting:
             option = random.choice(
                 ['geolocation', 'do_not_track', 'hardware_canvas',
