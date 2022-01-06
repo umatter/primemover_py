@@ -29,7 +29,7 @@ def send_update(password, email_list, date=datetime.date.today()):
     """
     subject = "PY's Daily Update"
 
-    body = """This is a daily update.\n\n Best regards,\nPrimemover_py"""
+    body = """This is a daily update.\n\n Best regards,\nPrimemover_py\n\n"""
 
     message = MIMEMultipart()
     message["From"] = SMTP_MAIL_FROM
