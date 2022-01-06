@@ -25,7 +25,7 @@ import pathlib
 from src.worker.Experiment import Experiment
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
-DOMAIN = "https://primemover.wimando.ch/api/v1/"
+DOMAIN = "https://primemoverswitch.wimando.ch/api/v1/"
 
 
 def get_access(e_mail, password):
