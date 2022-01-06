@@ -41,7 +41,7 @@ default_args = {
     # 'trigger_rule': 'all_success'
 }
 dag = DAG(
-    'test_1',
+    dag_id='test_1',
     default_args=default_args,
     description='A first test schedule',
     schedule_interval="36 * * * *",

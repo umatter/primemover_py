@@ -50,7 +50,7 @@ dag = DAG(
 t1 = PythonOperator(
     task_id='create_experiment',
     python_callable=src.experiment_2.launch_experiment,
-    dag=dag,
+    dag=dag
 )
 
 

@@ -42,7 +42,7 @@ default_args = {
     # 'trigger_rule': 'all_success'
 }
 dag = DAG(
-    'update',
+    dag_id='update',
     default_args=default_args,
     description='update crawler config and tasks',
     schedule_interval="30 7 * * *",

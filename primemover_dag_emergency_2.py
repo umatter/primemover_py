@@ -42,7 +42,7 @@ default_args = {
 }
 
 dag = DAG(
-    'update_emergency_2',
+    dag_id='update_emergency_2',
     default_args=default_args,
     description='update crawler config and tasks and upload csvs',
     schedule_interval=None,

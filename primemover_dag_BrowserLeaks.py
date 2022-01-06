@@ -41,7 +41,7 @@ default_args = {
     # 'trigger_rule': 'all_success'
 }
 dag = DAG(
-    'BrowserLeaks',
+    dag_id='BrowserLeaks',
     default_args=default_args,
     description='Add Browser Leaks tasks',
     schedule_interval=None,

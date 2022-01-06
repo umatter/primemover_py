@@ -42,7 +42,7 @@ default_args = {
 }
 
 dag = DAG(
-    'update_emergency',
+    dag_id='update_emergency',
     default_args=default_args,
     description='update crawler config and tasks',
     schedule_interval=None,

@@ -42,7 +42,7 @@ default_args = {
 }
 
 dag = DAG(
-    'pull_neutral',
+    dag_id='pull_neutral',
     default_args=default_args,
     description='pull neutral terms from s3 manually',
     schedule_interval=None,
