@@ -82,7 +82,7 @@ def SelectMediaOutlets(alpha_tilde, tau_tilde_ij, pi=0, k=8, local=2):
     path_outlets = PRIMEMOVER_PATH + '/resources/input_data/outlets_pool.csv'
 
     outlets = pd.read_csv(path_outlets,
-                          usecols=['domain', 'pub_state', 'redirect_url',
+                          usecols=['domain', 'state', 'redirect_url',
                                    'avg_users_us_percent',
                                    'avg_reach_permillion', 'pi', 'pop2019',
                                    'is_local'])
@@ -124,7 +124,7 @@ def SelectMediaOutlets(alpha_tilde, tau_tilde_ij, pi=0, k=8, local=2):
     path_outlets_local = PRIMEMOVER_PATH + '/resources/input_data/outlets_pool_local.csv'
 
     outlets_local = pd.read_csv(path_outlets_local,
-                                usecols=['domain', 'pub_state', 'redirect_url',
+                                usecols=['domain', 'state', 'redirect_url',
                                          'avg_users_us_percent',
                                          'avg_reach_permillion', 'pi',
                                          'pop2019',
@@ -278,16 +278,20 @@ def select_local_outlets(path_in, path_local_out, nr_per_state=2):
                                    'avg_reach_permillion', 'pi', 'pop2019',
                                    'is_local'])
     states = list(set(outlets['state']))
-    outlets['size'] = outlets['avg_reach_permillion']*outlets['avg_users_us_percent']/100
+    outlets['size'] = outlets['avg_reach_permillion'] * outlets[
+        'avg_users_us_percent'] / 100
     outlets = outlets.loc[outlets['is_local']]
-    outlets = outlets.loc[outlets['state']!='USA']
+    outlets = outlets.loc[outlets['state'] != 'USA']
     outlets = outlets.sort_values(by='size', ascending=False)
     outlets = outlets.reset_index(drop=True)
-    outlets_out = outlets.loc[outlets['state'] ==states[0]].iloc[0:nr_per_state]
+    outlets_out = outlets.loc[outlets['state'] == states[0]].iloc[
+                  0:nr_per_state]
     for state in states[1:]:
-        outlets_out = outlets_out.append(outlets.loc[outlets['state'] ==state].iloc[0:nr_per_state])
-    outlets_out = outlets_out.reset_index(drop = True)
+        outlets_out = outlets_out.append(
+            outlets.loc[outlets['state'] == state].iloc[0:nr_per_state])
+    outlets_out = outlets_out.reset_index(drop=True)
     outlets_out.to_csv(path_local_out, header=True)
+
 
 if __name__ == "__main__":
     a = SelectMediaOutlets(15, 1, 1, 'US-CA')
