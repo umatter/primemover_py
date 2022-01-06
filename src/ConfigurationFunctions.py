@@ -130,7 +130,8 @@ def SelectMediaOutlets(alpha_tilde, tau_tilde_ij, pi=0, k=8, local=2):
                                          'pop2019',
                                          'is_local'])
     chosen = r.sample(list(outlets_local.index), k=local)
-    outlets.append += [{'domain': outlets_local.loc[i]['domain'],
+
+    outlets += [{'domain': outlets_local.loc[i]['domain'],
                         'url': outlets_local.loc[i]['redirect_url'],
                         'pi': outlets_local.loc[i]['pi']} for
                        i in chosen]
