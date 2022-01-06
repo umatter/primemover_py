@@ -42,7 +42,8 @@ def get_access(e_mail, password):
         returned = post_login.json()
         token = returned['access_token']
     except:
-        raise ConnectionRefusedError("Could not login to api")
+        token = None
+        Warning("Could not login to api")
 
     return token
 
