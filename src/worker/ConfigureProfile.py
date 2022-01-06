@@ -231,10 +231,14 @@ class Config:
 
     @location.setter
     def location(self, val):
+        val = val.strip()
         if val is None:
             self._location = ConfigurationFunctions.location()
-        else:
+        elif val in Config.LOCATION_LIST:
             self._location = val
+        else:
+            raise ValueError(
+                f'{val} is not a valid location see geosurf cities')
         segments = self._location.split('-')
         if type(segments) is list and len(segments) == 3:
             self._state = segments[0] + '-' + segments[1]
