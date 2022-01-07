@@ -42,7 +42,7 @@ def single_update(experiment_id, date=datetime.now()):
     #     crawler_list_2.append(individual)
     #     i += 1
     # print(i)
-    crawler_list = [c.add_task(BrowserLeaks) for c in crawler_list]
+    [c.add_task(BrowserLeaks) for c in crawler_list]
 
     queues = [c.queues[0] for c in crawler_list]
     t_0 = datetime.fromisoformat('2022-01-07T12:00:00')
@@ -66,4 +66,4 @@ def single_update(experiment_id, date=datetime.now()):
 
 
 if __name__ == "__main__":
-    single_update(experiment_id=41, date=datetime.now())
+    single_update(experiment_id=46, date=datetime.now())
