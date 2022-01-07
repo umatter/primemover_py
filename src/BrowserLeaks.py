@@ -45,7 +45,7 @@ def single_update(experiment_id, date=datetime.now()):
     crawler_list = [c.add_task(BrowserLeaks) for c in crawler_list]
 
     queues = [c.queues[0] for c in crawler_list]
-    t_0 = datetime.fromisoformat(queues[0].start_at)
+    t_0 = datetime.fromisoformat('2022-01-07T12:00:00')
     print(t_0)
     delta_t_1 = int(120)
     for q in queues[1:]:
