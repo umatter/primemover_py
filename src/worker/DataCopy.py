@@ -161,8 +161,17 @@ def extract_selection_data(experiment_id, path_cleaned_data):
     return data_df
 
 
-def create_copy(experiment_id, date=datetime.now()):
-    date = date.date().isoformat()
+def setup_copy(experiment_id, date=datetime.now()):
+    s3_wrapper.append_csv(f'config_{experiment_id}/single_params.csv',
+                          extract_data(experiment_id))
+    s3_wrapper.append_csv(f'config_{experiment_id}/terms.csv',
+                          extract_list_params('terms', experiment_id))
+    s3_wrapper.append_csv(f'config_{experiment_id}/media.csv',
+                          extract_list_params('media', experiment_id))
+    return "Success"
+
+def create_copy(experiment_id, date=datetime.now().date()):
+    date = date.isoformat()
     s3_wrapper.append_csv(f'config_{experiment_id}/single_params.csv',
                           extract_data(experiment_id))
     s3_wrapper.append_csv(f'config_{experiment_id}/terms.csv',

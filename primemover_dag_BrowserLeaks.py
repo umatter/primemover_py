@@ -50,8 +50,15 @@ dag = DAG(
 
 # t1, t2 and t3 are examples of tasks created by instantiating operators
 
-
 t1 = PythonOperator(
+    task_id="setup_copy",
+    python_callable=src.worker.DataCopy.setup_copy,
+    op_kwargs={"experiment_id": Variable.get("experiment_id", "id_missing"),
+               "date": datetime.now().date()},
+    dag=dag
+)
+
+t2 = PythonOperator(
     task_id="addTasks",
     python_callable=src.BrowserLeaks.single_update,
     op_kwargs={"date_time": datetime.now(),
@@ -59,7 +66,7 @@ t1 = PythonOperator(
     dag=dag
 )
 
-t2 = PythonOperator(
+t3 = PythonOperator(
     task_id="cleanup",
     python_callable=src.worker.CleanUp.cleanup,
     op_kwargs={"date_time": datetime.now(),
@@ -67,3 +74,4 @@ t2 = PythonOperator(
     dag=dag)
 
 
+t1 >> t2 >> t3

@@ -82,7 +82,8 @@ dag = DAG(
 t5 = PythonOperator(
     task_id="csv_hist",
     python_callable=src.worker.DataCopy.create_copy,
-    op_kwargs={"experiment_id": Variable.get("experiment_id", "id_missing")},
+    op_kwargs={"experiment_id": Variable.get("experiment_id", "id_missing"),
+               "date": datetime.now().date()},
     dag=dag
 )
 
