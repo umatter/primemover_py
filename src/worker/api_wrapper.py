@@ -274,7 +274,7 @@ def set_inactive(access_token, queue_id):
     """
     r = requests.put(DOMAIN + f'queues/{queue_id}', data={'active': 0},
                      headers={'authorization': f'Bearer {access_token}'})
-    if r.status_code == 200:
+    if r.status_code in {200,404}:
         return 'success'
     else:
         raise ConnectionError(f'status code {r.status_code}')
@@ -373,6 +373,8 @@ def fetch_crawlers_by_exp(access_token, experiment_id):
 
 def delete_exp(access_token, id):
     requests.delete(DOMAIN + f'crawler/{id}', headers={'authorization': f'Bearer {access_token}'})
+
 def delete_queues_2(access_token,i):
     resp = requests.delete(DOMAIN + f'queues/{i}', headers={'authorization': f'Bearer {access_token}'})
     return resp
+
