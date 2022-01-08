@@ -10,7 +10,7 @@ from email.mime.text import MIMEText
 
 import os
 
-PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 SMTP_SERVER = "smtp.mail.yahoo.com"
 
