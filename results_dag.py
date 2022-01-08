@@ -45,7 +45,7 @@ dag = DAG(
     dag_id="results_dag",
     default_args=default_args,
     description="fetch results and do initial parse",
-    schedule_interval="30 7 * * *",
+    schedule_interval=None,
     catchup=False
 )
 
