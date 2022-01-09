@@ -108,7 +108,7 @@ t7 = PythonOperator(
     task_id="send_mail",
     python_callable=src.worker.Notify.send_update,
     op_kwargs={"email_list": Variable.get("email_list", "[johannesl@me.com]"),
-               "password": Variable.get("email_password", "password_missing"),
+               "password": Variable.get("email_password", "password_missing", deserialize_json=True),
                "date": datetime.now().date()},
     dag=dag)
 
