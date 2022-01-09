@@ -103,4 +103,4 @@ if __name__ == "__main__":
 
     p = input('your password here')
 
-    send_update(p, ['johannesl@me.com', 'ulrich.matter@unisg.ch'], date=datetime.datetime.fromisoformat("2021-07-06").date())
+    send_update(p, ['johannesl@me.com'], date=datetime.datetime.fromisoformat("2021-07-06").date())
