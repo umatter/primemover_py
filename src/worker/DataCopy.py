@@ -154,7 +154,12 @@ def extract_selection_data(experiment_id, path_cleaned_data):
 
                 new_row.update({'u_py': u_py})
                 data_restructure.append(new_row)
+
         data_df = pd.DataFrame(data=data_restructure)
+        if 'u_py' not in data_df.columns:
+            data_df['u_py'] = ''
+        if 'u_raw' not in data_df.columns:
+            data_df['u_raw'] = ''
         data_df['difference'] = data_df['u_py'] - data_df['u_raw']
         data_df['correct'] = abs(data_df['difference'] < 10 ** -5)
 
@@ -180,8 +185,9 @@ def create_copy(experiment_id, date=datetime.now().date()):
                           extract_list_params('media', experiment_id))
     selection_data = extract_selection_data(experiment_id,
                                             f'resources/cleaned_data/{date}.json')
-    s3_wrapper.append_csv(f'selected_{experiment_id}/selections.csv',
-                          selection_data)
+    if len(selection_data) >0:
+        s3_wrapper.append_csv(f'selected_{experiment_id}/selections.csv',
+                              selection_data)
     mistakes = selection_data.loc[-selection_data['correct']]
 
     try:
