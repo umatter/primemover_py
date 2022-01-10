@@ -145,7 +145,7 @@ def extract_selection_data(experiment_id, path_cleaned_data):
                         r_j=new_row['rank'],
                         known=known,
                         d_tilde_i_j_t=d_tilde_i_j_t,
-                        alpha_tilde=new_row['pi'],
+                        alpha_tilde=new_row['alpha'],
                         tau_tilde=new_row['tau'],
                         beta_i=new_row['beta'])
                 else:
