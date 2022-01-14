@@ -41,9 +41,9 @@ def cleanup(date_time, nr_days):
     if check_and_delete(f'resources/log/log_{to_delete}.json'):
         print(f'Deleted log for the {to_delete}')
 
-    if check_and_delete(f'/resources/log/issues_log_{to_delete}.csv'):
+    if check_and_delete(f'resources/log/issues_log_{to_delete}.csv'):
         print(f'Deleted issues log for the {to_delete}')
 
-    if check_and_delete(f'/resources/log/calc_errors_log_{to_delete}.csv'):
+    if check_and_delete(f'resources/log/calc_errors_log_{to_delete}.csv'):
         print(f'Deleted calculation error log for the {to_delete}')
 

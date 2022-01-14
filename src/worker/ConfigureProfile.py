@@ -334,7 +334,8 @@ class Config:
         if new_location is not None:
             self.location = new_location
         kappa_j_t = self.kappa
-        if len(results) > 0:
+        if results is not None and len(results) > 0:
+            pi_0 = self.pi
             for outlet in results:
                 if 2 == self.kappa:
                     if not outlet['known']:
@@ -350,11 +351,11 @@ class Config:
                 outlets=self.media + results, alpha_tilde=self.alpha,
                 pi=self.pi,
                 tau_tilde_ij=self.tau, k=10)
-
-        self.terms = ConfigurationFunctions.SelectSearchTerms(pi=self.pi,
-                                                              alpha_hat=self.alpha,
-                                                              tau_hat_ik=self.tau,
-                                                              k=40)
+            if terms and pi_0 != self.pi:
+                self.terms = ConfigurationFunctions.SelectSearchTerms(pi=self.pi,
+                                                                      alpha_hat=self.alpha,
+                                                                      tau_hat_ik=self.tau,
+                                                                      k=40)
 
         self.history.update_current_status()
         self.history.push()
