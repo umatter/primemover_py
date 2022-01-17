@@ -25,7 +25,7 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
     else:
         with open(neutral_path) as file:
             neutral_in = json.load(file)
-    nr_neutral = 3
+    nr_neutral = 2
     neutral = []
     if len(neutral_in) < nr_neutral:
         neutral_in += s3_wrapper.fetch_neutral()
@@ -73,9 +73,9 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
     for individual in crawler_list:
         session_id = individual.add_task(Tasks.HandleCookiesGoogle,
                                          to_session=True)
-        session_id = individual.add_task(Tasks.SetNrResults,
+        session_id = individual.add_task(Tasks.SetGooglePreferences,
                                          to_session=session_id,
-                                         params={'nr_results': 30})
+                                         params={'nr_results': 30, 'set_language': "English"})
         if individual.flag in {'left', 'right'} and \
                 individual.configuration.usage_type in {'only_search', 'both',
                                                         None}:
@@ -110,8 +110,8 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
                                 to_session=True)
         c.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
                    params={'term': neutral[1]})
-        c.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
-                   params={'term': neutral[2]})
+        # c.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
+        #            params={'term': neutral[2]})
     if fixed_times:
         queues_1 = [c.queues[0] for c in crawler_list]
         queues_1.sort(key=lambda q: datetime.fromisoformat(q.start_at))

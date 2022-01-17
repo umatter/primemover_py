@@ -8,7 +8,7 @@ PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 def check_and_delete(path):
     # Check if file @path exists and delete if it does
     if os.path.exists(f'{PRIMEMOVER_PATH}/{path}'):
-        os.remove(f'{PRIMEMOVER_PATH}/{path})')
+        os.remove(f'{PRIMEMOVER_PATH}/{path}')
         return True
     else:
         return False

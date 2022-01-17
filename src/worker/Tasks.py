@@ -27,15 +27,18 @@ class GoogleSearch(Queue):
                  name='GoogleSearch',
                  description='Open Google, enter a search query and select a result.',
                  search_type='google_search',
-                 select_result=False
+                 select_result=False,
+                 time_spent=5
                  ):
         self._search_term = term
+        self._time_spent = time_spent
         super().__init__(start_at=start_at,
                          name=name,
                          description=description)
         # Add Job to Visit a webpage (google)
         self.jobs.append(
-            Jobs.VisitJob(url='https://www.google.com', captcha_mode='always', task=name))
+            Jobs.VisitJob(url='https://www.google.com', captcha_mode='always',
+                          task=name))
 
         # Add Job to select the search field via XPATH and type the search term
         self.jobs.append(Jobs.EnterText(text=term,
@@ -69,7 +72,7 @@ class GoogleSearch(Queue):
 
             # Add Job to scroll down 80% of the visited page
             self.jobs.append(Jobs.Scroll(direction='DOWN',
-                                         percentage=80,
+                                         duration=self._time_spent,
                                          captcha_mode='always',
                                          task=name))
 
@@ -104,7 +107,7 @@ class VisitViaGoogle(Queue):
         self._duration = r.randint(30, 60)  # choose scroll time in seconds
         super().__init__(start_at=start_time,
                          name='Visit via Googe',
-                         description='Visit a media outlet via google and scroll for some time.',)
+                         description='Visit a media outlet via google and scroll for some time.', )
         # Add Job to Visit a  Google
         self.jobs.append(
             Jobs.VisitJob(url='https://www.google.com', captcha_mode='always',
@@ -176,7 +179,8 @@ class PoliticalSearch(GoogleSearch):
                          start_at=start_at,
                          name='search_google_political',
                          search_type='political',
-                         select_result=True)
+                         select_result=True,
+                         time_spent=30)
 
 
 class VisitMedia(VisitDirect):
@@ -220,7 +224,8 @@ class NeutralGoogleSearch(GoogleSearch):
                          name='search_google_neutral',
                          start_at=start_at,
                          search_type='neutral',
-                         select_result=True)
+                         select_result=True,
+                         time_spent=5)
 
 
 class BenignGoogleSearch(GoogleSearch):
@@ -369,15 +374,16 @@ class BrowserLeaks(Queue):
         self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
 
 
-class SetNrResults(Queue):
+class SetGooglePreferences(Queue):
     PASS_CRAWLER = False
     """
     Visit Google and adjust the number of search results
+    If Option set_language = 
     """
 
-    def __init__(self, start_at, nr_results=50):
+    def __init__(self, start_at, nr_results=50, set_language=None):
         super().__init__(start_at=start_at,
-                         name='Set_Nr_Results',
+                         name='Set_Google_Preferences',
                          )
 
         self.jobs.append(
@@ -392,6 +398,7 @@ class SetNrResults(Queue):
                                        selector='//*[@id="dEjpnf"]/li[1]',
                                        task=self.name,
                                        captcha_mode='never'))
+        self._set_language = set_language
         nr_results = round(nr_results, -1)
         click_dict = {10: (5, 1), 20: (4, 2), 30: (3, 3), 40: (2, 4),
                       50: (1, 5), 100: (0, 6)}
@@ -401,16 +408,28 @@ class SetNrResults(Queue):
             nr_click = click_dict[nr_results][0]
             click_list = 5 * [Jobs.TryClick(selector_type="XPATH",
                                             selector=f'//*[@id="result_slider"]/ol/li[{6}]',
-                                            task=self.name,
+                                            task=self.name + '/Nr_Results',
                                             captcha_mode='never')]
             click_list += nr_click * [Jobs.TryClick(selector_type="XPATH",
                                                     selector=f'//*[@id="result_slider"]/ol/li[{position}]',
-                                                    task=self.name,
+                                                    task=self.name + '/Nr_Results',
                                                     captcha_mode='never')]
 
             self.jobs = self.jobs + click_list
         else:
             raise ValueError('Can only set 10,20,30,40,50 or 100 results')
+        if set_language is not None:
+            # switch to language menu
+            self.jobs.append(Jobs.TryClick(selector_type="XPATH",
+                                           selector='//*[@id="langSecLink"]/a',
+                                           task=self.name + "/Language",
+                                           captcha_mode='never'
+                                           ))
+            # set the language
+            self.jobs.append(Jobs.TryClick(selector_type="XPATH",
+                                           selector=f'//*[@id="langten"]/div/span[@class="jfk-radiobutton-label"][text()="{self._set_language}"]',
+                                           task=self.name + "/Language",
+                                           captcha_mode='never'))
 
         self.jobs.append(Jobs.TryClick(selector_type="XPATH",
                                        selector='//*[@id="form-buttons"]/div[1]',
