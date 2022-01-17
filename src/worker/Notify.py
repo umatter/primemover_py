@@ -48,7 +48,7 @@ def send_update(password, email_list, date=datetime.date.today()):
         # [log['Summary neutral search'].pop(k, None) for k in
         #  ['failed_status', 'failed_ids',
         #   'failed_tasks', 'nr_queue_failure', 'queue_status', 'failed_queue_ids',]]
-        log.pop('Summary neutral serch')
+        log.pop('Summary neutral search')
     except:
         log["Tasks"]["Summary neutral search"] = 'failure'
     body += json.dumps(log, indent='  ')
