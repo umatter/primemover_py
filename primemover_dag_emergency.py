@@ -15,6 +15,7 @@ from airflow.utils.dates import days_ago
 # These args will get passed on to each operator
 # You can override them on a per-task basis during operator initialization
 import src
+from src.worker.Utilities import string_to_bool
 
 default_args = {
     "owner": "johannesl",
@@ -84,10 +85,10 @@ t6 = PythonOperator(
     python_callable=src.UpdateExperiment.single_update,
     op_kwargs={"date_time": datetime.now(),
                "experiment_id": Variable.get("experiment_id", "id_missing"),
-               "fixed_times": Variable.get("fixed_times", False, deserialize_json=True),
-               "update_preferences": Variable.get("update_preferences", False, deserialize_json=True),
-               "delta_t_1": Variable.get("delta_t_1", 120, deserialize_json=True),
-               "delta_t_2": Variable.get("delta_t_2", 36, deserialize_json=True)},
+               "fixed_times": string_to_bool(Variable.get("fixed_times", False)),
+               "update_preferences": string_to_bool(Variable.get("update_preferences", False)),
+               "delta_t_1": Variable.get("delta_t_1", 120),
+               "delta_t_2": Variable.get("delta_t_2", 36)},
     dag=dag
 )
 
