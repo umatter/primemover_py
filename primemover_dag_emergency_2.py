@@ -1,6 +1,5 @@
 from datetime import timedelta, datetime
 import sys
-
 PATH_MODULES = "/primemover_py"
 sys.path += [PATH_MODULES]
 
@@ -92,10 +91,10 @@ t6 = PythonOperator(
     python_callable=src.UpdateExperiment.single_update,
     op_kwargs={"date_time": datetime.now(),
                "experiment_id": Variable.get("experiment_id", "id_missing"),
-               "fixed_times": bool(Variable.get("fixed_times", False)),
-               "update_preferences": bool(Variable.get("update_preferences", False)),
-               "delta_t_1": int(Variable.get("delta_t_1", 120)),
-               "delta_t_2": int(Variable.get("delta_t_2", 36))},
+               "fixed_times": Variable.get("fixed_times", False, deserialize_json=True),
+               "update_preferences": Variable.get("update_preferences", False, deserialize_json=True),
+               "delta_t_1": Variable.get("delta_t_1", 120, deserialize_json=True),
+               "delta_t_2": Variable.get("delta_t_2", 36, deserialize_json=True)},
     dag=dag
 )
 
