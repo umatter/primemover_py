@@ -28,24 +28,20 @@ def single_update(experiment_id, date_time=datetime.now()):
 
     crawler_list = Crawler.from_list(raw_experiment['crawlers'], date_time=date_time)
     # crawler_list = UpdateObject(crawler_list, 'config')
-    # with open(PRIMEMOVER_PATH + '/resources/other/processed.json', 'r') as file:
-    #     ids_processed = json.load(file)
+    with open(PRIMEMOVER_PATH + '/resources/other/to_process.json', 'r') as file:
+        ids_to_process = json.load(file)
 
-    # i = 0
-    # crawler_list_2 = []
-    # while len(crawler_list_2) < 35 and i < len(crawler_list):
-    #     individual = crawler_list[i]
-    #     if individual.crawler_info.crawler_id not in ids_processed:
-    #         i += 1
-    #         continue
-    #     individual.add_task(BrowserLeaks)
-    #     crawler_list_2.append(individual)
-    #     i += 1
-    # print(i)
-    [c.add_task(BrowserLeaks) for c in crawler_list]
+    crawler_list_2 = []
+    for individual in crawler_list:
+        if individual.crawler_info.crawler_id in ids_to_process:
+            individual.add_task(BrowserLeaks)
+        crawler_list_2.append(individual)
 
+    # [c.add_task(BrowserLeaks) for c in crawler_list]
+
+    crawler_list = crawler_list_2
     queues = [c.queues[0] for c in crawler_list]
-    t_0 = datetime.fromisoformat(f'{date_time.date().isoformat()}T13:00:00+01:00')
+    t_0 = datetime.fromisoformat(f'{date_time.date().isoformat()}T14:30:00+01:00')
     print(t_0)
     delta_t_1 = int(120)
 
