@@ -43,7 +43,7 @@ def single_update(experiment_id, date_time=datetime.now()):
     queues = [c.queues[0] for c in crawler_list]
     t_0 = datetime.fromisoformat(f'{date_time.date().isoformat()}T14:30:00+01:00')
     print(t_0)
-    delta_t_1 = int(120)
+    delta_t_1 = int(90)
 
     for q in queues[0:]:
         q.start_at = t_0.isoformat()
