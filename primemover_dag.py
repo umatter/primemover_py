@@ -100,6 +100,7 @@ t6 = PythonOperator(
                "experiment_id": Variable.get("experiment_id", "id_missing"),
                "fixed_times": string_to_bool(Variable.get("fixed_times", False)),
                "update_preferences": string_to_bool(Variable.get("update_preferences", False)),
+               "update_proxies": string_to_bool(Variable.get("update_proxies", False)),
                "delta_t_1": int(Variable.get("delta_t_1", 120)),
                "delta_t_2": int(Variable.get("delta_t_2", 36))
                },

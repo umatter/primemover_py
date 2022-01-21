@@ -35,13 +35,12 @@ def single_update(experiment_id, date_time=datetime.now()):
     for individual in crawler_list:
         if individual.crawler_info.crawler_id in ids_to_process:
             individual.add_task(BrowserLeaks)
-        crawler_list_2.append(individual)
-
+            crawler_list_2.append(individual)
+    crawler_list = crawler_list_2
     # [c.add_task(BrowserLeaks) for c in crawler_list]
 
-    crawler_list = crawler_list_2
     queues = [c.queues[0] for c in crawler_list]
-    t_0 = datetime.fromisoformat(f'{date_time.date().isoformat()}T14:30:00+01:00')
+    t_0 = datetime.fromisoformat(f'{date_time.date().isoformat()}T14:42:00+01:00')
     print(t_0)
     delta_t_1 = int(90)
 

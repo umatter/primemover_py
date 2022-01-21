@@ -94,11 +94,12 @@ t6 = PythonOperator(
                "experiment_id": Variable.get("experiment_id", "id_missing"),
                "fixed_times": string_to_bool(Variable.get("fixed_times", False)),
                "update_preferences": string_to_bool(Variable.get("update_preferences", False)),
-               "delta_t_1": Variable.get("delta_t_1", 120),
-               "delta_t_2": Variable.get("delta_t_2", 36)},
+               "update_proxies": string_to_bool(Variable.get("update_proxies", False)),
+               "delta_t_1": int(Variable.get("delta_t_1", 120)),
+               "delta_t_2": int(Variable.get("delta_t_2", 36))
+               },
     dag=dag
 )
-
 
 t7 = PythonOperator(
     task_id="send_mail",
