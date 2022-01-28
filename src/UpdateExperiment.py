@@ -115,7 +115,9 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
     if fixed_times:
         queues_1 = [c.queues[0] for c in crawler_list]
         queues_1.sort(key=lambda q: datetime.fromisoformat(q.start_at))
-        t_0 = datetime.fromisoformat(queues_1[0].start_at)
+        # t_0 = datetime.fromisoformat(queues_1[0].start_at)
+        t_0 = datetime.fromisoformat(
+            f'{date_time.date().isoformat()}T10:00:00-06:00')
         print(t_0)
         delta_t_1 = int(delta_t_1)
         for q in queues_1[1:]:
@@ -124,7 +126,8 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
 
         queues_2 = [c.queues[1] for c in crawler_list]
         queues_2.sort(key=lambda q: datetime.fromisoformat(q.start_at))
-        t_0 = datetime.fromisoformat(queues_2[0].start_at)
+        t_0 = datetime.fromisoformat(
+            f'{date_time.date().isoformat()}T21:00:00-06:00')
         print(t_0)
         for q in queues_2[1:]:
             delta_t_2 = int(delta_t_2)
@@ -191,6 +194,8 @@ if __name__ == "__main__":
     #     single_update(day_delta=day)
     #     print((datetime.now().date() + timedelta(days=day)).isoformat())
     single_update(date_time=datetime.now(),
-                  experiment_id=41,
+                  experiment_id=47,
                   manual=True,
+                  update_preferences=False,
+                  update_proxies=False,
                   fixed_times=True)
