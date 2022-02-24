@@ -84,7 +84,9 @@ t5 = PythonOperator(
     python_callable=src.worker.DataCopy.create_copy,
     op_kwargs={"experiment_id": Variable.get("experiment_id", "id_missing"),
                "date": datetime.now().date()},
-    dag=dag
+    dag=dag,
+    retries=2,
+
 )
 
 t6 = PythonOperator(

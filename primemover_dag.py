@@ -61,7 +61,6 @@ t1 = PythonOperator(
 t2 = PythonOperator(
     task_id="parse_all_results",
     python_callable=src.Results.process_results,
-    retries=2,
     op_kwargs={"set_reviewed": True,
                "parser_dict": src.worker.s3_parser.ParserDict,
                "path_end": "all_data_",
@@ -92,6 +91,7 @@ t5 = PythonOperator(
     python_callable=src.worker.DataCopy.create_copy,
     op_kwargs={"experiment_id": Variable.get("experiment_id", "id_missing"),
                "date": datetime.now().date()},
+    retries=2,
     dag=dag
 )
 
