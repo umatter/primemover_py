@@ -349,6 +349,11 @@ def fetch_crawler(id):
     return r.json()['data']
 
 
+def fetch_queue(id):
+    r = requests.get(DOMAIN + f'queues/{id}')
+    return r.json()['data']
+
+
 def fetch_proxy(id):
     r = requests.get(DOMAIN + f'proxies/{id}')
     return r.json()['data']

@@ -2,7 +2,6 @@
 Proxy Class
 matches the proxy object on the primemover_api
 TODO Secure passwords
-TODO check with Ueli if update format is correct, seems to be missing a :
 """
 
 from src.worker.Info import ProxyInfo
@@ -108,8 +107,8 @@ class Proxy:
             proxy_dict = proxy_dict[0]
         proxy_object = cls(name=proxy_dict.get('name'),
                            description=proxy_dict.get('description'),
-                           username=proxy_dict.get('username'),
-                           password=proxy_dict.get('password'),
+                           # username=proxy_dict.get('username'),
+                           # password=proxy_dict.get('password'),
                            type=proxy_dict.get('type'),
                            hostname=proxy_dict.get('hostname'),
                            port=proxy_dict.get('port'),
