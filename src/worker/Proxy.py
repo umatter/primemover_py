@@ -12,10 +12,6 @@ from src.worker.History import S3History
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
-with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as key_file:
-    keys = json.load(key_file)
-GEOSURF_USERNAME = keys['GEOSURF']['username']
-GEOSURF_PASSWORD = keys['GEOSURF']['password']
 
 PROXYPATHS = ['/resources/proxies/rotating_proxies.csv',
               '/resources/proxies/private_proxies.csv']
@@ -24,8 +20,8 @@ PROXYPATHS = ['/resources/proxies/rotating_proxies.csv',
 class Proxy:
 
     def __init__(self,
-                 username=GEOSURF_USERNAME,
-                 password=GEOSURF_PASSWORD,
+                 username=None,
+                 password=None,
                  name="Sample Proxy",
                  description="Proxy",
                  type="GEOSURF",
@@ -33,18 +29,54 @@ class Proxy:
                  port=8000,
                  info=None
                  ):
+        with open(PRIMEMOVER_PATH + '/resources/other/keys.json',
+                  'r') as key_file:
+            self._keys = json.load(key_file)
+
         self._name = name
         self._description = description
         self._type = type
+        if self._type == 'HTTP':
+            self._internal_type = self._name.split()[0].upper()
+        else:
+            self._internal_type = self._type
         self._hostname = hostname
         self._port = port
-        self._username = username
-        self._password = password
+        self.username = username
+        self.password = password
         self._info = info
         if self._info is not None:
             self._history = S3History(self)
         else:
             self._history = None
+
+    @property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, val):
+        if val is not None:
+            self._password = val
+        elif val is None and self._internal_type in ['GEOSURF', 'ROTATING', 'PRIVATE']:
+            self._password = self._keys[self._internal_type]['password']
+        else:
+            self._password = ""
+
+    @property
+    def username(self):
+        return self._username
+
+    @username.setter
+    def username(self, val):
+        if val is not None:
+            self._username = val
+        elif val is None and self._internal_type in ['GEOSURF', 'ROTATING', 'PRIVATE']:
+            self._username = self._keys[self._internal_type]['username']
+        else:
+            self._username = ""
+
+
 
     def _check_location_non_geosurf(self):
         """
@@ -94,8 +126,8 @@ class Proxy:
                        "type": self._type,
                        "hostname": self._hostname,
                        "port": self._port,
-                       "username": self._username,
-                       "password": self._password}
+                       "username": self.username,
+                       "password": self.password}
         if send_info and self._info is not None:
             for key, value in self._info.as_dict().items():
                 return_dict[key] = value
