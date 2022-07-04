@@ -48,7 +48,7 @@ NEUTRAL = ["Sidney Powell", "Donald Trump is", "Joe Biden is", "covid vaccine",
 def single_update(day_delta=0):
     GenerateBenignTerms()
 
-    # existing_crawler_path = f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date()+ timedelta(days=-1)).isoformat()}.json'
+    # existing_crawler_path = f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date_time()+ timedelta(days=-1)).isoformat()}.json'
     existing_crawler_path = PRIMEMOVER_PATH + "/resources/crawlers/2020-10-23.json"
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,
@@ -124,7 +124,7 @@ def single_update(day_delta=0):
         path=PRIMEMOVER_PATH + "/resources/examples/test_update_py.json")
     # data_as_dict = json.loads(return_data.text)
     # with open(
-    #         f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date() + timedelta(days=day_delta)).isoformat()}.json',
+    #         f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date_time() + timedelta(days=day_delta)).isoformat()}.json',
     #         'w') as file:
     #     json.dump(data_as_dict, file, indent='  ')
 
@@ -132,7 +132,7 @@ def single_update(day_delta=0):
 if __name__ == "__main__":
     # for day in range(13):
     #     single_update(day_delta=day)
-    #     print((datetime.now().date() + timedelta(days=day)).isoformat())
+    #     print((datetime.now().date_time() + timedelta(days=day)).isoformat())
     do = input('push data? (y/n): ')
     if do == 'y':
         single_update(day_delta=0)

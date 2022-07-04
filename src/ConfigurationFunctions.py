@@ -39,7 +39,7 @@ def NoiseUtility():
     """
     Returns: epsilon: float, noise parameter when determining utility
     """
-    return float(gumbel(-0.4557735, 0.793006, 1)[0])/10
+    return float(gumbel(-0.4557735, 0.793006, 1)[0]) / 10
 
 
 def SelectSearchTerms(pi, alpha_hat, tau_hat_ik, k=40):
@@ -69,21 +69,24 @@ def SelectSearchTerms(pi, alpha_hat, tau_hat_ik, k=40):
     return terms
 
 
-def SelectMediaOutlets(alpha_tilde, tau_tilde_ij, state, pi=0, k=10):
+def SelectMediaOutlets(alpha_tilde, tau_tilde_ij, pi=0, k=8, local=2):
     """
     Select a subset of all media outlets.
     Arguments:
         - pi: political orientation of individual
+        - k: nr national outlets
+        - local: nr local outlets
     Returns: dictionary of outlets with domains as keys and urls as values
     """
-    us_pop = 327533774
-
+    # Select national outlets
     path_outlets = PRIMEMOVER_PATH + '/resources/input_data/outlets_pool.csv'
+
     outlets = pd.read_csv(path_outlets,
-                          usecols=['domain', 'pub_state', 'redirect_url',
+                          usecols=['domain', 'state', 'redirect_url',
                                    'avg_users_us_percent',
                                    'avg_reach_permillion', 'pi', 'pop2019',
                                    'is_local'])
+
     outlets['pi'] = outlets['pi'].astype(float)
     outlets['avg_users_us_percent'] = outlets['avg_users_us_percent'].astype(
         float)
@@ -97,17 +100,11 @@ def SelectMediaOutlets(alpha_tilde, tau_tilde_ij, state, pi=0, k=10):
     weighted_utilities = []
     for row in outlets.index:
         epsilon_ij = NoiseUtility()
-        s_j = outlets.loc[row]['pub_state']
-        if outlets.loc[row]['is_local'] and (type(s_j) is str):
-            if state in s_j:
-                weight = outlets.loc[row]['avg_reach_permillion'] * \
-                         outlets.loc[row]['avg_users_us_percent'] * us_pop / \
-                         outlets.loc[row]['pop2019']
-            else:
-                weight = 0
-        else:
+        if not outlets.loc[row]['is_local']:
             weight = outlets.loc[row]['avg_reach_permillion'] * \
                      outlets.loc[row]['avg_users_us_percent'] / 100
+        else:
+            continue
         weighted_utilities.append(((weight * media_utility_u_ij(pi_i=pi,
                                                                 pi_tilde_j=
                                                                 outlets.loc[
@@ -122,6 +119,22 @@ def SelectMediaOutlets(alpha_tilde, tau_tilde_ij, state, pi=0, k=10):
     max_K = weighted_utilities[-k:]
     outlets = [{'domain': domain, 'url': url, 'pi': pi} for
                util, domain, url, pi in max_K]
+
+    # select local outlets
+    path_outlets_local = PRIMEMOVER_PATH + '/resources/input_data/outlets_pool_local.csv'
+
+    outlets_local = pd.read_csv(path_outlets_local,
+                                usecols=['domain', 'state', 'redirect_url',
+                                         'avg_users_us_percent',
+                                         'avg_reach_permillion', 'pi',
+                                         'pop2019',
+                                         'is_local'])
+    chosen = r.sample(list(outlets_local.index), k=local)
+
+    outlets += [{'domain': outlets_local.loc[i]['domain'],
+                        'url': outlets_local.loc[i]['redirect_url'],
+                        'pi': outlets_local.loc[i]['pi']} for
+                       i in chosen]
     return outlets
 
 
@@ -179,8 +192,20 @@ def location():
 
 def usage_type():
     choice = \
-    r.choices(['only_search', 'only_direct', 'both'], [0.25, 0.25, 0.5])[0]
+        r.choices(['only_search', 'only_direct', 'both'], [0.25, 0.25, 0.5])[0]
     return choice
+
+
+def cookie_pref():
+    pref = {'accept_all': True}
+    if not pref['accept_all']:
+        pref['SearchCustom'] = r.choice([True, False])
+        pref['YoutubeHist'] = r.choice([True, False])
+        pref['AdCustom'] = r.choice([True, False, 'More'])
+        if pref['AdCustom'] == 'More':
+            pref['GoogleAds'] = False
+            pref['YoutubeAds'] = False
+    return pref
 
 
 """
@@ -197,12 +222,14 @@ def language():
         ("es-MX,es;q=0.8,en-US;q=0.5,en;q=0.3")
     returns: One of the two language strings above
     """
-    languages = ["en-US,en;q=0.5", "es-MX,es;q=0.8,en-US;q=0.5,en;q=0.3"]
-    choice = r.choices(languages, [0.75, 0.25])[0]
+    # languages = ["en-US,en;q=0.5", "es-MX,es;q=0.8,en-US;q=0.5,en;q=0.3"]
+    # choice = r.choices(languages, [0.75, 0.25])[0]
+
+    choice = "en-US,en;q=0.5"
     return choice
 
 
-def geolocation(option_choice = 'random'):
+def geolocation(option_choice='random'):
     if option_choice == 'random':
         choice = r.choices(['BLOCK', 'ALLOW'], [0.2, 0.8])[0]
     elif option_choice == 'geolocation':
@@ -212,7 +239,7 @@ def geolocation(option_choice = 'random'):
     return choice
 
 
-def do_not_track(option_choice = 'random'):
+def do_not_track(option_choice='random'):
     if option_choice == 'random':
         choice = r.choices([0, 1], [0.8, 0.2])[0]
     elif option_choice == 'do_not_track':
@@ -222,7 +249,7 @@ def do_not_track(option_choice = 'random'):
     return choice
 
 
-def hardware_canvas(option_choice = 'random'):
+def hardware_canvas(option_choice='random'):
     if option_choice == 'random':
         choice = r.choices(['BLOCK', 'NOISE'], [0.2, 0.8])[0]
     elif option_choice == 'hardware_canvas':
@@ -232,7 +259,7 @@ def hardware_canvas(option_choice = 'random'):
     return choice
 
 
-def local_storage(option_choice = 'random'):
+def local_storage(option_choice='random'):
     if option_choice == 'random':
         choice = r.choices([True, False], [0.8, 0.2])[0]
     elif option_choice == 'local_storage':
@@ -240,6 +267,31 @@ def local_storage(option_choice = 'random'):
     else:
         choice = True
     return choice
+
+
+def select_local_outlets(path_in, path_local_out, nr_per_state=2):
+    """
+        Select nr_per_state number of local news outlets per state in outlets input
+    """
+    outlets = pd.read_csv(path_in,
+                          usecols=['domain', 'state', 'redirect_url',
+                                   'avg_users_us_percent',
+                                   'avg_reach_permillion', 'pi', 'pop2019',
+                                   'is_local'])
+    states = list(set(outlets['state']))
+    outlets['size'] = outlets['avg_reach_permillion'] * outlets[
+        'avg_users_us_percent'] / 100
+    outlets = outlets.loc[outlets['is_local']]
+    outlets = outlets.loc[outlets['state'] != 'USA']
+    outlets = outlets.sort_values(by='size', ascending=False)
+    outlets = outlets.reset_index(drop=True)
+    outlets_out = outlets.loc[outlets['state'] == states[0]].iloc[
+                  0:nr_per_state]
+    for state in states[1:]:
+        outlets_out = outlets_out.append(
+            outlets.loc[outlets['state'] == state].iloc[0:nr_per_state])
+    outlets_out = outlets_out.reset_index(drop=True)
+    outlets_out.to_csv(path_local_out, header=True)
 
 
 if __name__ == "__main__":

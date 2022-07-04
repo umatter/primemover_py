@@ -16,7 +16,7 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
 
 
-def single_update(experiment_id, date=datetime.now()):
+def single_update(experiment_id, date_time=datetime.now()):
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=12 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
@@ -26,40 +26,40 @@ def single_update(experiment_id, date=datetime.now()):
     raw_experiment = api_wrapper.fetch_experiment(access_token=key, id=
     experiment_id)
 
-    crawler_list = Crawler.from_list(raw_experiment['crawlers'], date=date)
-    crawler_list = UpdateObject(crawler_list, 'config')
-    with open(PRIMEMOVER_PATH + '/resources/other/processed.json', 'r') as file:
-        ids_processed = json.load(file)
+    crawler_list = Crawler.from_list(raw_experiment['crawlers'], date_time=date_time)
+    # crawler_list = UpdateObject(crawler_list, 'config')
+    with open(PRIMEMOVER_PATH + '/resources/other/to_process.json', 'r') as file:
+        ids_to_process = json.load(file)
 
-    i = 0
     crawler_list_2 = []
-    while len(crawler_list_2) < 35 and i < len(crawler_list):
-        individual = crawler_list[i]
-        if individual.crawler_info.crawler_id not in ids_processed:
-            i += 1
-            continue
-        individual.schedule = TimeHandler("US-NY-NEW_YORK",
-                                          interval=120,
-                                          wake_time=8 * 60 * 60,
-                                          bed_time=9.5 * 60 * 60,
-                                          date=date)
-        individual.add_task(BrowserLeaks)
-        crawler_list_2.append(individual)
-        i += 1
-    print(i)
+    for individual in crawler_list:
+        if individual.crawler_info.crawler_id in ids_to_process:
+            individual.add_task(BrowserLeaks)
+            crawler_list_2.append(individual)
+    crawler_list = crawler_list_2
+    # [c.add_task(BrowserLeaks) for c in crawler_list]
+
+    queues = [c.queues[0] for c in crawler_list]
+    t_0 = datetime.fromisoformat(f'{date_time.date().isoformat()}T14:42:00+01:00')
+    print(t_0)
+    delta_t_1 = int(90)
+
+    for q in queues[0:]:
+        q.start_at = t_0.isoformat()
+        t_0 += timedelta(seconds=delta_t_1)
     with open(PRIMEMOVER_PATH + "/resources/updates/generated.json",
               'w') as file:
-        json.dump([crawler.as_dict() for crawler in crawler_list_2], file,
+        json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
     return_data = api.push_new(access_token=key,
                                path=PRIMEMOVER_PATH + "/resources/updates/generated.json")
     data_as_dict = json.loads(return_data.text)
     with open(
-            f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(date.date()).isoformat()}.json',
+            f'{PRIMEMOVER_PATH}/resources/updates/exp_3_{(date_time.date()).isoformat()}.json',
             'w') as file:
         json.dump(data_as_dict, file, indent='  ')
 
 
 if __name__ == "__main__":
-    single_update(experiment_id=41, date=datetime.now())
+    single_update(experiment_id=46, date_time=datetime.now())

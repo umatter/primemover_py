@@ -3,7 +3,9 @@ import sys
 
 PATH_MODULES = "/primemover_py"
 sys.path += [PATH_MODULES]
+
 # The DAG object; we"ll need this to instantiate a DAG
+from airflow.models import Variable
 
 from airflow import DAG
 # Operators; we need this to operate!
@@ -15,7 +17,7 @@ from airflow.utils.dates import days_ago
 import src
 
 default_args = {
-    "owner": "johannes",
+    "owner": "johannesl",
     "depends_on_past": False,
     "start_date": datetime(2021, 1, 1),
     "email": ["johannesl@me.com"],
@@ -38,17 +40,18 @@ default_args = {
     # "sla_miss_callback": yet_another_function,
     # "trigger_rule": "all_success"
 }
+
 dag = DAG(
-    "new_experiment",
+    dag_id="pull_neutral",
     default_args=default_args,
-    description="create new crawlers",
+    description="pull neutral terms from s3 manually",
     schedule_interval=None,
     catchup=False
 )
 
-# t1, t2 and t3 are examples of tasks created by instantiating operators
 t1 = PythonOperator(
-    task_id="create_experiment",
-    python_callable=src.experiment_2.launch_experiment,
-    dag=dag
-)
+    task_id="cleanup",
+    python_callable=src.worker.s3_wrapper.fetch_neutral,
+    dag=dag)
+
+t1
