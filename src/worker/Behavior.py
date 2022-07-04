@@ -203,6 +203,8 @@ class SelectionType(Behavior):
 
 class ClickSelectionType(Behavior):
     """
+    Describes type of click_selector, one of "XPATH|CSS|CLASS|ID".
+    
     ClickSelectionType behavior key value pair, used to share what type some selector
     Public Attributes:
         - click_selector_type: string, one of "XPATH|CSS|CLASS|ID"
@@ -231,6 +233,8 @@ class ClickSelectionType(Behavior):
 
 class CriteriaSelectionType(Behavior):
     """
+    Describes type of criteria_selector, one of "XPATH|CSS|CLASS|ID".
+    
     CriteriaSelectionType behavior key value pair, used to share what type some selector
     Public Attributes:
         - criteria_selector_type: string, one of "XPATH|CSS|CLASS|ID"
@@ -284,6 +288,8 @@ class Selector(Behavior):
 
 class ClickSelector(Behavior):
     """
+    Identifies all elements, which can potentially be selected.
+    
     Click selector behavior key value pair, used to share a html selector
     Public Attributes:
         - selector: string, a valid XPATH|CSS|CLASS|ID selector
@@ -308,6 +314,8 @@ class ClickSelector(Behavior):
 
 class CriteriaSelector(Behavior):
     """
+    Identifies the information relevant for selecting a specific element if decision_type="CALCULATED".
+    
     Criteria selector behavior key value pair, used to share a html selector
     Public Attributes:
         - selector: string, a valid XPATH|CSS|CLASS|ID selector
@@ -637,6 +645,9 @@ class CaptchaMode(Behavior):
 class CriteriaExtractorBehavior(Behavior):
     """
     Behavior of criteriaExtractor (string describing matching mechanism).
+    
+    A regex used for filtering out relevant information from the elements selected by the criteria_selector if decision_type="CALCULATED".
+    E.g. for Google, the regex reduces the URLs of search results to their domains.    
     """
 
     def __init__(self, criteria_extractor):
@@ -656,6 +667,8 @@ class CriteriaExtractorBehavior(Behavior):
 class CriteriaBaseBehavior(Behavior):
     """
     Behavior of criteriaBase (string describing matching source (attribute or text)).
+    
+    Describes whether an attribute or the element text of the elements selected by the criteria_selector should be used.
     """
 
     def __init__(self, criteria_base):

@@ -137,7 +137,17 @@ class EnterText(Job):
 
 
 class SingleSelect(Job):
-    """Click on an element of a website"""
+    """
+    Click on an element of a website.
+
+    REQUIRED: click_selector, click_selector_type
+        if decision_type=="CALCULATED": criteria_extractor is also required
+
+    For decision_type=="CALCULATED", it is possible to distinguish between the click_selector and the criteria_selector.
+    The criteria_selector and the criteria_extractor select the element. The click_selector then points towards where
+    the click should happen. If no additional criteria_selector is given, it is assumed that the click_selector and the
+    criteria_selector are equivalent.
+    """
 
     def __init__(self,
                  click_selector,
@@ -167,10 +177,13 @@ class SingleSelect(Job):
                          description=f'Select an item and click', task=task,
                          flag=flag,
                          captcha_mode=captcha_mode)
+        
+        # click_selector_type and click_selector are always required
         self.behaviors.append(
             Behavior.ClickSelectionType(click_selector_type))
         self.behaviors.append(
             Behavior.ClickSelector(click_selector))
+        
         self.behaviors.append(
             Behavior.DecisionType(decision_type))
         if flag is not None:
@@ -182,18 +195,21 @@ class SingleSelect(Job):
             self.behaviors.append(
                 Behavior.TaskBehavior(f'{decision_type}/{task}')
             )
-
+        
+        # if decision_type is CALCULATED, a regex (criteria_extractor) is required
         if criteria_extractor is None and decision_type == 'CALCULATED':
             raise ValueError('Criteria extractor required for decision type CALCULATED.')
-
         elif criteria_extractor is not None and decision_type == 'CALCULATED':
             self.behaviors.append(
                 Behavior.CriteriaExtractorBehavior(criteria_extractor)
             )
 
         if decision_type == 'CALCULATED':
+            # raise error if a new criteria_selector_type is given, but no new criteria_selector
             if criteria_selector_type is not None and criteria_selector is None:
                 raise ValueError('New criteria selector type given, but no new criteria selector was given.')
+            # if a new criteria_selector is given, but no new criteria_selector_type, it is assumed that the
+            # criteria_selector_type is equivalent to the click_selector_type
             elif criteria_selector_type is None and criteria_selector is not None:
                 self.behaviors.append(
                     Behavior.CriteriaSelectionType(click_selector_type)
@@ -203,10 +219,12 @@ class SingleSelect(Job):
                 )
                 if click_selector_type == 'XPATH':
                     if criteria_base is None:
+                        # if the selector_type is "XPATH" and a-elements are selected, the criteria_base is "ATR_href"
                         if criteria_selector.split('/')[len(criteria_selector.split('/'))-1].split('[')[0] == 'a':
                             self.behaviors.append(
                                 Behavior.CriteriaBaseBehavior('ATR_href')
                             )
+                        # if other elements are selected, the criteria_base is "TEXT"
                         else:
                             self.behaviors.append(
                                 Behavior.CriteriaBaseBehavior('TEXT')
@@ -215,6 +233,8 @@ class SingleSelect(Job):
                         self.behaviors.append(
                             Behavior.CriteriaBaseBehavior(criteria_base)
                         )
+            # if neither the criteria_selector nor the criteria_selector_type are given, it is assumed that the
+            # criteria_selector_type (criteria_selector) is equivalent to the click_selector_type (click_selector)
             elif criteria_selector_type is None and criteria_selector is None:
                 self.behaviors.append(
                     Behavior.CriteriaSelectionType(click_selector_type)
@@ -224,6 +244,7 @@ class SingleSelect(Job):
                 )
                 if click_selector_type == 'XPATH':
                     if criteria_base is None:
+                        # if the selector_type is "XPATH" and a-elements are selected, the criteria_base is "ATR_href"
                         if click_selector.split('/')[len(click_selector.split('/'))-1].split('[')[0] == 'a':
                             self.behaviors.append(
                                 Behavior.CriteriaBaseBehavior('ATR_href')
@@ -232,6 +253,7 @@ class SingleSelect(Job):
                             self.behaviors.append(
                                 Behavior.CriteriaBaseBehavior('TEXT')
                             )
+                    # if other elements are selected, the criteria_base is "TEXT"
                     else:
                         self.behaviors.append(
                             Behavior.CriteriaBaseBehavior(criteria_base)
@@ -245,10 +267,12 @@ class SingleSelect(Job):
                 )
                 if criteria_selector_type == 'XPATH':
                     if criteria_base is None:
+                        # if the selector_type is "XPATH" and a-elements are selected, the criteria_base is "ATR_href"
                         if criteria_selector.split('/')[len(criteria_selector.split('/'))-1].split('[')[0] == 'a':
                             self.behaviors.append(
                                 Behavior.CriteriaBaseBehavior('ATR_href')
                             )
+                        # if other elements are selected, the criteria_base is "TEXT"
                         else:
                             self.behaviors.append(
                                 Behavior.CriteriaBaseBehavior('TEXT')
