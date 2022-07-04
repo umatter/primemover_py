@@ -52,3 +52,14 @@ def pref_as_dict(pref_object):
     for item in pref_object:
         pref_dict[item.get('name')] = item.get('value')
     return pref_dict
+
+
+def string_to_bool(string_in):
+    if type(string_in) is bool:
+        return string_in
+    elif string_in.lower().strip() in ['false', 'no', 'n']:
+        return False
+    elif string_in.lower().strip() in ['true', 'yes', 'y']:
+        return True
+    else:
+        raise ValueError(f"{string_in} is not a recognized string!")

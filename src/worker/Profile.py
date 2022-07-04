@@ -53,7 +53,7 @@ class Profile:
         self.name = name
         self.browser = browser
 
-        privacy_setting = random.choices([True, False], [0.75, 0.25])[0]
+        privacy_setting = False
         if privacy_setting:
             option = random.choice(
                 ['geolocation', 'do_not_track', 'hardware_canvas',
@@ -351,13 +351,13 @@ class Profile:
             base_dict['canvas'] = {'mode': self.hardware_canvas}
         if self.local_storage not in [None, 'MultiloginDefault']:
             base_dict['storage'] = {'local': self.local_storage}
-        if self.service_worker_cache not in [None, 'MultiloginDefault']:
-            if 'storage' in base_dict:
-                base_dict['storage'][
-                    'serviceWorkerCache'] = self.service_worker_cache
-            else:
-                base_dict['storage'] = {
-                    'serviceWorkerCache': self.service_worker_cache}
+        # if self.service_worker_cache not in [None, 'MultiloginDefault']:
+        #     if 'storage' in base_dict:
+        #         base_dict['storage'][
+        #             'serviceWorkerCache'] = self.service_worker_cache
+        #     else:
+        #         base_dict['storage'] = {
+        #             'serviceWorkerCache': self.service_worker_cache}
 
         return base_dict
 

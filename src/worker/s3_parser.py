@@ -119,17 +119,29 @@ def SelectionParser(behaviors, dynamic_data, job_id):
                      'pi': None, 'known': False})
 
 
-ParserDict['GoogleSearch'] = {'method': GoogleParser, 'data': 'html'}
-ParserDict['search_google_political'] = {'method': GoogleParser, 'data': 'html'}
-ParserDict['search_google_political_media_no_utility'] = {
-    'method': GoogleParser, 'data': 'html'}
-ParserDict['search_google_political_no_utility'] = {'method': GoogleParser,
+ParserDict['google_search'] = {'method': GoogleParser, 'data': 'html'}
+ParserDict['political'] = {'method': GoogleParser,
                                                     'data': 'html'}
-ParserDict['search_google_neutral'] = {'method': GoogleParser, 'data': 'html'}
-ParserDict['BrowserLeaks'] = {'method': BrowserLeaksParser, 'data': 'reports'}
-ParserDict['CALCULATED/search_google_neutral'] = {'method': SelectionParser,
+ParserDict['neutral'] = {'method': GoogleParser, 'data': 'html'}
+ParserDict['leak_ip'] = {'method': BrowserLeaksParser, 'data': 'reports'}
+ParserDict['leak_javascript'] = {'method': BrowserLeaksParser, 'data': 'reports'}
+ParserDict['leak_webrtc'] = {'method': BrowserLeaksParser, 'data': 'reports'}
+ParserDict['leak_canvas'] = {'method': BrowserLeaksParser, 'data': 'reports'}
+ParserDict['leak_webgl'] = {'method': BrowserLeaksParser, 'data': 'reports'}
+ParserDict['leak_fonts'] = {'method': BrowserLeaksParser, 'data': 'reports'}
+ParserDict['leak_ssl'] = {'method': BrowserLeaksParser, 'data': 'reports'}
+ParserDict['leak_features'] = {'method': BrowserLeaksParser, 'data': 'reports'}
+ParserDict['leak_proxy'] = {'method': BrowserLeaksParser, 'data': 'reports'}
+ParserDict['leak_java'] = {'method': BrowserLeaksParser, 'data': 'reports'}
+ParserDict['leak_flash'] = {'method': BrowserLeaksParser, 'data': 'reports'}
+ParserDict['leak_ssl'] = {'method': BrowserLeaksParser, 'data': 'reports'}
+
+
+ParserDict['CALCULATED/neutral'] = {'method': SelectionParser,
+                                                  'data': 'dynamic'}
+ParserDict['CALCULATED/political'] = {'method': SelectionParser,
                                                   'data': 'dynamic'}
 
-UpdateParser['CALCULATED/search_google_neutral'] = {'method': SelectionParser,
+UpdateParser['CALCULATED/neutral'] = {'method': SelectionParser,
                                                     'data': 'dynamic'}
 ParserDict['captcha'] = {'method': CaptchaParser, 'data': 'html'}

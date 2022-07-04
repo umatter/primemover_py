@@ -25,6 +25,7 @@ import pathlib
 from src.worker.Experiment import Experiment
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
+
 DOMAIN = "https://primemover.wimando.ch/api/v1/"
 
 
@@ -35,10 +36,16 @@ def get_access(e_mail, password):
     Returns:
         access_token
     """
+    try:
+        params = {'email': e_mail, 'password': password}
+        post_login = requests.post(DOMAIN + 'login', params=params)
+        returned = post_login.json()
+        token = returned['access_token']
+    except:
+        token = ""
+        Warning("Could not login to api")
 
-    params = {'email': e_mail, 'password': password}
-    post_login = requests.post(DOMAIN + 'login', params=params)
-    return post_login.json()['access_token']
+    return token
 
 
 def push_new(access_token,
@@ -267,7 +274,7 @@ def set_inactive(access_token, queue_id):
     """
     r = requests.put(DOMAIN + f'queues/{queue_id}', data={'active': 0},
                      headers={'authorization': f'Bearer {access_token}'})
-    if r.status_code == 200:
+    if r.status_code in {200,404}:
         return 'success'
     else:
         raise ConnectionError(f'status code {r.status_code}')
@@ -342,6 +349,11 @@ def fetch_crawler(id):
     return r.json()['data']
 
 
+def fetch_queue(id):
+    r = requests.get(DOMAIN + f'queues/{id}')
+    return r.json()['data']
+
+
 def fetch_proxy(id):
     r = requests.get(DOMAIN + f'proxies/{id}')
     return r.json()['data']
@@ -365,7 +377,9 @@ def fetch_crawlers_by_exp(access_token, experiment_id):
 
 
 def delete_exp(access_token, id):
-    requests.delete(DOMAIN + f'crawler/{id}', headers={'authorization': f'Bearer {access_token}'})
+    requests.delete(DOMAIN + f'experiments/{id}', headers={'authorization': f'Bearer {access_token}'})
+
 def delete_queues_2(access_token,i):
     resp = requests.delete(DOMAIN + f'queues/{i}', headers={'authorization': f'Bearer {access_token}'})
     return resp
+

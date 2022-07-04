@@ -2,8 +2,10 @@ from datetime import datetime
 import json
 from src.worker import api_wrapper as api
 import pathlib
+import src.worker.Crawler as Crawler
+import numpy as np
 
-PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
@@ -17,7 +19,11 @@ except FileExistsError:
 
     with open(path, 'r') as file:
         res = json.load(file)
-    res = res['data']
+    res = res['crawlers']
+
+path = f'{PRIMEMOVER_PATH}/resources/updates/{"2021-08-01"}.json'
+
+
 
 def to_datetime(time_str):
     tz = time_str[-5:]

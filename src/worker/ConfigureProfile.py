@@ -72,8 +72,9 @@ class Config:
                  terms=None,
                  location=None,
                  usage_type=None,
+                 cookie_pref=None,
                  info=None,
-                 date=datetime.now()
+                 date_time=datetime.now()
                  ):
 
         self.name = name
@@ -97,10 +98,11 @@ class Config:
 
         self.media = media
         self.terms = terms
-        self._date = date
+        self._date_time = date_time
         self.usage_type = usage_type
+        self.cookie_pref = cookie_pref
         if self.info is not None:
-            self._history = S3History(self, date)
+            self._history = S3History(self, date_time)
         else:
             self._history = None
 
@@ -187,8 +189,8 @@ class Config:
             self._media = ConfigurationFunctions.SelectMediaOutlets(pi=self._pi,
                                                                     alpha_tilde=self.alpha,
                                                                     tau_tilde_ij=self.tau,
-                                                                    state=self._state,
-                                                                    k=10)
+                                                                    k=8,
+                                                                    local=2)
         elif type(media_in) in {list, dict}:
             self._media = media_in
         elif type(media_in) is str and media_in != "":
@@ -229,6 +231,7 @@ class Config:
 
     @location.setter
     def location(self, val):
+        val = val.strip()
         if val is None:
             self._location = ConfigurationFunctions.location()
         elif val in Config.LOCATION_LIST:
@@ -262,6 +265,26 @@ class Config:
         else:
             raise ValueError('Not a valid value for usage_type')
 
+    @property
+    def cookie_pref(self):
+        return self._cookie_pref
+
+    @cookie_pref.setter
+    def cookie_pref(self, val):
+        if (val is None) or (val == "Value not provided at update!"):
+            val = ConfigurationFunctions.cookie_pref()
+        elif type(val) is str:
+            try:
+                val = json.loads(val)
+            except:
+                raise TypeError(
+                    'cookie preferences should be a dictionary or at the very least a json containing "accept_all')
+
+        if type(val) is dict and 'accept_all' in val.keys():
+            self._cookie_pref = val
+        else:
+            raise ValueError('Not a valid value for cookie_pref')
+
     def as_dict(self, send_info=False):
         """
         Generate dictionary object from self, matching configurations in primemover api
@@ -287,19 +310,21 @@ class Config:
                 {
                     "name": 'usage_type',
                     "value": self.usage_type
-                }
-            ]
+                },
+                {"name": "cookie_pref",
+                 "value": json.dumps(self.cookie_pref)
+                 }]
         }
         if send_info and self._info is not None:
             for key, value in self._info.as_dict().items():
                 return_dict[key] = value
-        if self.history is not None and len(self.history.history) != 0:
-            return_dict["preferences"].append({"name": "history",
-                                               "value": str(list(
-                                                   self.history.history.keys()))})
+        # if self.history is not None and len(self.history.history) != 0:
+        #     return_dict["preferences"].append({"name": "history",
+        #                                        "value": str(list(
+        #                                            self.history.history.keys()))})
         return return_dict
 
-    def update_config(self, results, new_location):
+    def update_config(self, results, new_location, terms=True):
         """
         Update self according to results
         """
@@ -309,26 +334,34 @@ class Config:
         if new_location is not None:
             self.location = new_location
         kappa_j_t = self.kappa
+        if results is not None and len(results) > 0:
+            pi_0 = self.pi
+            for outlet in results:
+                if 2 == self.kappa:
+                    if not outlet['known']:
+                        kappa_j_t = 1
+                    else:
+                        kappa_j_t = 0
 
-        for outlet in results:
-            if self.kappa == 2:
-                if not outlet['known']:
-                    kappa_j_t = 1
-                else:
-                    kappa_j_t = 0
+                self.pi = src.Preferences.political_orientation_pi_i_t(
+                    psi_i=self.psi, kappa_j_t_prev=kappa_j_t,
+                    pi_tilde_j_prev=outlet['pi'], pi_i_prev=self.pi)
 
-            self.pi = src.Preferences.political_orientation_pi_i_t(
-                psi_i=self.psi, kappa_j_t_prev=kappa_j_t,
-                pi_tilde_j_prev=outlet['pi'], pi_i_prev=self.pi)
-        self.media = ConfigurationFunctions.update_media_outlets(
-            outlets=self.media + results, alpha_tilde=self.alpha, pi=self.pi,
-            tau_tilde_ij=self.tau, k=10)
+            self.media = ConfigurationFunctions.update_media_outlets(
+                outlets=self.media + results, alpha_tilde=self.alpha,
+                pi=self.pi,
+                tau_tilde_ij=self.tau, k=10)
+            if terms and pi_0 != self.pi:
+                self.terms = ConfigurationFunctions.SelectSearchTerms(pi=self.pi,
+                                                                      alpha_hat=self.alpha,
+                                                                      tau_hat_ik=self.tau,
+                                                                      k=40)
 
         self.history.update_current_status()
         self.history.push()
 
     @classmethod
-    def from_dict(cls, config_dict, location, date=datetime.now()):
+    def from_dict(cls, config_dict, location, date_time=datetime.now()):
         """
         Generate config object from single api return
         Parameters:
@@ -338,7 +371,8 @@ class Config:
         if type(config_dict) is list:
             config_dict = config_dict[0]
         pref = pref_as_dict(config_dict.get('preferences', []))
-        usage_type = pref.get('usage_type')
+        usage_type = pref.get('usage_type', None)
+        cookie_pref = pref.get('cookie_pref', None)
         config_object = cls(name=config_dict.get('name'),
                             description=config_dict.get('description'),
                             psi=config_dict['params'][0].get('psi'),
@@ -352,7 +386,8 @@ class Config:
                             terms=config_dict['params'][0].get('search_terms'),
                             info=ConfigurationInfo.from_dict(config_dict),
                             location=location,
-                            date=date,
-                            usage_type=usage_type
+                            date_time=date_time,
+                            usage_type=usage_type,
+                            cookie_pref=cookie_pref
                             )
         return config_object
