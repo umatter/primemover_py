@@ -1,6 +1,5 @@
 """
 Task(s) for GoogleNews Search.
-
 """
 
 from src.worker import Tasks
@@ -31,7 +30,7 @@ class GoogleNewsSearch(Queue):
 
         # add job to click button (agree) (check if needed)
         self.jobs.append(
-            Jobs.SingleSelect(
+            Jobs.TryClick(
                 selector="//button[@class='VfPpkd-LgbsSe VfPpkd-LgbsSe-OWXEXe-k8QpJ VfPpkd-LgbsSe-OWXEXe-dgl2Hf nCP5yc AjY5Oe DuMIQc']",
                 selector_type='XPATH',
                 flag=search_type,
@@ -63,8 +62,11 @@ class GoogleNewsSearch(Queue):
         # add job to select a result randomly
         if select_result:
             self.jobs.append(
-                Jobs.SingleSelect(selector='/html/body/c-wiz[2]/div/div[2]/div[2]/div/main/c-wiz/div[1]/div',
-                                  selector_type='XPATH',
+                Jobs.SingleSelect(click_selector="//c-wiz[@jsrenderer='vBVNjc']//h3/a | //c-wiz[@jsrenderer='vBVNjc']//h4/a",
+                                  click_selector_type='XPATH',
+                                  criteria_selector="//c-wiz[@jsrenderer='vBVNjc']//a[@class='wEwyrc AVN2gc uQIVzc Sksgp'] | //c-wiz[@jsrenderer='vBVNjc']//a[@class='wEwyrc AVN2gc uQIVzc Sksgp']",
+                                  criteria_selector_type='XPATH',
+                                  criteria_base='TEXT',
                                   decision_type="CALCULATED",
                                   flag=search_type,
                                   task=name
