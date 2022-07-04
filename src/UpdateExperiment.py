@@ -25,7 +25,7 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
     else:
         with open(neutral_path) as file:
             neutral_in = json.load(file)
-    nr_neutral = 3
+    nr_neutral = 2
     neutral = []
     if len(neutral_in) < nr_neutral:
         neutral_in += s3_wrapper.fetch_neutral()
@@ -73,9 +73,9 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
     for individual in crawler_list:
         session_id = individual.add_task(Tasks.HandleCookiesGoogle,
                                          to_session=True)
-        # session_id = individual.add_task(Tasks.SetNrResults,
-        #                                  to_session=session_id,
-        #                                  params={'nr_results': 30})
+        session_id = individual.add_task(Tasks.SetGooglePreferences,
+                                         to_session=session_id,
+                                         params={'nr_results': 30, 'set_language': "English"})
         if individual.flag in {'left', 'right'} and \
                 individual.configuration.usage_type in {'only_search', 'both',
                                                         None}:
@@ -110,12 +110,14 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
                                 to_session=True)
         c.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
                    params={'term': neutral[1]})
-        c.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
-                   params={'term': neutral[2]})
+        # c.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
+        #            params={'term': neutral[2]})
     if fixed_times:
         queues_1 = [c.queues[0] for c in crawler_list]
         queues_1.sort(key=lambda q: datetime.fromisoformat(q.start_at))
-        t_0 = datetime.fromisoformat(queues_1[0].start_at)
+        # t_0 = datetime.fromisoformat(queues_1[0].start_at)
+        t_0 = datetime.fromisoformat(
+            f'{date_time.date().isoformat()}T10:00:00-06:00')
         print(t_0)
         delta_t_1 = int(delta_t_1)
         for q in queues_1[1:]:
@@ -124,7 +126,8 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
 
         queues_2 = [c.queues[1] for c in crawler_list]
         queues_2.sort(key=lambda q: datetime.fromisoformat(q.start_at))
-        t_0 = datetime.fromisoformat(queues_2[0].start_at)
+        t_0 = datetime.fromisoformat(
+            f'{date_time.date().isoformat()}T21:00:00-06:00')
         print(t_0)
         for q in queues_2[1:]:
             delta_t_2 = int(delta_t_2)
@@ -152,6 +155,9 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
         do = input('push data? (y/n): ')
     else:
         do = 'y'
+
+    message = 'success'
+    error_code = None
     if do == 'y':
 
         return_data = api.push_new(access_token=key,
@@ -165,10 +171,22 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
             with open(neutral_path, 'w') as file:
                 json.dump(neutral_in, file)
         else:
+            message = {return_data.text}
+            error_code = return_data.content
             print(return_data)
 
         # experiment = api.update_experiment(key, [exp.as_dict()], exp.id)
-        # print(experiment)
+    # print(experiment)
+    try:
+        with open(PRIMEMOVER_PATH + f'/resources/log/log_{date_time.date().isoformat()}.json', 'r') as f:
+            log = json.load(f)
+    except FileNotFoundError:
+        log = {"Tasks": {}}
+    with open(PRIMEMOVER_PATH + f'/resources/log/log_{date_time.date().isoformat()}.json', 'w') as f:
+        log["Tasks"]["Update_Crawler"] = message
+        if error_code is not None:
+            log["Update_error"] = error_code
+        json.dump(log, f, indent='  ')
 
 
 if __name__ == "__main__":
@@ -176,6 +194,8 @@ if __name__ == "__main__":
     #     single_update(day_delta=day)
     #     print((datetime.now().date() + timedelta(days=day)).isoformat())
     single_update(date_time=datetime.now(),
-                  experiment_id=41,
+                  experiment_id=47,
                   manual=True,
+                  update_preferences=False,
+                  update_proxies=False,
                   fixed_times=True)

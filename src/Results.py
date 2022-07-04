@@ -11,6 +11,7 @@ import pathlib
 import src.worker.s3_wrapper as s3
 import zipfile
 import io
+import pandas as pd
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
 
@@ -49,24 +50,24 @@ class JobResult:
         self._parser_dict = parser_dict
         self.results = None
         if captcha_parse:
-            self.task = 'captcha'
+            self.flag = 'captcha'
         # Check if flag in parser dict, if yes, parse
-        if self.task in self._parser_dict.keys():
-            if parser_dict[self.task]['data'] == 'html':
+        if self.flag in self._parser_dict.keys():
+            if parser_dict[self.flag]['data'] == 'html':
                 raw_data, success = self._download_html()
-            elif parser_dict[self.task]['data'] == 'reports':
+            elif parser_dict[self.flag]['data'] == 'reports':
                 raw_data = self.reports
                 if len(self.reports) > 0:
                     success = True
                 else:
                     success = False
-            elif parser_dict[self.task]['data'] == 'dynamic':
+            elif parser_dict[self.flag]['data'] == 'dynamic':
                 raw_data, success = self._download_dynamic()
             else:
                 raw_data = None
                 success = True
             if success:
-                self.parsed_data = self._parser_dict[self.task]['method'](
+                self.parsed_data = self._parser_dict[self.flag]['method'](
                     self.behaviors,
                     raw_data, job_id)
                 self.results = {'finished_at': self.finished_at,
@@ -194,6 +195,28 @@ class SessionResult:
         for res in temp_results:
             if res is not None:
                 self.results.append(res)
+        self.summary = {'nr_success': 0, 'nr_failure': 0, 'failed_ids': [],
+                        'failed_status': [], 'failed_tasks': []}
+        for job in self._jobs:
+            if job.status_code == 'success':
+                self.summary['nr_success'] += 1
+            elif job.status_code == 'failure':
+                self.summary['nr_failure'] += 1
+                self.summary['failed_ids'].append(job.job_id)
+                self.summary['failed_status'].append(job.status_message)
+                self.summary['failed_tasks'].append(job.task)
+
+    @property
+    def queue_id(self):
+        return self._queue_id
+
+    @property
+    def status_code(self):
+        return self._status_code
+
+    @property
+    def status_message(self):
+        return self._status_message
 
     @classmethod
     def from_list(cls, result_list, set_reviewed=True,
@@ -252,9 +275,36 @@ def export_results(results, date=datetime.today().date().isoformat()):
     return combined
 
 
+def generate_summary(session_data):
+    summary = session_data[0].summary
+    summary['nr_queue_failure'] = 0
+    summary['nr_queue_success'] = 0
+    summary['queue_status'] = []
+    summary['failed_queue_ids'] = []
+    for i, queue in enumerate(session_data):
+        if i > 0:
+            summary['nr_success'] += queue.summary['nr_success']
+            summary['nr_failure'] += queue.summary['nr_failure']
+            summary['failed_ids'] += queue.summary['failed_ids']
+            summary['failed_status'] += queue.summary['failed_status']
+            summary['failed_tasks'] += queue.summary['failed_tasks']
+        if queue.status_code == 'success':
+            summary['nr_queue_success'] += 1
+        elif queue.status_code == 'failure':
+            summary['nr_queue_failure'] += 1
+            summary['failed_queue_ids'].append(queue.queue_id)
+            summary['queue_status'].append(queue.status_message)
+
+    failed_task_df = pd.DataFrame({key: summary[key] for key in
+                                   ['failed_status', 'failed_ids',
+                                    'failed_tasks']})
+
+    return failed_task_df, summary
+
+
 def process_results(set_reviewed=True, parser_dict=Parser.ParserDict,
-                    path_end='', date=datetime.now()):
-    path = f'{PRIMEMOVER_PATH}/resources/raw_data/{date.date().isoformat()}.json'
+                    path_end='', date=datetime.now().date(), process = None):
+    path = f'{PRIMEMOVER_PATH}/resources/raw_data/{date.isoformat()}.json'
 
     with open(path, 'r') as file:
         raw_data = json.load(file)
@@ -271,28 +321,53 @@ def process_results(set_reviewed=True, parser_dict=Parser.ParserDict,
             combined_sessions[session.crawler_id] = session.results
 
     with open(
-            f'{PRIMEMOVER_PATH}/resources/cleaned_data/{path_end}{date.date().isoformat()}.json',
+            f'{PRIMEMOVER_PATH}/resources/cleaned_data/{path_end}{date.isoformat()}.json',
             'w') as file:
         json.dump(combined_sessions, file, indent='  ')
 
+    job_df, summary = generate_summary(session_data)
+
+    try:
+        with open(
+                PRIMEMOVER_PATH + f'/resources/log/log_{date.isoformat()}.json',
+                'r') as f:
+            log = json.load(f)
+    except FileNotFoundError:
+        log = {"Tasks": {}}
+    with open(PRIMEMOVER_PATH + f'/resources/log/log_{date.isoformat()}.json',
+              'w') as f:
+        log["Tasks"][f'Parse Results {process}'] = "success"
+        log[f'Summary {process}'] = summary
+        json.dump(log, f, indent='  ')
+    if process == 'ALL':
+        job_df.to_csv(PRIMEMOVER_PATH + f'/resources/log/issues_log_{date.isoformat()}.csv')
     return 'Success'
 
 
-def fetch_results():
+def fetch_results(date=datetime.now().date()):
     with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
         keys = json.load(f)
     access_token = api_wrapper.get_access(keys['PRIMEMOVER']['username'],
                                           keys['PRIMEMOVER']['password'])
     try:
         api_wrapper.fetch_results(access_token=access_token)
+        fetch_error = False
     except FileExistsError:
+        fetch_error = True
         print('file already exists')
+
+    with open(PRIMEMOVER_PATH + f'/resources/log/log_{date.isoformat()}.json',
+              'w') as f:
+        log = {"Tasks": {}}
+        if not fetch_error:
+            log["Tasks"]["fetch_results"] = 'success'
+        else:
+            log["Tasks"]["fetch_results"] = 'failure'
+        json.dump(log, f, indent='  ')
 
 
 if __name__ == "__main__":
-    date = datetime.now()
+    d = datetime.now()
     api_wrapper.fetch_results(access_token=ACCESS_TOKEN)
     process_results(set_reviewed=False, parser_dict=Parser.ParserDict,
-                    path_end='all_data_', date=date)
-
-
+                    path_end='all_data_', date=d)

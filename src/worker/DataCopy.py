@@ -93,7 +93,6 @@ def extract_list_params(object_name, experiment_id):
 def extract_selection_data(experiment_id, path_cleaned_data):
     # Run with results, not after update!!! Relevant parameters will otherwhise be different.
     path_jobs = f'{PRIMEMOVER_PATH}/{path_cleaned_data}'
-
     with open(path_jobs) as f:
         raw_data = json.load(f)
 
@@ -146,7 +145,7 @@ def extract_selection_data(experiment_id, path_cleaned_data):
                         r_j=new_row['rank'],
                         known=known,
                         d_tilde_i_j_t=d_tilde_i_j_t,
-                        alpha_tilde=new_row['pi'],
+                        alpha_tilde=new_row['alpha'],
                         tau_tilde=new_row['tau'],
                         beta_i=new_row['beta'])
                 else:
@@ -156,23 +155,58 @@ def extract_selection_data(experiment_id, path_cleaned_data):
                 new_row.update({'u_py': u_py})
                 data_restructure.append(new_row)
 
-    return pd.DataFrame(data=data_restructure)
+        data_df = pd.DataFrame(data=data_restructure)
+        if 'u_py' not in data_df.columns:
+            data_df['u_py'] = ''
+        if 'u_raw' not in data_df.columns:
+            data_df['u_raw'] = ''
+        data_df['difference'] = data_df['u_py'] - data_df['u_raw']
+        data_df['correct'] = abs(data_df['difference'] < 10 ** -5)
+
+    return data_df
 
 
-def create_copy(experiment_id, date=datetime.now()):
-    date = date.date().isoformat()
+def setup_copy(experiment_id, date=datetime.now()):
     s3_wrapper.append_csv(f'config_{experiment_id}/single_params.csv',
                           extract_data(experiment_id))
     s3_wrapper.append_csv(f'config_{experiment_id}/terms.csv',
                           extract_list_params('terms', experiment_id))
     s3_wrapper.append_csv(f'config_{experiment_id}/media.csv',
                           extract_list_params('media', experiment_id))
-    s3_wrapper.append_csv(f'selected_{experiment_id}/selections.csv',
-                          extract_selection_data(experiment_id,
-                                                 f'resources/cleaned_data/{date}.json'))
+    return "Success"
+
+def create_copy(experiment_id, date=datetime.now().date()):
+    date = date.isoformat()
+    s3_wrapper.append_csv(f'config_{experiment_id}/single_params.csv',
+                          extract_data(experiment_id))
+    s3_wrapper.append_csv(f'config_{experiment_id}/terms.csv',
+                          extract_list_params('terms', experiment_id))
+    s3_wrapper.append_csv(f'config_{experiment_id}/media.csv',
+                          extract_list_params('media', experiment_id))
+    selection_data = extract_selection_data(experiment_id,
+                                            f'resources/cleaned_data/{date}.json')
+    if len(selection_data) >0:
+        s3_wrapper.append_csv(f'selected_{experiment_id}/selections.csv',
+                              selection_data)
+    mistakes = selection_data.loc[-selection_data['correct']]
+
+    try:
+        with open(
+                PRIMEMOVER_PATH + f'/resources/log/log_{date}.json',
+                'r') as f:
+            log = json.load(f)
+    except FileNotFoundError:
+        log = {"Tasks": {}}
+    with open(PRIMEMOVER_PATH + f'/resources/log/log_{date}.json',
+              'w') as f:
+        log["Tasks"][f'Data Copy'] = "success"
+        log["Selection Errors"] = len(mistakes)
+        json.dump(log, f, indent='  ')
+    if len(mistakes) > 0:
+        mistakes.to_csv(
+            PRIMEMOVER_PATH + f'/resources/log/calc_errors_log_{date}.csv')
+    return 'Success'
 
 
 if __name__ == "__main__":
-    s3_wrapper.append_csv(f'selected_{22}/selections.csv',
-                          extract_selection_data(22,
-                                                 f'resources/cleaned_data/{"2021-06-07"}.json'))
+    extract_selection_data(41, f'resources/cleaned_data/{"2021-06-07"}.json')

@@ -22,6 +22,7 @@ default_args = {
     "start_date": datetime(2021, 1, 1),
     "email": ["johannesl@me.com"],
     "email_on_failure": True,
+    "email_on_success": True,
     "email_on_retry": False,
     "retries": 0,
     "retry_delay": timedelta(minutes=15),
@@ -41,37 +42,51 @@ default_args = {
     # "trigger_rule": "all_success"
 }
 dag = DAG(
-    dag_id="BrowserLeaks",
+    dag_id="results_dag",
     default_args=default_args,
-    description="Add Browser Leaks tasks",
+    description="fetch results and do initial parse",
     schedule_interval=None,
     catchup=False
 )
 
 # t1, t2 and t3 are examples of tasks created by instantiating operators
-
 t1 = PythonOperator(
-    task_id="setup_copy",
-    python_callable=src.worker.DataCopy.setup_copy,
-    op_kwargs={"experiment_id": Variable.get("experiment_id", "id_missing"),
-               "date": datetime.now().date()},
-    dag=dag
+    task_id="fetch_results",
+    python_callable=src.Results.fetch_results,
+    op_kwargs={"date": datetime.now().date()},
+    dag=dag,
 )
 
 t2 = PythonOperator(
-    task_id="addTasks",
-    python_callable=src.BrowserLeaks.single_update,
-    op_kwargs={"date_time": datetime.now(),
-               "experiment_id": Variable.get("experiment_id", "id_missing")},
-    dag=dag
-)
+    task_id="parse_all_results",
+    python_callable=src.Results.process_results,
+    op_kwargs={"set_reviewed": True,
+               "parser_dict": src.worker.s3_parser.ParserDict,
+               "path_end": "all_data_",
+               "date_time": datetime.now().date,
+               "process": "ALL"},
+    dag=dag)
 
 t3 = PythonOperator(
+    task_id="upload_results",
+    python_callable=src.worker.s3_wrapper.upload_data,
+    op_kwargs={"filename": f"output/{datetime.now().date().isoformat()}.json",
+               "path": f"/resources/cleaned_data/all_data_{datetime.now().date().isoformat()}.json"},
+    dag=dag)
+
+t7 = PythonOperator(
+    task_id="send_mail",
+    python_callable=src.worker.Notify.send_update,
+    op_kwargs={"email_list": Variable.get("email_list", "[johannesl@me.com]"),
+               "password": Variable.get("email_password", "password_missing"),
+               "date": datetime.now().date()},
+    dag=dag)
+
+t8 = PythonOperator(
     task_id="cleanup",
     python_callable=src.worker.CleanUp.cleanup,
     op_kwargs={"date_time": datetime.now(),
                "nr_days": 5},
     dag=dag)
 
-
-t1 >> t2 >> t3
+t1 >> t2 >> t3 >> t7 >> t8

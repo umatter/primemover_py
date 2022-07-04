@@ -189,8 +189,8 @@ class Config:
             self._media = ConfigurationFunctions.SelectMediaOutlets(pi=self._pi,
                                                                     alpha_tilde=self.alpha,
                                                                     tau_tilde_ij=self.tau,
-                                                                    state=self._state,
-                                                                    k=10)
+                                                                    k=8,
+                                                                    local=2)
         elif type(media_in) in {list, dict}:
             self._media = media_in
         elif type(media_in) is str and media_in != "":
@@ -231,6 +231,7 @@ class Config:
 
     @location.setter
     def location(self, val):
+        val = val.strip()
         if val is None:
             self._location = ConfigurationFunctions.location()
         elif val in Config.LOCATION_LIST:
@@ -273,9 +274,11 @@ class Config:
         if (val is None) or (val == "Value not provided at update!"):
             val = ConfigurationFunctions.cookie_pref()
         elif type(val) is str:
-            try: val = json.loads(val)
+            try:
+                val = json.loads(val)
             except:
-                raise TypeError('cookie preferences should be a dictionary or at the very least a json containing "accept_all')
+                raise TypeError(
+                    'cookie preferences should be a dictionary or at the very least a json containing "accept_all')
 
         if type(val) is dict and 'accept_all' in val.keys():
             self._cookie_pref = val
@@ -315,10 +318,10 @@ class Config:
         if send_info and self._info is not None:
             for key, value in self._info.as_dict().items():
                 return_dict[key] = value
-        if self.history is not None and len(self.history.history) != 0:
-            return_dict["preferences"].append({"name": "history",
-                                               "value": str(list(
-                                                   self.history.history.keys()))})
+        # if self.history is not None and len(self.history.history) != 0:
+        #     return_dict["preferences"].append({"name": "history",
+        #                                        "value": str(list(
+        #                                            self.history.history.keys()))})
         return return_dict
 
     def update_config(self, results, new_location, terms=True):
@@ -331,7 +334,8 @@ class Config:
         if new_location is not None:
             self.location = new_location
         kappa_j_t = self.kappa
-        if len(results) > 0:
+        if results is not None and len(results) > 0:
+            pi_0 = self.pi
             for outlet in results:
                 if 2 == self.kappa:
                     if not outlet['known']:
@@ -347,11 +351,11 @@ class Config:
                 outlets=self.media + results, alpha_tilde=self.alpha,
                 pi=self.pi,
                 tau_tilde_ij=self.tau, k=10)
-
-        self.terms = ConfigurationFunctions.SelectSearchTerms(pi=self.pi,
-                                                              alpha_hat=self.alpha,
-                                                              tau_hat_ik=self.tau,
-                                                              k=40)
+            if terms and pi_0 != self.pi:
+                self.terms = ConfigurationFunctions.SelectSearchTerms(pi=self.pi,
+                                                                      alpha_hat=self.alpha,
+                                                                      tau_hat_ik=self.tau,
+                                                                      k=40)
 
         self.history.update_current_status()
         self.history.push()
