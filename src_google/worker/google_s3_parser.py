@@ -1,21 +1,7 @@
-"""
-For all tasks that gather data which needs to be extracted from a raw HTML file,
-define a parser function. Store all function names in a dictionary, with keys the
-Task name as specified in a TaskBehavior.
-"""
-from bs4 import BeautifulSoup
-from lxml import etree
+from src.base.base_s3_parser import *
 from src.worker.Utilities import extract_domain
 import pandas as pd
-import pathlib
-
-
-PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
-
-ParserDict = {}
-htmlparser = etree.HTMLParser()
-
-UpdateParser = {}
+from bs4 import BeautifulSoup
 
 
 def GoogleParser(behaviors, raw_html, job_id):
@@ -66,26 +52,6 @@ def GoogleParser(behaviors, raw_html, job_id):
     return parsed_data
 
 
-def CaptchaParser(behaviors, raw_html, job_id):
-    if raw_html is None:
-        return {'issue': 'unknown'}
-
-    if 'captcha' in str(raw_html):
-        print(f'Captcha: {job_id}')
-        return {'issue': 'Captcha'}
-    return {'issue':'no captcha'}
-
-def BrowserLeaksParser(behaviors, reports, job_id):
-    if reports is None:
-        return {'issue': 'unknown'}
-    parsed_data = []
-    for report in reports:
-        parsed_data.append(report['path'])
-    if len(parsed_data) == 0:
-        parsed_data = parsed_data[0]
-    return parsed_data
-
-
 def SelectionParser(behaviors, dynamic_data, job_id):
     if dynamic_data is None:
         return {'issue': 'unknown'}
@@ -121,20 +87,8 @@ def SelectionParser(behaviors, dynamic_data, job_id):
 
 ParserDict['google_search'] = {'method': GoogleParser, 'data': 'html'}
 ParserDict['political'] = {'method': GoogleParser,
-                                                    'data': 'html'}
+                           'data': 'html'}
 ParserDict['neutral'] = {'method': GoogleParser, 'data': 'html'}
-ParserDict['leak_ip'] = {'method': BrowserLeaksParser, 'data': 'reports'}
-ParserDict['leak_javascript'] = {'method': BrowserLeaksParser, 'data': 'reports'}
-ParserDict['leak_webrtc'] = {'method': BrowserLeaksParser, 'data': 'reports'}
-ParserDict['leak_canvas'] = {'method': BrowserLeaksParser, 'data': 'reports'}
-ParserDict['leak_webgl'] = {'method': BrowserLeaksParser, 'data': 'reports'}
-ParserDict['leak_fonts'] = {'method': BrowserLeaksParser, 'data': 'reports'}
-ParserDict['leak_ssl'] = {'method': BrowserLeaksParser, 'data': 'reports'}
-ParserDict['leak_features'] = {'method': BrowserLeaksParser, 'data': 'reports'}
-ParserDict['leak_proxy'] = {'method': BrowserLeaksParser, 'data': 'reports'}
-ParserDict['leak_java'] = {'method': BrowserLeaksParser, 'data': 'reports'}
-ParserDict['leak_flash'] = {'method': BrowserLeaksParser, 'data': 'reports'}
-ParserDict['leak_ssl'] = {'method': BrowserLeaksParser, 'data': 'reports'}
 
 
 ParserDict['CALCULATED/neutral'] = {'method': SelectionParser,
@@ -144,4 +98,3 @@ ParserDict['CALCULATED/political'] = {'method': SelectionParser,
 
 UpdateParser['CALCULATED/neutral'] = {'method': SelectionParser,
                                                     'data': 'dynamic'}
-ParserDict['captcha'] = {'method': CaptchaParser, 'data': 'html'}

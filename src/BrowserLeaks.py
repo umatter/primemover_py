@@ -1,12 +1,14 @@
 """Assign desired crawlers the task to visit browserleaks.com and all relevant sub sites
 J.L. 11.2020
 """
-from src.worker.UpdateObject import *
-from src.worker.Crawler import *
-from src.worker.TimeHandler import Schedule
+from src.base.UpdateObject import *
+from src.base.TimeHandler import *
 from datetime import datetime, timedelta
-import src.worker.api_wrapper as api
-from src.worker.Tasks import BrowserLeaks
+import src.base.api_wrapper as api
+from src.base.base_tasks import BrowserLeaks
+
+from src.base.BaseCrawler import BaseCrawler
+
 import json
 import pathlib
 
@@ -16,7 +18,7 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
 
 
-def single_update(experiment_id, date_time=datetime.now()):
+def single_update(experiment_id, date_time=datetime.now(), crawler_class=BaseCrawler):
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=12 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
@@ -26,7 +28,7 @@ def single_update(experiment_id, date_time=datetime.now()):
     raw_experiment = api_wrapper.fetch_experiment(access_token=key, id=
     experiment_id)
 
-    crawler_list = Crawler.from_list(raw_experiment['crawlers'], date_time=date_time)
+    crawler_list = crawler_class.from_list(raw_experiment['crawlers'], date_time=date_time)
     # crawler_list = UpdateObject(crawler_list, 'config')
     with open(PRIMEMOVER_PATH + '/resources/other/to_process.json', 'r') as file:
         ids_to_process = json.load(file)

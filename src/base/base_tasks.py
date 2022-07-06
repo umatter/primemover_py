@@ -3,12 +3,13 @@
  TODO re-structure tasks into a folder system for different tasks. Perhaps a base folder for reoccouring tasks and separate folders for different experiments.
  J.L. 03/2021
  """
-from src.worker.PrimemoverQueue import Queue
-from src.worker import Jobs
+from src.base.PrimemoverQueue import Queue
+from src.base import jobs
 import random as r
 import pathlib
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
+
 
 class VisitDirect(Queue):
     """
@@ -22,12 +23,13 @@ class VisitDirect(Queue):
                          name='Visit Direct',
                          description='Visit a media outlet and scroll for 2-3 minutes.')
         # Add Job to Visit a media outlet
-        self.jobs.append(Jobs.VisitJob(url=self._outlet_url, task=self.name))
+        self.jobs.append(jobs.VisitJob(url=self._outlet_url, task=self.name))
 
         # Add Job to scroll down for random time between 1 and 3 minutes
-        self.jobs.append(Jobs.Scroll(direction='DOWN',
+        self.jobs.append(jobs.Scroll(direction='DOWN',
                                      duration=self._duration,
                                      task=self.name))
+
 
 class BrowserLeaks(Queue):
     """
@@ -40,64 +42,64 @@ class BrowserLeaks(Queue):
                          description='Visit a browserleaks.com and extract all data.')
         # IP site
         self.jobs.append(
-            Jobs.VisitJob(url="https://browserleaks.com/ip", flag='leak_ip',
+            jobs.VisitJob(url="https://browserleaks.com/ip", flag='leak_ip',
                           task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
+        self.jobs.append(jobs.Wait(time=r.randint(2, 4)))
 
         # JavaScript
         self.jobs.append(
-            Jobs.VisitJob(url="https://browserleaks.com/javascript",
+            jobs.VisitJob(url="https://browserleaks.com/javascript",
                           flag='leak_javascript', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
+        self.jobs.append(jobs.Wait(time=r.randint(2, 4)))
 
         # Webrtc
-        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/webrtc",
+        self.jobs.append(jobs.VisitJob(url="https://browserleaks.com/webrtc",
                                        flag='leak_webrtc', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
+        self.jobs.append(jobs.Wait(time=r.randint(2, 4)))
 
         # Canvas
-        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/canvas",
+        self.jobs.append(jobs.VisitJob(url="https://browserleaks.com/canvas",
                                        flag='leak_canvas', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
+        self.jobs.append(jobs.Wait(time=r.randint(2, 4)))
 
         # Webgl
-        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/webgl",
+        self.jobs.append(jobs.VisitJob(url="https://browserleaks.com/webgl",
                                        flag='leak_webgl', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
+        self.jobs.append(jobs.Wait(time=r.randint(2, 4)))
         # Fonts
-        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/fonts",
+        self.jobs.append(jobs.VisitJob(url="https://browserleaks.com/fonts",
                                        flag='leak_fonts', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
+        self.jobs.append(jobs.Wait(time=r.randint(2, 4)))
         # SSL
-        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/ssl",
+        self.jobs.append(jobs.VisitJob(url="https://browserleaks.com/ssl",
                                        flag='leak_ssl', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
+        self.jobs.append(jobs.Wait(time=r.randint(2, 4)))
         # GeoLocation
-        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/geo",
+        self.jobs.append(jobs.VisitJob(url="https://browserleaks.com/geo",
                                        flag='leak_geo', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
+        self.jobs.append(jobs.Wait(time=r.randint(2, 4)))
         # Features
-        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/features",
+        self.jobs.append(jobs.VisitJob(url="https://browserleaks.com/features",
                                        flag='leak_features',
                                        task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
+        self.jobs.append(jobs.Wait(time=r.randint(2, 4)))
         # Proxy
-        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/proxy",
+        self.jobs.append(jobs.VisitJob(url="https://browserleaks.com/proxy",
                                        flag='leak_proxy', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
+        self.jobs.append(jobs.Wait(time=r.randint(2, 4)))
 
         # Java system
-        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/java",
+        self.jobs.append(jobs.VisitJob(url="https://browserleaks.com/java",
                                        flag='leak_java', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
+        self.jobs.append(jobs.Wait(time=r.randint(2, 4)))
 
         # Flash
-        self.jobs.append(Jobs.VisitJob(url="https://browserleaks.com/flash",
+        self.jobs.append(jobs.VisitJob(url="https://browserleaks.com/flash",
                                        flag='leak_flash', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
+        self.jobs.append(jobs.Wait(time=r.randint(2, 4)))
 
         # Silverlight
         self.jobs.append(
-            Jobs.VisitJob(url="https://browserleaks.com/silverlight",
+            jobs.VisitJob(url="https://browserleaks.com/silverlight",
                           flag='leak_silverlight', task='BrowserLeaks'))
-        self.jobs.append(Jobs.Wait(time=r.randint(2, 4)))
+        self.jobs.append(jobs.Wait(time=r.randint(2, 4)))

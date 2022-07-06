@@ -258,23 +258,6 @@ class SessionResult:
         return session_result_object
 
 
-def export_results(results, date=datetime.today().date().isoformat()):
-    # existing_crawler_path = f'{PRIMEMOVER_PATH}/resources/updates/exp_2_{(datetime.now().date_time() + timedelta(days=-1)).isoformat()}.json'
-    existing_crawler_path = PRIMEMOVER_PATH + '/resources/updates/test_2020-12-22.json'
-    out_path = f'{PRIMEMOVER_PATH}/resources/cleaned_data/with_crawler_{date}.json'
-    with open(existing_crawler_path, 'r') as file:
-        crawlers = Crawler.from_dict(json.load(file))
-    combined = []
-    for crawler in crawlers:
-        crawler_dict = crawler.as_dict()
-        key = crawler_dict['id']
-        crawler_dict['results'] = results.get(key)
-        combined.append(crawler_dict)
-    with open(out_path, 'w') as file:
-        json.dump(combined, file, indent='  ')
-    return combined
-
-
 def generate_summary(session_data):
     summary = session_data[0].summary
     summary['nr_queue_failure'] = 0
