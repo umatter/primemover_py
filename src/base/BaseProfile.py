@@ -8,13 +8,15 @@ import json
 import warnings
 import re
 import pathlib
-import src.ConfigurationFunctions as Config
+import src.base.base_config_functions as base_config
 import random
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 
-class Profile:
+class BaseProfile:
+    CONFIGURATION_FUNCTIONS = base_config
+
     def __init__(self,
                  name="%%AGENTID%%",
                  os='win',
@@ -61,25 +63,25 @@ class Profile:
         else:
             option = 'None'
         if language == 'PyDefault':
-            self.language = Config.language()
+            self.language = self.CONFIGURATION_FUNCTIONS.language()
         else:
             self.language = language
         self._fill_based_on_external_ip = None
         if geolocation == 'PyDefault':
-            self.geolocation = Config.geolocation(option)
+            self.geolocation = self.CONFIGURATION_FUNCTIONS.geolocation(option)
         else:
             self.geolocation = geolocation
         if do_not_track == 'PyDefault':
-            self.do_not_track = Config.do_not_track(option)
+            self.do_not_track = self.CONFIGURATION_FUNCTIONS.do_not_track(option)
         else:
             self.do_not_track = do_not_track
         if hardware_canvas == 'PyDefault':
-            self.hardware_canvas = Config.hardware_canvas(option)
+            self.hardware_canvas = self.CONFIGURATION_FUNCTIONS.hardware_canvas(option)
         else:
             self.hardware_canvas = hardware_canvas
 
         if local_storage == 'PyDefault':
-            self.local_storage = Config.local_storage(option)
+            self.local_storage = self.CONFIGURATION_FUNCTIONS.local_storage(option)
         else:
             self.local_storage = local_storage
 
@@ -365,7 +367,6 @@ class Profile:
     def from_dict(cls, profile_dict: dict):
         navigator = profile_dict.get('navigator', {})
 
-
         profile_object = cls(
             name=profile_dict.get('name', "%%AGENTID%%"),
             os=profile_dict.get('os', 'win'),
@@ -376,32 +377,32 @@ class Profile:
             resolution='MultiloginDefault',
 
             geolocation=profile_dict.get('geolocation', {}).get('mode',
-                                                              "PyDefault"),
+                                                                "PyDefault"),
             do_not_track=navigator.get('doNotTrack',
                                        "PyDefault"),
             hardware_canvas=profile_dict.get('canvas', {}).get('mode',
-                                                              "PyDefault"),
+                                                               "PyDefault"),
             local_storage=profile_dict.get('storage', {}).get('local',
                                                               "PyDefault"),
             service_worker_cache=profile_dict.get('storage', {}).get(
                 'serviceWorkerCache', 'MultiloginDefault'),
             user_agent=navigator.get('user_agent', 'MultiloginDefault'),
             platform=navigator.get('platform', 'MultiloginDefault'),
-            hardware_concurrency=navigator.get('hardware_concurrency', 'MultiloginDefault'),
+            hardware_concurrency=navigator.get('hardware_concurrency',
+                                               'MultiloginDefault'),
             base_dict=profile_dict
         )
         return profile_object
 
 
 if __name__ == '__main__':
-    profile_base = Profile(language="en-us;q=1.0, en-uk;q=1.0, it;q=0.1",
-                           geolocation='BLOCK',
-                           do_not_track=1,
-                           hardware_canvas='REAL',
-                           local_storage=False,
-                           service_worker_cache=True)
+    profile_base = BaseProfile(language="en-us;q=1.0, en-uk;q=1.0, it;q=0.1",
+                               geolocation='BLOCK',
+                               do_not_track=1,
+                               hardware_canvas='REAL',
+                               local_storage=False,
+                               service_worker_cache=True)
 
     with open(PRIMEMOVER_PATH + '/resources/examples/example_profile_0.json',
               'w') as file:
         json.dump(profile_base.as_dict(), file, indent='  ')
-

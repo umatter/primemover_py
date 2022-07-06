@@ -1,5 +1,5 @@
 """
-Use this file or copies of it to control how the Config class generates user profiles
+Use this file or copies of it to control how the CONFIGURATION_FUNCTIONS class generates user profiles
 
 J.L. 11.2020
 """
@@ -8,9 +8,9 @@ import random as r
 import pandas as pd
 from numpy.random import gumbel
 import pathlib
-from src.Preferences import search_utility_v_ik, media_utility_u_ij
+from src_google.worker.preferences import search_utility_v_ik, media_utility_u_ij
 
-PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 
 def Psi():
@@ -273,11 +273,19 @@ def select_local_outlets(path_in, path_local_out, nr_per_state=2):
     """
         Select nr_per_state number of local news outlets per state in outlets input
     """
-    outlets = pd.read_csv(path_in,
+    try:
+        outlets = pd.read_csv(path_in,
                           usecols=['domain', 'state', 'redirect_url',
                                    'avg_users_us_percent',
                                    'avg_reach_permillion', 'pi', 'pop2019',
                                    'is_local'])
+    except UnicodeDecodeError:
+        outlets = pd.read_csv(path_in,
+                              encoding='latin1',
+                              usecols=['domain', 'state', 'redirect_url',
+                                       'avg_users_us_percent',
+                                       'avg_reach_permillion', 'pi', 'pop2019',
+                                       'is_local'])
     states = list(set(outlets['state']))
     outlets['size'] = outlets['avg_reach_permillion'] * outlets[
         'avg_users_us_percent'] / 100
@@ -288,8 +296,8 @@ def select_local_outlets(path_in, path_local_out, nr_per_state=2):
     outlets_out = outlets.loc[outlets['state'] == states[0]].iloc[
                   0:nr_per_state]
     for state in states[1:]:
-        outlets_out = outlets_out.append(
-            outlets.loc[outlets['state'] == state].iloc[0:nr_per_state])
+        outlets_out = pd.concat((outlets_out,
+            outlets.loc[outlets['state'] == state].iloc[0:nr_per_state]), axis=0, join='outer')
     outlets_out = outlets_out.reset_index(drop=True)
     outlets_out.to_csv(path_local_out, header=True)
 

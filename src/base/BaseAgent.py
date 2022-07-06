@@ -5,15 +5,15 @@ Available Classes:
 J.L. 11.2020
 """
 
-from src.worker.Profile import Profile
-from src.worker.Info import AgentInfo
+from src.base.BaseProfile import BaseProfile
+from src.base.info import AgentInfo
 import json
 import pathlib
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 
-class Agent:
+class BaseAgent:
     """
     Base class
     Public Arguments:
@@ -35,6 +35,9 @@ class Agent:
     with open(PRIMEMOVER_PATH + "/resources/other/valid_cities.json",
               'r') as file:
         LOCATION_LIST = list(json.load(file).keys())
+
+    "Set Profile Class, redefine when amending Profile"
+    PROFILE_CLASS = BaseProfile
 
     def __init__(self,
                  location=None,
@@ -73,7 +76,7 @@ class Agent:
 
     @location.setter
     def location(self, val):
-        if val in Agent.LOCATION_LIST:
+        if val in self.LOCATION_LIST:
             self._location = val
         else:
             raise ValueError(
@@ -85,9 +88,11 @@ class Agent:
 
     @multilogin_profile.setter
     def multilogin_profile(self, val):
+        "REDEFINE WHEN REPLACING PROFILE"
+
         if val is None:
-            self._multilogin_profile = Profile()
-        elif type(val) is Profile:
+            self._multilogin_profile = self.PROFILE_CLASS()
+        elif type(val) is self.PROFILE_CLASS:
             self._multilogin_profile = val
         elif type(val) is str:
             self._multilogin_profile = json.loads(val)
@@ -95,7 +100,7 @@ class Agent:
             self._multilogin_profile = val
         else:
             raise TypeError(
-                f'multilogin profile must be of type Profile got {type(val)} instead')
+                f'multilogin profile must be compatible with type {test.__name__} got {type(val)} instead')
 
     def as_dict(self, send_info=False):
         """
@@ -107,7 +112,7 @@ class Agent:
                        "identification": self._identification,
                        "multilogin_id": self._multilogin_id,
                        "multilogin_profile": self._multilogin_profile}
-        if type(self._multilogin_profile) is Profile:
+        if type(self._multilogin_profile) is self.PROFILE_CLASS:
             return_dict["multilogin_profile"] = (
                 self._multilogin_profile.as_dict())
 
@@ -126,7 +131,7 @@ class Agent:
                            description=agent_dict.get('description'),
                            identification=agent_dict.get('identification'),
                            multilogin_id=agent_dict.get('multilogin_id'),
-                           multilogin_profile=Profile.from_dict(json.loads(agent_dict.get(
+                           multilogin_profile=cls.PROFILE_CLASS.from_dict(json.loads(agent_dict.get(
                                'multilogin_profile'))),
                            location=agent_dict.get('location'),
                            info=AgentInfo.from_dict(agent_dict))
@@ -140,7 +145,7 @@ if __name__ == '__main__':
                          KEYS['PRIMEMOVER']['password'])
     for id in range(1550, 1800):
         file = api.fetch_agent(id)
-        test = Agent.from_dict(file)
+        test = BaseAgent.from_dict(file)
         comp = json.loads(file['multilogin_profile'])
-        prof = Profile.from_dict(json.loads(file['multilogin_profile']))
+        prof = BaseProfile.from_dict(json.loads(file['multilogin_profile']))
         assert comp == prof.as_dict(), f'Oh No! {id},\n {comp} \n {prof}'

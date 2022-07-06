@@ -1,5 +1,5 @@
 """
-Jobs.py creates the base job class and a series of 'Jobs'. These are jobs as they
+jobs.py creates the base job class and a series of 'jobs'. These are jobs as they
 can be run by the primemover_runner. Variables that the runner needs to execute and
 recognize these jobs are passed as 'behaviors', which are defined in Behavior.py.
 These behaviors parse input for validity.
@@ -7,7 +7,7 @@ Classes:
     - Job: base job class
 """
 
-import src.worker.Behavior as Behavior
+import src.base.Behavior as Behavior
 
 
 class Job:

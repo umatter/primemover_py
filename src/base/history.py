@@ -1,10 +1,11 @@
-import src.worker.s3_wrapper as s3_wrapper
-
+import src.base.s3_wrapper as s3_wrapper
+from src.base import BaseProfile
 import json
 from datetime import date
 
 
 class S3History:
+    PROFILE_CLASS = BaseProfile
     def __init__(self, value, fetch_existing=False):
         self.date = date.today().isoformat()
         self._object_class = None
@@ -28,11 +29,11 @@ class S3History:
     @py_object.setter
     def py_object(self, value):
         class_name = str(type(value)).split('.')[-1].replace("'>","")
-        if class_name in ["Config", "Proxy",
+        if class_name in ["CONFIGURATION_FUNCTIONS", "Proxy",
                                 "Agent"] and value.info is None:
             raise ValueError(
                 f'py_object info is empty! Never create a history for an object not returned by the primemover api!')
-        if class_name == "Config":
+        if class_name == "CONFIGURATION_FUNCTIONS":
             self._object_class = 'config'
             self._py_object = value
             self._object_id = value.info.configuration_id
@@ -46,7 +47,7 @@ class S3History:
             self._py_object = value
             self._object_id = value.info.agent_id
         else:
-            raise TypeError('expected object of type Config, Proxy or Agent')
+            raise TypeError('expected object of type CONFIGURATION_FUNCTIONS, Proxy or Agent')
 
     def update_current_status(self):
         if self._object_class == 'agent':
@@ -84,7 +85,7 @@ class S3History:
             "location": self._py_object.location,
             "multilogin_id": self._py_object.multilogin_id,
             "multilogin_profile": self._py_object.multilogin_profile}
-        if type(self._py_object.multilogin_profile) is Profile:
+        if type(self._py_object.multilogin_profile) is self.PROFILE_CLASS:
             self._current_status["multilogin_profile"] = (
                 self._py_object.multilogin_profile.as_dict())
 

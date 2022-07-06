@@ -96,6 +96,12 @@ def fetch_file(path, filename):
         else:
             print(f'File has been stored at {path}')
             data = None
+        if file_path.endswith('.csv'):
+            try:
+                file_in = pd.read_csv(file_path)
+            except UnicodeDecodeError:
+                file_in = pd.read_csv(file_path, encoding='latin1')
+            file_in.to_csv(file_path, encoding='utf-16', index=False)
     else:
         raise FileExistsError(
             f'The file {filename} is not available in the bucket')

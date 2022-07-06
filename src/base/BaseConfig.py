@@ -1,21 +1,23 @@
 """
-Establishes the Config class, mirroring the configurations object in the primemover api
+Establishes the CONFIGURATION_FUNCTIONS class, mirroring the configurations object in the primemover api
 any parameters that are not set upon init are generated according to the
-ConfigurationFunctions file.
+CONFIGURATION_FUNCTIONS file.
 
 J.L. 11.2020
 """
 
-from src import ConfigurationFunctions
-from src.worker.Info import ConfigurationInfo
+from datetime import datetime, timedelta
+from src.base import base_config_functions
+from src.base.info import ConfigurationInfo
 import json
 import pathlib
+from src.base.utilities import pref_as_dict, EscapeStrings
+from src.base.history import S3History
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 
-
-class Config:
+class BaseConfig:
     """A configuration object, sets all parameters documented in configurations.
     Most are standard, though these can be extended through optional parameters.
     In case this is required, extend the class.
@@ -26,33 +28,36 @@ class Config:
             (It is part of the name attribute, to ensure availability on api return)
          - description: string, optional
          - psi: float in [0,1], individuals persuadability
-            default: set according to ConfigurationFunctions
+            default: set according to CONFIGURATION_FUNCTIONS
          - pi: float political orientation of individual
-            default: set according to ConfigurationFunctions
+            default: set according to CONFIGURATION_FUNCTIONS
          - alpha: float >= 0, shift parameter in media outlet utility
-            default: set according to ConfigurationFunctions
+            default: set according to CONFIGURATION_FUNCTIONS
          - tau: float > 0, "transportation costs" i.e. costs of consuming
                 ideologically distant news outlets
-            default: set according to ConfigurationFunctions
+            default: set according to CONFIGURATION_FUNCTIONS
          - beta:
-            default: set according to ConfigurationFunctions
+            default: set according to CONFIGURATION_FUNCTIONS
          - kappa: binary in {0,1}, indicates whether individual can be persuaded
-            default: set according to ConfigurationFunctions
+            default: set according to CONFIGURATION_FUNCTIONS
          - media: list or dict, media redirect urls for outlets known to individual
             must be compatible with any tasks the user intends to set!
-            default: set according to ConfigurationFunctions
+            default: set according to CONFIGURATION_FUNCTIONS
          - terms: list or dict, search terms individual may search
             must be compatible with any tasks the user intends to set!
-            default: set according to ConfigurationFunctions
+            default: set according to CONFIGURATION_FUNCTIONS
          - location: string, must be in "resources/other/geosurf_cities.json"
             this is required for geosurf compatibility, restriction may be altered
             in future release
-            default: set according to ConfigurationFunctions
+            default: set according to CONFIGURATION_FUNCTIONS
     Private attributes:
         - info: should only be set using existing crawlers, via from_dict method.
     """
 
-    with open(PRIMEMOVER_PATH + "/resources/other/geosurf_cities.json", 'r') as file:
+    CONFIGURATION_FUNCTIONS = base_config_functions
+
+    with open(PRIMEMOVER_PATH + "/resources/other/valid_cities.json",
+              'r') as file:
         LOCATION_LIST = list(json.load(file).keys())
 
     def __init__(self,
@@ -67,13 +72,16 @@ class Config:
                  media=None,
                  terms=None,
                  location=None,
+                 usage_type=None,
+                 cookie_pref=None,
                  info=None,
+                 date_time=datetime.now()
                  ):
 
         self.name = name
         self.description = description
         self._info = info
-        if '/' in self.name:
+        if (self.name is not None) and ('/' in self.name):
             self._flag = self.name.split('/')[1]
         else:
             self._flag = None
@@ -85,9 +93,23 @@ class Config:
 
         self.beta = beta
         self.kappa = kappa
+
+        self._state = None
+        self.location = location
+
         self.media = media
         self.terms = terms
-        self.location = location
+        self._date_time = date_time
+        self.usage_type = usage_type
+        self.cookie_pref = cookie_pref
+        if self.info is not None:
+            self._history = S3History(self, date_time)
+        else:
+            self._history = None
+
+    @property
+    def info(self):
+        return self._info
 
     @property
     def flag(self):
@@ -100,7 +122,7 @@ class Config:
     @psi.setter
     def psi(self, value):
         if value is None:
-            self._psi = ConfigurationFunctions.Psi()
+            self._psi = self.CONFIGURATION_FUNCTIONS.Psi()
         else:
             self._psi = float(value)
 
@@ -111,7 +133,7 @@ class Config:
     @alpha.setter
     def alpha(self, value):
         if value is None:
-            self._alpha = ConfigurationFunctions.alpha()
+            self._alpha = self.CONFIGURATION_FUNCTIONS.alpha()
         else:
             self._alpha = float(value)
 
@@ -122,7 +144,7 @@ class Config:
     @tau.setter
     def tau(self, value):
         if value is None:
-            self._tau = ConfigurationFunctions.tau()
+            self._tau = self.CONFIGURATION_FUNCTIONS.tau()
         else:
             self._tau = float(value)
 
@@ -133,7 +155,7 @@ class Config:
     @beta.setter
     def beta(self, value):
         if value is None:
-            self._beta = ConfigurationFunctions.beta()
+            self._beta = self.CONFIGURATION_FUNCTIONS.beta()
         else:
             self._beta = float(value)
 
@@ -144,9 +166,9 @@ class Config:
     @kappa.setter
     def kappa(self, value):
         if value is None:
-            self._kappa = ConfigurationFunctions.kappa()
+            self._kappa = self.CONFIGURATION_FUNCTIONS.kappa()
         else:
-            self._kappa = float(value)
+            self._kappa = int(value)
 
     @property
     def pi(self):
@@ -155,9 +177,8 @@ class Config:
     @pi.setter
     def pi(self, value):
         if value is None:
-            self._pi = ConfigurationFunctions.Pi(self._flag)
-        else:
-            self._pi = float(value)
+            value = self.CONFIGURATION_FUNCTIONS.Pi(self._flag)
+        self._pi = float(value)
 
     @property
     def media(self):
@@ -166,9 +187,11 @@ class Config:
     @media.setter
     def media(self, media_in):
         if media_in is None:
-            self._media = ConfigurationFunctions.SelectMediaOutlets(pi=self._pi)
+            self._media = self.CONFIGURATION_FUNCTIONS.SelectMediaOutlets()
         elif type(media_in) in {list, dict}:
             self._media = media_in
+        elif type(media_in) is str and media_in != "":
+            self._media = json.loads(media_in)
         elif media_in == "":
             self._media = ""
         else:
@@ -182,12 +205,14 @@ class Config:
     @terms.setter
     def terms(self, term_dict):
         if term_dict is None:
-            self._terms = ConfigurationFunctions.SelectSearchTerms(pi=self._pi)
+            self._terms = self.CONFIGURATION_FUNCTIONS.SelectSearchTerms()
 
         elif type(term_dict) is list:
             self._terms = term_dict
         elif type(term_dict) is dict:
             self._terms = term_dict
+        elif type(term_dict) is str and term_dict != "":
+            self._terms = json.loads(term_dict)
         elif term_dict == "":
             self._terms = ""
         else:
@@ -201,14 +226,59 @@ class Config:
     @location.setter
     def location(self, val):
         if val is None:
-            self._location = ConfigurationFunctions.location()
-        elif val in Config.LOCATION_LIST:
-            self._location = val
+            self._location = self.CONFIGURATION_FUNCTIONS.location()
+        elif val.strip() in self.LOCATION_LIST:
+            self._location = val.strip()
         else:
             raise ValueError(
                 f'{val} is not a valid location see geosurf cities')
+        segments = self._location.split('-')
+        if type(segments) is list and len(segments) == 3:
+            self._state = segments[0] + '-' + segments[1]
+        else:
+            self._state = None
 
-    def as_dict(self):
+    @property
+    def history(self):
+        return self._history
+
+    @property
+    def usage_type(self):
+        return self._usage_type
+
+    @usage_type.setter
+    def usage_type(self, val):
+        if (val is None) or (val == "Value not provided at update!"):
+            val = self.CONFIGURATION_FUNCTIONS.usage_type()
+        elif type(val) is str:
+            val = val.lower().strip()
+
+        if val in ['only_search', 'only_direct', 'both']:
+            self._usage_type = val
+        else:
+            raise ValueError('Not a valid value for usage_type')
+
+    @property
+    def cookie_pref(self):
+        return self._cookie_pref
+
+    @cookie_pref.setter
+    def cookie_pref(self, val):
+        if (val is None) or (val == "Value not provided at update!"):
+            val = self.CONFIGURATION_FUNCTIONS.cookie_pref()
+        elif type(val) is str:
+            try:
+                val = json.loads(val)
+            except:
+                raise TypeError(
+                    'cookie preferences should be a dictionary or at the very least a json containing "accept_all')
+
+        if type(val) is dict and 'accept_all' in val.keys():
+            self._cookie_pref = val
+        else:
+            raise ValueError('Not a valid value for cookie_pref')
+
+    def as_dict(self, send_info=False):
         """
         Generate dictionary object from self, matching configurations in primemover api
         Returns: dict, valid configurations dictionary.
@@ -224,31 +294,56 @@ class Config:
                 "kappa": self.kappa,
                 "beta": self.beta,
                 "search_terms": self.terms,
-                "media_outlet_urls": self.media}]
+                "media_outlet_urls": self.media
+            }],
+            "preferences": [{
+                "name": 'location',
+                "value": self.location
+            },
+                {
+                    "name": 'usage_type',
+                    "value": self.usage_type
+                },
+                {"name": "cookie_pref",
+                 "value": json.dumps(self.cookie_pref)
+                 }]
         }
-        if self._info is not None:
+        if send_info and self._info is not None:
             for key, value in self._info.as_dict().items():
-                return_dict['key'] = value
-            return_dict['params'][0]['user_id'] = self._info.as_dict()[
-                'user_id']
-            return_dict['params'][0]['configuration_id'] = self._info.as_dict()[
-                'id']
-
+                return_dict[key] = value
+        # if self.history is not None and len(self.history.history) != 0:
+        #     return_dict["preferences"].append({"name": "history",
+        #                                        "value": str(list(
+        #                                            self.history.history.keys()))})
         return return_dict
 
-    def update_config(self, results):
+    def update_config(self, results, new_location, terms=True):
         """
         Update self according to results
         """
+        if self.info is not None:
+            self.history.pull_existing()
+
+        if new_location is not None:
+            self.location = new_location
+        # if results is not None and len(results) > 0:
+        # do something
+        self.history.update_current_status()
+        self.history.push()
 
     @classmethod
-    def from_dict(cls, config_dict):
+    def from_dict(cls, config_dict, location, date_time=datetime.now()):
         """
         Generate config object from single api return
         Parameters:
             config_dict: api return of configurations. Note: media and terms
             must be json type objects!
         """
+        if type(config_dict) is list:
+            config_dict = config_dict[0]
+        pref = pref_as_dict(config_dict.get('preferences', []))
+        usage_type = pref.get('usage_type', None)
+        cookie_pref = pref.get('cookie_pref', None)
         config_object = cls(name=config_dict.get('name'),
                             description=config_dict.get('description'),
                             psi=config_dict['params'][0].get('psi'),
@@ -257,11 +352,13 @@ class Config:
                             tau=config_dict['params'][0].get('tau'),
                             beta=config_dict['params'][0].get('beta'),
                             kappa=config_dict['params'][0].get('kappa'),
-                            media=json.loads(config_dict['params'][0].get(
-                                'media_outlet_urls')),
-                            terms=json.loads(
-                                config_dict['params'][0].get('search_terms')),
-                            location=config_dict['params'][0].get('location'),
-                            info=ConfigurationInfo.from_dict(config_dict)
+                            media=config_dict['params'][0].get(
+                                'media_outlet_urls'),
+                            terms=config_dict['params'][0].get('search_terms'),
+                            info=ConfigurationInfo.from_dict(config_dict),
+                            location=location,
+                            date_time=date_time,
+                            usage_type=usage_type,
+                            cookie_pref=cookie_pref
                             )
         return config_object

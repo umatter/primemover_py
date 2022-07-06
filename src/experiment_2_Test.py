@@ -45,11 +45,11 @@ def distribute_proxies(location_groups, exp_id, proxy_type="rotating"):
                     if type(pi_right) == str:
                         print('string error occoured!')
                         print(crawler_list[-1].as_dict())
-                    config = Config(name='Config/left', location=location,
+                    config = Config(name='CONFIGURATION_FUNCTIONS/left', location=location,
                                     pi=-pi_right)
                     pi_right = None
                 else:
-                    config = Config(name='Config/left', location=location)
+                    config = Config(name='CONFIGURATION_FUNCTIONS/left', location=location)
                     pi_left = config.pi
                 flag = 'left'
 
@@ -59,16 +59,16 @@ def distribute_proxies(location_groups, exp_id, proxy_type="rotating"):
                         print('string error occoured!')
                         print(crawler_list[-1].as_dict())
 
-                    config = Config(name='Config/right', location=location,
+                    config = Config(name='CONFIGURATION_FUNCTIONS/right', location=location,
                                     pi=-pi_left)
                     pi_left = None
                 else:
-                    config = Config(name='Config/right', location=location,
+                    config = Config(name='CONFIGURATION_FUNCTIONS/right', location=location,
                                     )
                     pi_right = config.pi
                 flag = 'right'
             else:
-                config = Config(name='Config/neutral', location=location, pi=0,
+                config = Config(name='CONFIGURATION_FUNCTIONS/neutral', location=location, pi=0,
                                 media=[],
                                 terms=[])
                 flag = 'neutral_test'
@@ -123,7 +123,7 @@ def launch_experiment():
 
     # generate neutral configurations
     config_list_neutral = [
-        Config(name='Config/neutral', location=l, pi=0, media=[], terms=[]) for
+        Config(name='CONFIGURATION_FUNCTIONS/neutral', location=l, pi=0, media=[], terms=[]) for
         l in 2 * GEO_SURF_PROXIES]
     # generate crawlers from neutral configs
     crawler_list = [
@@ -131,10 +131,10 @@ def launch_experiment():
         c in
         config_list_neutral]
     # generate left and right configs with opposing pi in each location
-    config_list_left = [Config(name='Config/left', location=l) for l in
+    config_list_left = [Config(name='CONFIGURATION_FUNCTIONS/left', location=l) for l in
                         4 * GEO_SURF_PROXIES]
     config_list_right = [
-        Config(name='Config/right', location=left_config.location,
+        Config(name='CONFIGURATION_FUNCTIONS/right', location=left_config.location,
                pi=-left_config.pi) for left_config in
         config_list_left]
 

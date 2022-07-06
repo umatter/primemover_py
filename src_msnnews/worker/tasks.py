@@ -31,7 +31,7 @@ class BingNewsSearch(Queue):
 
         # add job to click button (agree) (check if needed)
         # self.jobs.append(
-        #    Jobs.SingleSelect(
+        #    jobs.SingleSelect(
         #        selector="//button[@class='VfPpkd-LgbsSe VfPpkd-LgbsSe-OWXEXe-k8QpJ VfPpkd-LgbsSe-OWXEXe-dgl2Hf nCP5yc AjY5Oe DuMIQc']",
         #        selector_type='XPATH',
         #        flag=search_type,

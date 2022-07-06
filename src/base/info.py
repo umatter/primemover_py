@@ -7,7 +7,7 @@ identify objects on the API.
 Classes:
     Info: basic info object
     BehaviorInfo: Info object for the Behavior class (Behavior.py)
-    JobInfo: Info object for the Job class (Jobs.py)
+    JobInfo: Info object for the Job class (jobs.py)
     QueueInfo: Info object for the Queue class (Queue.py)
     CrawlerInfo: Info object for the Crawler class (Crawler.py)
     ConfigurationInfo: Info object for the Configuration class (ConfigurationProfile.py)

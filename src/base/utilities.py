@@ -1,5 +1,5 @@
 """
-Assortment of usefull functions
+Assortment of useful functions
 
 J.L. 11.2020
 """

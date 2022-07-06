@@ -2,21 +2,21 @@
 Experiment partisan google elections 2022-01-03
 This file generates new crawlers, in particular the required config files
 
-J.L. 11.2020
+J.L. 07.2022
 """
+from src.base.TimeHandler import Schedule, TimeHandler
+from src.base import api_wrapper as api
+from src.base import s3_wrapper
+from src.base.Experiment import Experiment
 
-from src.worker.Crawler import Crawler
-from src.worker.TimeHandler import Schedule, TimeHandler
-from src.worker.ConfigureProfile import Config
-from src.ConfigurationFunctions import select_local_outlets
-from src.worker import api_wrapper as api
-from src.worker import s3_wrapper
+from src_google.worker.classes import Crawler, Config, Proxy
+from src_google.worker.config_functions import select_local_outlets
+
+
 import json
 import pandas as pd
-from src.worker.Experiment import Experiment
 from datetime import datetime
 import pathlib
-from src.worker.Proxy import Proxy
 import random as r
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
@@ -49,11 +49,11 @@ def distribute_proxies(location_groups, exp_id, proxy_type="rotating"):
                     if type(pi_right) == str:
                         print('string error occoured!')
                         print(crawler_list[-1].as_dict())
-                    config = Config(name='Config/left', location=location,
+                    config = Config(name='CONFIGURATION_FUNCTIONS/left', location=location,
                                     pi=-pi_right)
                     pi_right = None
                 else:
-                    config = Config(name='Config/left', location=location)
+                    config = Config(name='CONFIGURATION_FUNCTIONS/left', location=location)
                     pi_left = config.pi
                 flag = 'left'
 
@@ -63,16 +63,16 @@ def distribute_proxies(location_groups, exp_id, proxy_type="rotating"):
                         print('string error occoured!')
                         print(crawler_list[-1].as_dict())
 
-                    config = Config(name='Config/right', location=location,
+                    config = Config(name='CONFIGURATION_FUNCTIONS/right', location=location,
                                     pi=-pi_left)
                     pi_left = None
                 else:
-                    config = Config(name='Config/right', location=location,
+                    config = Config(name='CONFIGURATION_FUNCTIONS/right', location=location,
                                     )
                     pi_right = config.pi
                 flag = 'right'
             else:
-                config = Config(name='Config/neutral', location=location, pi=0,
+                config = Config(name='CONFIGURATION_FUNCTIONS/neutral', location=location, pi=0,
                                 media=[],
                                 terms=[])
                 flag = 'neutral_test'
@@ -109,10 +109,10 @@ def launch_experiment():
     s3_wrapper.fetch_terms()
 
     key = api.get_access(KEYS['PRIMEMOVER']['username'],
-                         KEYS['PRIMEMOVER']['password'])
-    exp_return = api.new_experiment(key, exp.as_dict())
-    exp_id = Experiment.from_dict(exp_return).id
-
+                       KEYS['PRIMEMOVER']['password'])
+    # exp_return = api.new_experiment(key, exp.as_dict())
+    # exp_id = Experiment.from_dict(exp_return).id
+    exp_id = 1
     TimeHandler.GLOBAL_SCHEDULE = Schedule(start_at=10 * 60 * 60,
                                            end_at=(10 + 23) * 60 * 60,
                                            interval=600,
@@ -131,7 +131,7 @@ def launch_experiment():
 
     # generate neutral configurations
     config_list_neutral = [
-        Config(name='Config/neutral', location=l, pi=0, media=[], terms=[]) for
+        Config(name='CONFIGURATION_FUNCTIONS/neutral', location=l, pi=0, media=[], terms=[]) for
         l in 2 * GEO_SURF_PROXIES]
     # generate crawlers from neutral configs
     crawler_list = [
@@ -139,10 +139,10 @@ def launch_experiment():
         c in
         config_list_neutral]
     # generate left and right configs with opposing pi in each location
-    config_list_left = [Config(name='Config/left', location=l) for l in
+    config_list_left = [Config(name='CONFIGURATION_FUNCTIONS/left', location=l) for l in
                         4 * GEO_SURF_PROXIES]
     config_list_right = [
-        Config(name='Config/right', location=left_config.location,
+        Config(name='CONFIGURATION_FUNCTIONS/right', location=left_config.location,
                pi=-left_config.pi) for left_config in
         config_list_left]
 
@@ -191,16 +191,16 @@ def launch_experiment():
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
-    return_data = api.push_new(access_token=key,
-                               path=PRIMEMOVER_PATH + "/resources/crawlers/experiment_3.json")
-    data_as_dict = json.loads(return_data.text)
-
-    with open(
-            f'{PRIMEMOVER_PATH}/resources/crawlers/experiment_3{datetime.now().date().isoformat()}.json',
-            'w') as file:
-        json.dump(data_as_dict, file, indent='  ')
-
-    return f"exp_id = {exp_id}"
+    # return_data = api.push_new(access_token=key,
+    #                            path=PRIMEMOVER_PATH + "/resources/crawlers/experiment_3.json")
+    # data_as_dict = json.loads(return_data.text)
+    #
+    # with open(
+    #         f'{PRIMEMOVER_PATH}/resources/crawlers/experiment_3{datetime.now().date().isoformat()}.json',
+    #         'w') as file:
+    #     json.dump(data_as_dict, file, indent='  ')
+    #
+    # return f"exp_id = {exp_id}"
 
 
 if __name__ == "__main__":

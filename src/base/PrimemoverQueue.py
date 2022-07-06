@@ -5,7 +5,7 @@ session and when to begin execution. Queues can be combined
 J.L. 11.2020
 """
 
-import src.worker.Jobs as Jobs
+import src.base.jobs as jobs
 import random as r
 
 
@@ -85,6 +85,6 @@ class Queue:
         other: second queue object
         """
         delay = r.randint(self.delay_min, self.delay_max)
-        self.jobs.append(Jobs.Wait(delay))
+        self.jobs.append(jobs.Wait(delay))
         self.jobs = self.jobs + other.jobs
         return self

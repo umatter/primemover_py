@@ -8,8 +8,7 @@ TODO extend possibilities for time generation. In particular add option to get t
 """
 
 import random as r
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 import pytz
 import time
 import json

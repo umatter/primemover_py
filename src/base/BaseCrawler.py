@@ -6,17 +6,17 @@ based on this information. This can then be exported and pushed to the primemove
 J.L. 11.2020
 """
 
-from src.worker.ConfigureProfile import Config
-from src.worker.Info import CrawlerInfo
-from src.worker.Agent import Agent
-from src.worker.Proxy import Proxy
-from src.worker.TimeHandler import TimeHandler
-import src.worker.Utilities as Util
-import src.worker.Tasks as Tasks
+from src.base.BaseConfig import BaseConfig
+from src.base.info import CrawlerInfo
+from src.base.BaseAgent import BaseAgent
+from src.base.BaseProxy import BaseProxy
+from src.base.TimeHandler import TimeHandler
+import src.base.utilities as util
+from src.base.PrimemoverQueue import Queue
 from datetime import datetime
 
 
-class Crawler:
+class BaseCrawler:
     """ Crawler combines all relevant information about an individual bot. It contains
     configuration, proxy, agent, queue (task) data and the necessary information
     to re-identify a crawler both in the primemover_api and in primemover_py.
@@ -27,7 +27,7 @@ class Crawler:
         - description: string, optional
         - configuration: a configuration object.
             default: generates a new config object with all parameters determined
-            through ConfigurationFunctions or defaults. The name defaults to a modified version of the crawler name.
+            through CONFIGURATION_FUNCTIONS or defaults. The name defaults to a modified version of the crawler name.
         - agent: Agent object
             default: generates default Agent object
         - proxy: Proxy object
@@ -54,6 +54,9 @@ class Crawler:
     """
 
     CRAWLER_NR = 0
+    CONFIG_CLASS = BaseConfig
+    AGENT_CLASS = BaseAgent
+    PROXY_CLASS = BaseProxy
 
     def __init__(self,
                  name=None,
@@ -74,7 +77,7 @@ class Crawler:
         self.name = name
         if self.flag is None and self._name is not None:
             split_name = self._name.split('/')
-            if len(split_name) > 0:
+            if len(split_name) > 1:
                 self.flag = split_name[1]
         self.configuration = configuration
         self.send_agent = False
@@ -96,10 +99,10 @@ class Crawler:
     def name(self, val):
         if val is None:
             if self.flag is not None:
-                self._name = f'Crawler_{Crawler.CRAWLER_NR}/{self.flag}'
+                self._name = f'Crawler_{BaseCrawler.CRAWLER_NR}/{self.flag}'
             else:
-                self._name = f'Crawler_{Crawler.CRAWLER_NR}'
-            Crawler.CRAWLER_NR += 1
+                self._name = f'Crawler_{BaseCrawler.CRAWLER_NR}'
+            BaseCrawler.CRAWLER_NR += 1
         else:
             self._name = val
 
@@ -136,12 +139,12 @@ class Crawler:
     @configuration.setter
     def configuration(self, config):
         if config is None:
-            self._configuration = Config(
-                name=self._name.replace('Crawler', 'Config'))
-        elif type(config) is Config:
+            self._configuration = self.CONFIG_CLASS(
+                name=self._name.replace('Crawler', 'CONFIGURATION_FUNCTIONS'))
+        elif type(config) is self.CONFIG_CLASS:
             self._configuration = config
         else:
-            raise TypeError(f'configuration must be a  a  Config object')
+            raise TypeError(f'configuration must be a  a  CONFIGURATION_FUNCTIONS object')
 
     @property
     def agent(self):
@@ -153,10 +156,10 @@ class Crawler:
             self.send_agent = True
             name = self._name.replace('Crawler', 'Agent')
             name = name.replace('crawler', 'agent')
-            self._agent = Agent(name=name,
+            self._agent = self.AGENT_CLASS(name=name,
                                 location=self._configuration.location)
 
-        elif type(agent_in) is Agent:
+        elif type(agent_in) is self.AGENT_CLASS:
             self.send_agent = False
             self._agent = agent_in
         else:
@@ -172,9 +175,9 @@ class Crawler:
         if proxy_in is None:
             name = self._name.replace('Crawler', 'Proxy')
             name = name.replace('crawler', 'proxy')
-            self._proxy = Proxy(name=name)
+            self._proxy = self.PROXY_CLASS(name=name)
 
-        elif type(proxy_in) is Proxy:
+        elif type(proxy_in) is self.PROXY_CLASS:
             self._proxy = proxy_in
         else:
             raise TypeError(
@@ -204,9 +207,9 @@ class Crawler:
         if self._crawler_info is not None:
             return_dict['id'] = self._crawler_info.crawler_id
         if object_ids:
-            return_dict['agent_id'] = self.agent._info.agent_id
+            return_dict['agent_id'] = self.agent.info.agent_id
             return_dict[
-                'configuration_id'] = self.configuration._info.configuration_id
+                'configuration_id'] = self.configuration.info.configuration_id
             # return_dict['proxy_id'] = self.proxy._info.proxy_id
 
         return_dict["queues"] = [x.as_dict() for x in self.queues.values()]
@@ -224,7 +227,7 @@ class Crawler:
         Returns:
             session_id
         """
-        if not issubclass(cls, Tasks.Queue):
+        if not issubclass(cls, Queue):
             raise TypeError(f'cls must be a subclass of Queue')
         # generate new object
         if start_at is None and to_session is None or to_session is False:
@@ -246,15 +249,15 @@ class Crawler:
             if to_session not in self.queues.keys():
                 if start_at is None:
                     start_at = self.schedule.new_time()
-                to_session = Util.new_key(self.queues)
-                self.queues[to_session] = Tasks.Queue(start_at=start_at,
+                to_session = util.new_key(self.queues)
+                self.queues[to_session] = Queue(start_at=start_at,
                                                       name=f'Session_{to_session}',
                                                       delay_min=1,
                                                       delay_max=10)
             self.queues[to_session] + new_queue_object
         # add to queue list as new session
         else:
-            to_session = Util.new_key(self.queues)
+            to_session = util.new_key(self.queues)
             self.queues[to_session] = new_queue_object
         return to_session
 
@@ -263,7 +266,7 @@ class Crawler:
                   time_list=None):
         """
         Arguments:
-            - cls: class of the desired task, subclass of Queue (see. Tasks.py for available tasks)
+            - cls: class of the desired task, subclass of Queue (see. task files for available tasks)
             - nr: number of times this task is to be added
             - to_session: session_id (int) to add to existing queue if the session_id exists. Else a new queue is generated.
             - params: dictionary, required parameters for the defined class (required, if and when class requires parameters)
@@ -298,7 +301,7 @@ class Crawler:
         return to_session
 
     @classmethod
-    def from_list(cls, crawler_list, date_time = datetime.now()):
+    def from_list(cls, crawler_list, date_time=datetime.now()):
         """
         Initialize crawler objects from list of crawlers in dictionary format
         Arguments:
@@ -337,14 +340,14 @@ class Crawler:
 
     @classmethod
     def _single_crawler(cls, crawler_dict, date_time):
-        agent = Agent.from_dict(crawler_dict.get('agent'))
+        agent = cls.AGENT_CLASS.from_dict(crawler_dict.get('agent'))
         crawler_object = cls(name=crawler_dict.get('name'),
                              description=crawler_dict.get('description'),
-                             configuration=Config.from_dict(
+                             configuration=cls.CONFIG_CLASS.from_dict(
                                  crawler_dict.get('configuration'),
                                  location=agent.location, date_time=date_time),
                              agent=agent,
-                             proxy=Proxy.from_dict(crawler_dict.get('proxy')),
+                             proxy=cls.PROXY_CLASS.from_dict(crawler_dict.get('proxy')),
                              crawler_info=CrawlerInfo.from_dict(crawler_dict),
                              experiment_id=crawler_dict.get('experiment_id'),
                              date_time=date_time
@@ -382,5 +385,3 @@ class Crawler:
         self.configuration.update_config(results_valid, update_location, terms=terms)
 
         return self
-
-

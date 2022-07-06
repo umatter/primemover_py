@@ -22,7 +22,7 @@ import os
 import io
 import zipfile
 import pathlib
-from src.worker.Experiment import Experiment
+from src.base.Experiment import Experiment
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
@@ -34,7 +34,7 @@ def get_access(e_mail, password):
     Wrapper for the primemover login function. Use to post json like data from path.
 
     Returns:
-        access_token
+        bearer Token (access_token)
     """
     try:
         params = {'email': e_mail, 'password': password}
@@ -53,6 +53,7 @@ def push_new(access_token,
     """
     Wrapper for the primemover load function. Use to post json like data from path.
     Args:
+        access_token: bearer Token
         path: valid path to a json document
     Returns:
         response from primemover api
@@ -65,48 +66,16 @@ def push_new(access_token,
     return post_crawlers
 
 
-#
-# def update_crawlers(access_token, crawler_objects=None,
-#                     ):
-#     """
-#     Wrapper for the primemover load function. Use to post json like data from path.
-#     Args:
-#         path: valid path to a json document
-#     Returns:
-#         response from primemover api
-#     """
-#     queue_load = [crawler.as_dict(queues_only=True) for crawler in
-#                   crawler_objects]
-#
-#     agent_put = [crawler.agent.as_dict() for crawler in crawler_objects]
-#     for agent in agent_put:
-#         response = requests.put(f'{DOMAIN}agents/{agent.get("id")}', json=agent, headers={
-#             'authorization': 'Bearer ' + access_token})
-#     proxy_put = [crawler.proxy.as_dict() for crawler in crawler_objects]
-#     for proxy in proxy_put:
-#         response = requests.put(f'{DOMAIN}proxies/{proxy.get("id")}', json=proxy, headers={
-#             'authorization': 'Bearer ' + access_token})
-#     configurations_put = [crawler.configuration.as_dict() for crawler in
-#                           crawler_objects]
-#     for config in configurations_put:
-#         response = requests.put(f'{DOMAIN}configurations/{config.get("id")}', json=config,
-#                      headers={
-#                          'authorization': 'Bearer ' + access_token})
-#
-#     post_crawlers = requests.post(DOMAIN + 'load', json=queue_load, headers={
-#         'authorization': 'Bearer ' + access_token})
-#
-#     return post_crawlers
-
-
 def fetch_results(access_token,
-                  experiment_id = None,
+                  experiment_id=None,
                   path=f'{PRIMEMOVER_PATH}/resources/raw_data/{datetime.today().date().isoformat()}.json'):
     """
     Wrapper for the queues-unreviewed method of the primemover api. These are all
     processed, unreviewed queues.
 
     Args:
+        experiment_id: int, id of an existing experiment
+        access_token: str, bearer Token
         path: target path where response json will be stored, raises an error if path already exists.
             default: resources/raw_data/<<Today's Date>>.json'
     Returns:
@@ -115,12 +84,14 @@ def fetch_results(access_token,
     if os.path.exists(path):
         raise FileExistsError('file already exists')
     if experiment_id is not None:
-        raw_data = requests.get(DOMAIN + f'experiments/{experiment_id}/queues-unreviewed',
-                                headers={
-                                    'authorization': 'Bearer ' + access_token})
+        raw_data = requests.get(
+            DOMAIN + f'experiments/{experiment_id}/queues-unreviewed',
+            headers={
+                'authorization': 'Bearer ' + access_token})
     else:
         raw_data = requests.get(DOMAIN + 'queues-unreviewed',
-                            headers={'authorization': 'Bearer ' + access_token})
+                                headers={
+                                    'authorization': 'Bearer ' + access_token})
     raw_dict = raw_data.json()
     with open(path, 'w') as f:
         json.dump(raw_dict, f, indent='  ')
@@ -133,6 +104,7 @@ def fetch_reviewed(access_token,
     Wrapper for the queues-reviewed method of the primemover api. This contains all previously
         reviewed queues (reviewed is not set automaticaly, use set_reviewed())
     Args:
+        access_token: str, bearer Token
         path: target path where response json will be stored, raises an error if path already exists.
             default: resources/raw_data/reviewed_<<Today's Date>>.json'
     Returns:
@@ -154,6 +126,7 @@ def fetch_unprocessed(access_token,
     Wrapper for the queues-unprocessed method of the primemover api. This contains all queues not
         yet processed by the runner. This includes inactive queues.
     Args:
+        access_token: str, bearer Token
         path: target path where response json will be stored, raises an error if path already exists.
             default: resources/raw_data/unprocessed_<<Today's Date>>.json'
     Returns:
@@ -175,6 +148,7 @@ def fetch_all_crawlers(access_token,
     Wrapper for the crawlers method of the primemover api. This contains all active crawlers.
 
     Args:
+        access_token: str, bearer Token
         path: target path where response json will be stored. Existing data is overwritten!
             default: resources/crawlers/<<Today's Date>>.json'
     Returns:
@@ -192,6 +166,7 @@ def fetch_html(access_token, url):
     """
     Wrapper function to fetch html data from report urls
     Args:
+        access_token: str, bearer Token
         url: A url to a report file, e.g. "https://siaw.qlick.ch/api/v1/file/227989"
     Returns:
         html as text
@@ -232,6 +207,7 @@ def fetch_dynamic(access_token, url):
     """
     Wrapper function to fetch html data from report urls
     Args:
+        access_token: str, bearer Token
         url: A url to a report file, e.g. "https://siaw.qlick.ch/api/v1/file/227989"
     Returns:
         dict
@@ -252,6 +228,7 @@ def set_reviewed(access_token, queue_id: int):
     """
     Wrapper function to set queue status to reviewed.
     Args:
+        access_token: str, bearer Token
         queue_id: The id of a queue that is to be set to reviewed
     Returns:
         'sucess' if status code 200, else raises ConnectionError with response status code
@@ -268,45 +245,25 @@ def set_inactive(access_token, queue_id):
     """
     Wrapper function set queue status to active = 0
     Args:
+        access_token: str, bearer Token
         queue_id: The id of a queue that is to be set to reviewed
     Returns:
         'sucess' if status code 200, else raises ConnectionError with response status code
     """
     r = requests.put(DOMAIN + f'queues/{queue_id}', data={'active': 0},
                      headers={'authorization': f'Bearer {access_token}'})
-    if r.status_code in {200,404}:
+    if r.status_code in {200, 404}:
         return 'success'
     else:
         raise ConnectionError(f'status code {r.status_code}')
 
 
-def get_outlets(access_token):
-    """
-    DEPRECIATED
-    Wrapper function to retrive media outlets from primemover api
-    Returns:
-        contents of response json at key 'data'
-    """
-    r = requests.get(DOMAIN + 'outlets',
-                     headers={'authorization': f'Bearer {access_token}'})
-    return r.json()['data']
-
-
-def get_terms(access_token):
-    """
-    DEPRECIATED
-    Wrapper function to retrive search terms from primemover api
-    Returns:
-        contents of response json at key 'data'
-    """
-    r = requests.get(DOMAIN + 'terms',
-                     headers={'authorization': f'Bearer {access_token}'})
-    return r.json()['data']
-
-
 def new_experiment(access_token, experiment):
     """
     Wrapper function to create a new experiment object
+    Args:
+        access_token: str, bearer Token
+        experiment: dict, expeiment to create, must be in valid format (see base.BaseExperient)
     Returns:
         contents of response json at key 'data'
     """
@@ -319,6 +276,10 @@ def new_experiment(access_token, experiment):
 def update_experiment(access_token, experiment, exp_id):
     """
     Wrapper function to upaate an experiment object
+    Args:
+        access_token: str, bearer Token
+        experiment: dict, matching experiment format
+        exp_id: int, id of experiment to update
     Returns:
         contents of response json at key 'data'
     """
@@ -377,9 +338,11 @@ def fetch_crawlers_by_exp(access_token, experiment_id):
 
 
 def delete_exp(access_token, id):
-    requests.delete(DOMAIN + f'experiments/{id}', headers={'authorization': f'Bearer {access_token}'})
+    requests.delete(DOMAIN + f'experiments/{id}',
+                    headers={'authorization': f'Bearer {access_token}'})
 
-def delete_queues_2(access_token,i):
-    resp = requests.delete(DOMAIN + f'queues/{i}', headers={'authorization': f'Bearer {access_token}'})
+
+def delete_queues_2(access_token, i):
+    resp = requests.delete(DOMAIN + f'queues/{i}',
+                           headers={'authorization': f'Bearer {access_token}'})
     return resp
-

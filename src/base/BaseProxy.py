@@ -4,11 +4,11 @@ matches the proxy object on the primemover_api
 TODO Secure passwords
 """
 
-from src.worker.Info import ProxyInfo
+from src.base.info import ProxyInfo
 import json
 import pathlib
 import pandas as pd
-from src.worker.History import S3History
+from src.base.history import S3History
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
@@ -17,7 +17,7 @@ PROXYPATHS = ['/resources/proxies/rotating_proxies.csv',
               '/resources/proxies/private_proxies.csv']
 
 
-class Proxy:
+class BaseProxy:
 
     def __init__(self,
                  username=None,

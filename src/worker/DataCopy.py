@@ -1,12 +1,12 @@
-from src.worker.Crawler import Crawler
+from src.base.BaseCrawler import BaseCrawler
 from datetime import datetime, timedelta
 import json
 import pathlib
-from src.worker.Utilities import pref_as_dict
+from src.base.utilities import pref_as_dict
 import pandas as pd
-from src.worker import s3_wrapper
+from src.base import s3_wrapper
 import src.auxiliary.result_select as result_select
-import src.worker.api_wrapper as api_wrapper
+import src.base.api_wrapper as api_wrapper
 from src.worker.UpdateObject import UpdateObject
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
@@ -16,6 +16,9 @@ with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
 
 ACCESS_TOKEN = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
                                       KEYS['PRIMEMOVER']['password'])
+
+from src_google.worker.classes import Crawler
+
 
 
 def extract_data(experiment_id: int):
