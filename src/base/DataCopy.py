@@ -1,10 +1,10 @@
 from datetime import datetime
 import json
 import pathlib
-from src.base.utilities import pref_as_dict
+from src.worker.utilities import pref_as_dict
 import pandas as pd
-from src.base import s3_wrapper
-import src.base.api_wrapper as api_wrapper
+from src.worker import s3_wrapper
+import src.worker.api_wrapper as api_wrapper
 from src.worker.UpdateObject import UpdateObject
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())

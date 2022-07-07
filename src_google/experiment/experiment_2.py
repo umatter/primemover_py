@@ -4,10 +4,12 @@ This file generates new crawlers, in particular the required config files
 
 J.L. 07.2022
 """
-from src.base.TimeHandler import Schedule, TimeHandler
-from src.base import api_wrapper as api
-from src.base import s3_wrapper
-from src.base.Experiment import Experiment
+import os
+
+from src.worker.TimeHandler import Schedule, TimeHandler
+from src.worker import api_wrapper as api
+from src.worker import s3_wrapper
+from src.worker.Experiment import Experiment
 
 from src_google.worker.classes import Crawler, Config, Proxy
 from src_google.worker.config_functions import select_local_outlets
@@ -19,7 +21,7 @@ from datetime import datetime
 import pathlib
 import random as r
 
-PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 PATH_BENIGN_TERMS = PRIMEMOVER_PATH + '/resources/other/benign_terms.json'
 
@@ -95,44 +97,35 @@ def launch_experiment():
         description='A test of all systems based on a future experiment set up',
         contact='JLadwig',
     )
-    s3_wrapper.fetch_private("/resources/proxies/private_proxies.csv")
-    s3_wrapper.fetch_rotating("/resources/proxies/rotating_proxies.csv")
+    # s3_wrapper.fetch_private("/resources/proxies/private_proxies.csv")
+    # s3_wrapper.fetch_rotating("/resources/proxies/rotating_proxies.csv")
     s3_wrapper.fetch_geosurf()
 
-    s3_wrapper.update_valid_cities()
+    # s3_wrapper.update_valid_cities()
 
     s3_wrapper.fetch_neutral_domains()
     s3_wrapper.fetch_outlets()
 
     select_local_outlets(PATH_OUTLETS, PATH_OUTLETS_LOCAL, nr_per_state=2)
 
-    s3_wrapper.fetch_terms()
+    #s3_wrapper.fetch_terms()
 
     key = api.get_access(KEYS['PRIMEMOVER']['username'],
                        KEYS['PRIMEMOVER']['password'])
-    # exp_return = api.new_experiment(key, exp.as_dict())
-    # exp_id = Experiment.from_dict(exp_return).id
-    exp_id = 1
+    exp_return = api.new_experiment(key, exp.as_dict())
+    exp_id = Experiment.from_dict(exp_return).id
     TimeHandler.GLOBAL_SCHEDULE = Schedule(start_at=10 * 60 * 60,
                                            end_at=(10 + 23) * 60 * 60,
                                            interval=600,
                                            )
     # Generate GEOSURF based crawlers
     GEO_SURF_PROXIES = ["US-CO-COLORADO_SPRINGS",
-                        "US-OK-OKLAHOMA_CITY",
-                        "US-KS-WICHITA",
-                        "US-CA-BAKERSFIELD",
-                        "US-FL-JACKSONVILLE",
-                        "US-CA-SAN_FRANCISCO",
-                        "US-WI-MADISON",
-                        "US-CA-SAN_JOSE",
-                        "US-DC-WASHINGTON",
-                        "US-TX-EL_PASO"]
+                        "US-OK-OKLAHOMA_CITY"]
 
     # generate neutral configurations
     config_list_neutral = [
         Config(name='CONFIGURATION_FUNCTIONS/neutral', location=l, pi=0, media=[], terms=[]) for
-        l in 2 * GEO_SURF_PROXIES]
+        l in 1 * GEO_SURF_PROXIES]
     # generate crawlers from neutral configs
     crawler_list = [
         Crawler(flag='neutral', configuration=c, experiment_id=exp_id) for
@@ -140,7 +133,7 @@ def launch_experiment():
         config_list_neutral]
     # generate left and right configs with opposing pi in each location
     config_list_left = [Config(name='CONFIGURATION_FUNCTIONS/left', location=l) for l in
-                        4 * GEO_SURF_PROXIES]
+                        1 * GEO_SURF_PROXIES]
     config_list_right = [
         Config(name='CONFIGURATION_FUNCTIONS/right', location=left_config.location,
                pi=-left_config.pi) for left_config in
@@ -156,25 +149,25 @@ def launch_experiment():
         config_list_right]
 
     # Distribute rotating proxies
-    rotating_proxies = pd.read_csv(ROTATING_PATH)
-    rotating_proxies = rotating_proxies.loc[rotating_proxies['active'] == 1]
-    rotating_proxies['gateway_ip_port'] = rotating_proxies[
-        'gateway_ip_port'].astype(str)
-    location_groups = rotating_proxies.groupby('loc_id')
-    crawler_list += distribute_proxies(location_groups, exp_id, "rotating")
-
-    # Distribute Private Proxies
-    private_proxies = pd.read_csv(PRIVATE_PATH)
-    private_proxies = private_proxies.loc[private_proxies['active'] == 1]
-
-    private_proxies['gateway_ip_port'] = private_proxies[
-        'gateway_ip_port'].astype(
-        str)
-    location_groups = private_proxies.groupby('loc_id')
-    crawler_list += distribute_proxies(location_groups, exp_id, "private")
+    # rotating_proxies = pd.read_csv(ROTATING_PATH)
+    # rotating_proxies = rotating_proxies.loc[rotating_proxies['active'] == 1]
+    # rotating_proxies['gateway_ip_port'] = rotating_proxies[
+    #     'gateway_ip_port'].astype(str)
+    # location_groups = rotating_proxies.groupby('loc_id')
+    # crawler_list += distribute_proxies(location_groups, exp_id, "rotating")
+    #
+    # # Distribute Private Proxies
+    # private_proxies = pd.read_csv(PRIVATE_PATH)
+    # private_proxies = private_proxies.loc[private_proxies['active'] == 1]
+    #
+    # private_proxies['gateway_ip_port'] = private_proxies[
+    #     'gateway_ip_port'].astype(
+    #     str)
+    # location_groups = private_proxies.groupby('loc_id')
+    # crawler_list += distribute_proxies(location_groups, exp_id, "private")
 
     # Set privacy
-    with_privacy = r.sample(crawler_list, k=80)
+    with_privacy = r.sample(crawler_list, k=2)
     for i, crawler in enumerate(with_privacy):
         if i < 20:
             crawler.agent.multilogin_profile.geolocation = 'BLOCK'
@@ -185,22 +178,23 @@ def launch_experiment():
         elif i < 80:
             crawler.agent.multilogin_profile.local_storage = False
             crawler.agent.multilogin_profile.service_worker_cache = False
-
+    if not os.path.isdir(PRIMEMOVER_PATH+'/resources/crawlers'):
+        os.mkdir(PRIMEMOVER_PATH+'/resources/crawlers')
     with open(PRIMEMOVER_PATH + "/resources/crawlers/experiment_3.json",
               'w') as file:
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
-    # return_data = api.push_new(access_token=key,
-    #                            path=PRIMEMOVER_PATH + "/resources/crawlers/experiment_3.json")
-    # data_as_dict = json.loads(return_data.text)
-    #
-    # with open(
-    #         f'{PRIMEMOVER_PATH}/resources/crawlers/experiment_3{datetime.now().date().isoformat()}.json',
-    #         'w') as file:
-    #     json.dump(data_as_dict, file, indent='  ')
-    #
-    # return f"exp_id = {exp_id}"
+    return_data = api.push_new(access_token=key,
+                               path=PRIMEMOVER_PATH + "/resources/crawlers/experiment_3.json")
+    data_as_dict = json.loads(return_data.text)
+
+    with open(
+            f'{PRIMEMOVER_PATH}/resources/crawlers/experiment_3_{datetime.now().date().isoformat()}.json',
+            'w') as file:
+        json.dump(data_as_dict, file, indent='  ')
+
+    return f"exp_id = {exp_id}"
 
 
 if __name__ == "__main__":

@@ -8,14 +8,14 @@ import json
 import warnings
 import re
 import pathlib
-import src.base.base_config_functions as base_config
+from src.base import base_config_functions
 import random
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 
 class BaseProfile:
-    CONFIGURATION_FUNCTIONS = base_config
+    CONFIGURATION_FUNCTIONS = base_config_functions
 
     def __init__(self,
                  name="%%AGENTID%%",

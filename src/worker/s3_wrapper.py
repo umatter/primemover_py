@@ -34,11 +34,13 @@ def fetch_report(job_id: int, report_type='dynamic'):
     fetch job report from s3 bucket:
     """
 
-    report_type = report_type.lower()
-    if not report_type in ['dynamic', 'static']:
-        raise ValueError('report type must be one of dynamic, static')
+    report_type = report_type.lower().strip()
+    if not report_type in ['dynamic', 'static', 'html']:
+        raise ValueError('report type must be one of dynamic, static and html')
     in_stream = io.BytesIO()
     try:
+        if report_type == 'html':
+            file_path = f"finalsource/{report_type}_jobdata_{job_id}"
         CLIENT.download_fileobj("primemoverrunner",
                                 f"reports/{report_type}_jobdata_{job_id}",
                                 in_stream,
@@ -130,12 +132,12 @@ def fetch_neutral_domains():
     path = "/resources/input_data/neutraldomains_pool.csv"
     return fetch_file(path, "neutraldomains_pool.csv")
 
-def fetch_private(path = "/resources/proxies/private_proxies_new.csv"):
+
+def fetch_private(path="/resources/proxies/private_proxies_new.csv"):
     return fetch_file(path, "private_proxies.csv")
 
 
-def fetch_rotating(path = "/resources/proxies/rotating_proxies_new.csv"):
-
+def fetch_rotating(path="/resources/proxies/rotating_proxies_new.csv"):
     return fetch_file(path, "rotating_proxies.csv")
 
 

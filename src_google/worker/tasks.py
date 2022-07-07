@@ -3,8 +3,8 @@
  TODO re-structure tasks into a folder system for different tasks. Perhaps a base folder for reoccouring tasks and separate folders for different experiments.
  J.L. 03/2021
  """
-from src.base.PrimemoverQueue import Queue
-from src.base import jobs
+from src.worker.PrimemoverQueue import Queue
+from src.worker import jobs
 
 import src_google.worker.preferences as pref
 from src_google.worker.config_functions import NoiseUtility
@@ -252,7 +252,7 @@ class VisitFrequentDirect(VisitDirect):
 class VisitNeutralDirect(VisitDirect):
     def __init__(self, start_at,
                  file_path='/resources/input_data/neutraldomains_pool.csv'):
-        domains = pd.read_csv(PRIMEMOVER_PATH + file_path)
+        domains = pd.read_csv(PRIMEMOVER_PATH + file_path, encoding='utf-16')
         url = r.choice(domains['redirect_url'])
         super().__init__(outlet_url=url, start_at=start_at)
 

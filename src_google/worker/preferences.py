@@ -1,7 +1,4 @@
 import math
-import random
-import numpy as np
-
 
 
 def media_utility_u_ij(pi_i, pi_tilde_j, epsilon_ij, alpha_tilde,

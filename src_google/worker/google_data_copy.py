@@ -1,10 +1,6 @@
 from src_google.worker.classes import Crawler
-import json
-import pathlib
-import pandas as pd
-from src.base import s3_wrapper
+
 import src.auxiliary.result_select as result_select
-import src.base.api_wrapper as api_wrapper
 from src.base.DataCopy import *
 from src.worker.UpdateObject import UpdateObject
 

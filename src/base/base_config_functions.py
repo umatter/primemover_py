@@ -1,11 +1,10 @@
 """
-Use this file or copies of it to control how the CONFIGURATION_FUNCTIONS class generates user profiles
-
+Use this file or copies of it to control how the CONFIGURATION_FUNCTIONS class generates user profiles.
+The intent is to create an experiment specific copy and replace parameter defining rules.
 J.L. 11.2020
 """
 
 import random as r
-import pandas as pd
 from numpy.random import gumbel
 import pathlib
 

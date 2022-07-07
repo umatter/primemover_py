@@ -1,15 +1,16 @@
-from src.worker import Crawler, Tasks, ConfigureProfile, s3_wrapper, Experiment
+from src_google.worker.classes import Crawler, Config
+from src.worker import s3_wrapper, Experiment
+from src_google.worker import tasks
 from src.worker.UpdateObject import *
 from src.worker.ReplaceProxies import update_all_proxies
 from src.worker.TimeHandler import Schedule, TimeHandler
 from datetime import datetime, timedelta
 import src.worker.api_wrapper as api
-import random as r
 import json
 import pathlib
 import os
 
-PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
@@ -25,7 +26,7 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
     else:
         with open(neutral_path) as file:
             neutral_in = json.load(file)
-    nr_neutral = 2
+    nr_neutral = 1
     neutral = []
     if len(neutral_in) < nr_neutral:
         neutral_in += s3_wrapper.fetch_neutral()
@@ -42,9 +43,9 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
     raw_experiment = api_wrapper.fetch_experiment(access_token=key, id=
     experiment_id)
 
-    crawler_list = Crawler.Crawler.from_list(raw_experiment['crawlers'],
+    crawler_list = Crawler.from_list(raw_experiment['crawlers'],
                                              date_time=date_time)
-    crawler_list = UpdateObject(crawler_list, 'config')
+    crawler_list = UpdateObject(crawler_list, Config)
     "Compute Proxy Changes"
     if update_proxies:
         update_proxies_dict = update_all_proxies()
@@ -71,33 +72,33 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
     crawler_list = crawler_list_political + crawler_list_neutral
 
     for individual in crawler_list:
-        session_id = individual.add_task(Tasks.HandleCookiesGoogle,
+        session_id = individual.add_task(tasks.HandleCookiesGoogle,
                                          to_session=True)
-        session_id = individual.add_task(Tasks.SetGooglePreferences,
+        session_id = individual.add_task(tasks.SetGooglePreferences,
                                          to_session=session_id,
                                          params={'nr_results': 30, 'set_language': "English"})
         if individual.flag in {'left', 'right'} and \
                 individual.configuration.usage_type in {'only_search', 'both',
                                                         None}:
-            individual.add_task(Tasks.PoliticalSearch,
+            individual.add_task(tasks.PoliticalSearch,
                                 to_session=session_id)
-            # individual.add_task(Tasks.PoliticalSearch,
+            # individual.add_task(tasks.PoliticalSearch,
             #                     to_session=session_id)
         if individual.flag in {'left', 'right'} and \
                 individual.configuration.usage_type in {'only_direct', 'both',
                                                         None}:
-            individual.add_task(Tasks.VisitMedia,
+            individual.add_task(tasks.VisitMedia,
                                 to_session=session_id)
-            # individual.add_task(Tasks.VisitMedia,
+            # individual.add_task(tasks.VisitMedia,
             #                     to_session=session_id)
 
         if individual.configuration.usage_type in {'only_direct', 'both', None}:
-            individual.add_task(Tasks.VisitNeutralDirect,
+            individual.add_task(tasks.VisitNeutralDirect,
                                 to_session=session_id)
-            individual.add_task(Tasks.VisitNeutralDirect,
+            individual.add_task(tasks.VisitNeutralDirect,
                                 to_session=session_id)
 
-        individual.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
+        individual.add_task(tasks.NeutralGoogleSearch, to_session=session_id,
                             params={'term': neutral[0]})
 
     for c in crawler_list:
@@ -106,18 +107,19 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
                                  wake_time=18 * 60 * 60,
                                  bed_time=21 * 60 * 60,
                                  date_time=date_time)
-        session_id = c.add_task(Tasks.HandleCookiesGoogle,
+        session_id = c.add_task(tasks.HandleCookiesGoogle,
                                 to_session=True)
-        c.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
-                   params={'term': neutral[1]})
-        # c.add_task(Tasks.NeutralGoogleSearch, to_session=session_id,
-        #            params={'term': neutral[2]})
+        c.add_task(tasks.NeutralGoogleSearch, to_session=session_id,
+                   params={'term': neutral[0]})
+        # c.add_task(tasks.NeutralGoogleSearch, to_session=session_id,
+        #            params={'term': neutral[1]})
     if fixed_times:
         queues_1 = [c.queues[0] for c in crawler_list]
         queues_1.sort(key=lambda q: datetime.fromisoformat(q.start_at))
         # t_0 = datetime.fromisoformat(queues_1[0].start_at)
-        t_0 = datetime.fromisoformat(
-            f'{date_time.date().isoformat()}T10:00:00-06:00')
+        # t_0 = datetime.fromisoformat(
+        #     f'{date_time.date().isoformat()}T10:00:00-06:00')
+        t_0 = datetime.now() + timedelta(minutes=10)
         print(t_0)
         delta_t_1 = int(delta_t_1)
         for q in queues_1[1:]:
@@ -126,8 +128,9 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
 
         queues_2 = [c.queues[1] for c in crawler_list]
         queues_2.sort(key=lambda q: datetime.fromisoformat(q.start_at))
-        t_0 = datetime.fromisoformat(
-            f'{date_time.date().isoformat()}T21:00:00-06:00')
+        # t_0 = datetime.fromisoformat(
+        #     f'{date_time.date().isoformat()}T21:00:00-06:00')00
+        t_0 = datetime.now() + timedelta(minutes=40)
         print(t_0)
         for q in queues_2[1:]:
             delta_t_2 = int(delta_t_2)
@@ -194,8 +197,9 @@ if __name__ == "__main__":
     #     single_update(day_delta=day)
     #     print((datetime.now().date() + timedelta(days=day)).isoformat())
     single_update(date_time=datetime.now(),
-                  experiment_id=47,
+                  experiment_id=49,
                   manual=True,
                   update_preferences=False,
                   update_proxies=False,
-                  fixed_times=True)
+                  fixed_times=True,
+                  delta_t_1=240, delta_t_2=60)

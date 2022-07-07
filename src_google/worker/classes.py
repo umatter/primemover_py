@@ -6,7 +6,7 @@ from src.base.BaseProxy import BaseProxy
 from src.base.BaseConfig import BaseConfig
 from src.base.BaseCrawler import BaseCrawler
 
-from src.base.TimeHandler import TimeHandler
+from src.worker.TimeHandler import TimeHandler
 
 from datetime import datetime
 import json

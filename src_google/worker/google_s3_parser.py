@@ -1,5 +1,5 @@
 from src.base.base_s3_parser import *
-from src.worker.Utilities import extract_domain
+from src.worker.utilities import extract_domain
 import pandas as pd
 from bs4 import BeautifulSoup
 

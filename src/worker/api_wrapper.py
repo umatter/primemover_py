@@ -7,7 +7,6 @@ Available Functions:
     - fetch_reviewed: Wrapper for the queues-reviewed method of the primemover api
     - fetch_unprocessed: Wrapper for the queues-unprocessed method of the primemover api
     - fetch_all_crawlers: Wrapper for the crawlers method of the primemover api. This contains all active crawlers.
-    - fetch_html: Fetch html files from single report
     - set_reviewed: Set queue reviewed flag to 1
     - get_outlets: Fetch all outlets from primemover_api
     - get_terms: Fetch all terms from primemover_api
@@ -19,10 +18,9 @@ import requests
 import json
 from datetime import datetime
 import os
-import io
-import zipfile
+
 import pathlib
-from src.base.Experiment import Experiment
+from src.worker.Experiment import Experiment
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
@@ -160,69 +158,6 @@ def fetch_all_crawlers(access_token,
     with open(path, 'w') as f:
         json.dump(raw_dict, f, indent='  ')
     return raw_dict
-
-
-def fetch_html(access_token, url):
-    """
-    Wrapper function to fetch html data from report urls
-    Args:
-        access_token: str, bearer Token
-        url: A url to a report file, e.g. "https://siaw.qlick.ch/api/v1/file/227989"
-    Returns:
-        html as text
-    """
-    r = requests.get(url, headers={'authorization': f'Bearer {access_token}'})
-    zipdata = io.BytesIO(r.content)
-    as_zipfile = zipfile.ZipFile(zipdata)
-    name = None
-    for name in as_zipfile.namelist():
-        if 'html' in name:
-            break
-    raw_html = as_zipfile.read(name)
-
-    return raw_html
-
-
-# def fetch_html( url):
-#     """
-#     Wrapper function to fetch html data from report urls
-#     Args:
-#         url: A url to a report file, e.g. "https://siaw.qlick.ch/api/v1/file/227989"
-#     Returns:
-#         html as text
-#     """
-#     r = requests.get(url)
-#     zipdata = io.BytesIO(r.content)
-#     as_zipfile = zipfile.ZipFile(zipdata)
-#     name = None
-#     for name in as_zipfile.namelist():
-#         if 'html' in name:
-#             break
-#     raw_html = as_zipfile.read(name)
-#
-#     return raw_html
-#
-
-def fetch_dynamic(access_token, url):
-    """
-    Wrapper function to fetch html data from report urls
-    Args:
-        access_token: str, bearer Token
-        url: A url to a report file, e.g. "https://siaw.qlick.ch/api/v1/file/227989"
-    Returns:
-        dict
-    """
-    r = requests.get(url, headers={'authorization': f'Bearer {access_token}'})
-    zipdata = io.BytesIO(r.content)
-    as_zipfile = zipfile.ZipFile(zipdata)
-    name = None
-    for name in as_zipfile.namelist():
-        if 'json' in name:
-            break
-    raw_json = as_zipfile.read(name)
-    raw_dict = json.loads(raw_json)
-    return raw_dict
-
 
 def set_reviewed(access_token, queue_id: int):
     """

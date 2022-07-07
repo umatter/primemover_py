@@ -4,7 +4,7 @@ matches the proxy object on the primemover_api
 TODO Secure passwords
 """
 
-from src.base.info import ProxyInfo
+from src.worker.info import ProxyInfo
 import json
 import pathlib
 import pandas as pd

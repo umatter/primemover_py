@@ -6,7 +6,7 @@ J.L. 11.2020
 """
 
 from src.base.BaseProfile import BaseProfile
-from src.base.info import AgentInfo
+from src.worker.info import AgentInfo
 import json
 import pathlib
 

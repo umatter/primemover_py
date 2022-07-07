@@ -17,7 +17,6 @@ Classes:
 J.L 11/2020
 """
 
-import json
 
 
 class Info:

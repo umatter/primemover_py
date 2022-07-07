@@ -7,12 +7,12 @@ J.L. 11.2020
 """
 
 from src.base.BaseConfig import BaseConfig
-from src.base.info import CrawlerInfo
+from src.worker.info import CrawlerInfo
 from src.base.BaseAgent import BaseAgent
 from src.base.BaseProxy import BaseProxy
-from src.base.TimeHandler import TimeHandler
-import src.base.utilities as util
-from src.base.PrimemoverQueue import Queue
+from src.worker.TimeHandler import TimeHandler
+import src.worker.utilities as util
+from src.worker.PrimemoverQueue import Queue
 from datetime import datetime
 
 

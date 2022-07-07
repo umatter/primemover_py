@@ -1,5 +1,4 @@
-from src.base import BaseAgent, BaseProxy, BaseConfig, BaseCrawler
-from src.base import api_wrapper
+from src.worker import api_wrapper
 
 
 def UpdateObject(crawler_list, desired_object):
@@ -42,7 +41,7 @@ def UpdateObject(crawler_list, desired_object):
     elif object_name == 'BaseConfig':
         for c in crawler_list:
             location = c.agent.location
-            c.configuration = desired_object.CONFIGURATION_FUNCTIONS.from_dict(updated_dict[c.configuration.info.configuration_id], location)
+            c.configuration = desired_object.from_dict(updated_dict[c.configuration.info.configuration_id], location)
     else:
         raise Exception('This should not happen!')
     return crawler_list

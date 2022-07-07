@@ -6,12 +6,12 @@ CONFIGURATION_FUNCTIONS file.
 J.L. 11.2020
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from src.base import base_config_functions
-from src.base.info import ConfigurationInfo
+from src.worker.info import ConfigurationInfo
 import json
 import pathlib
-from src.base.utilities import pref_as_dict, EscapeStrings
+from src.worker.utilities import pref_as_dict
 from src.base.history import S3History
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())

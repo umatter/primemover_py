@@ -1,4 +1,4 @@
-import src.base.s3_wrapper as s3_wrapper
+import src.worker.s3_wrapper as s3_wrapper
 from src.base import BaseProfile
 import json
 from datetime import date
@@ -29,11 +29,11 @@ class S3History:
     @py_object.setter
     def py_object(self, value):
         class_name = str(type(value)).split('.')[-1].replace("'>","")
-        if class_name in ["CONFIGURATION_FUNCTIONS", "Proxy",
+        if class_name in ["Config", "Proxy",
                                 "Agent"] and value.info is None:
             raise ValueError(
                 f'py_object info is empty! Never create a history for an object not returned by the primemover api!')
-        if class_name == "CONFIGURATION_FUNCTIONS":
+        if class_name == "Config":
             self._object_class = 'config'
             self._py_object = value
             self._object_id = value.info.configuration_id

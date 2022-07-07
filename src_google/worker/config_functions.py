@@ -81,7 +81,7 @@ def SelectMediaOutlets(alpha_tilde, tau_tilde_ij, pi=0, k=8, local=2):
     # Select national outlets
     path_outlets = PRIMEMOVER_PATH + '/resources/input_data/outlets_pool.csv'
 
-    outlets = pd.read_csv(path_outlets,
+    outlets = pd.read_csv(path_outlets, encoding='utf-16',
                           usecols=['domain', 'state', 'redirect_url',
                                    'avg_users_us_percent',
                                    'avg_reach_permillion', 'pi', 'pop2019',
@@ -273,19 +273,13 @@ def select_local_outlets(path_in, path_local_out, nr_per_state=2):
     """
         Select nr_per_state number of local news outlets per state in outlets input
     """
-    try:
-        outlets = pd.read_csv(path_in,
+
+    outlets = pd.read_csv(path_in,encoding='utf-16',
                           usecols=['domain', 'state', 'redirect_url',
                                    'avg_users_us_percent',
                                    'avg_reach_permillion', 'pi', 'pop2019',
                                    'is_local'])
-    except UnicodeDecodeError:
-        outlets = pd.read_csv(path_in,
-                              encoding='latin1',
-                              usecols=['domain', 'state', 'redirect_url',
-                                       'avg_users_us_percent',
-                                       'avg_reach_permillion', 'pi', 'pop2019',
-                                       'is_local'])
+
     states = list(set(outlets['state']))
     outlets['size'] = outlets['avg_reach_permillion'] * outlets[
         'avg_users_us_percent'] / 100

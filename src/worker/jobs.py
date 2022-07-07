@@ -7,7 +7,7 @@ Classes:
     - Job: base job class
 """
 
-import src.base.Behavior as Behavior
+import src.worker.Behavior as Behavior
 
 
 class Job:

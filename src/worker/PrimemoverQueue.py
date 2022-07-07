@@ -5,7 +5,7 @@ session and when to begin execution. Queues can be combined
 J.L. 11.2020
 """
 
-import src.base.jobs as jobs
+import src.worker.jobs as jobs
 import random as r
 
 

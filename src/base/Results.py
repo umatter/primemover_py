@@ -2,13 +2,12 @@
 Process results returned from primemover runner via the API
 """
 
-import src.worker.s3_parser as Parser
-from src.base import api_wrapper
+import src.base.base_s3_parser as Parser
+from src.worker import api_wrapper
 import json
 from datetime import datetime
-from src.worker.Crawler import Crawler
 import pathlib
-import src.base.s3_wrapper as s3
+import src.worker.s3_wrapper as s3
 import zipfile
 import io
 import pandas as pd
@@ -85,6 +84,9 @@ class JobResult:
                                 'job_id': self.job_id}
             if type(raw_data) == io.BytesIO:
                 raw_data.close()
+    def _download_full_report(self):
+        raw_data, success = s3.fetch_report(self.job_id, 'static')
+        return raw_data
 
     def _download_html(self):
         raw_data, success = s3.fetch_report(self.job_id, 'static')
