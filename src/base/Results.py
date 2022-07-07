@@ -12,7 +12,7 @@ import zipfile
 import io
 import pandas as pd
 
-PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
@@ -26,13 +26,14 @@ class JobResult:
     Stores and processes the returned data for a single job
     """
 
-    def __init__(self, crawler_id=None, job_id=None, started_at=None,
+    def __init__(self, crawler_id=None, job_id=None, job_type=None, started_at=None,
                  status_code=None, status_message=None,
                  created_at=None, updated_at=None, finished_at=None,
                  behaviors=None, flag_list=None, reports=None,
                  parser_dict=Parser.ParserDict, captcha_parse=False):
         self.crawler_id = crawler_id
         self.job_id = job_id
+        self.job_type = job_type
         self._started_at = started_at
         self.status_message = status_message
         self.status_code = status_code
@@ -85,14 +86,12 @@ class JobResult:
             if type(raw_data) == io.BytesIO:
                 raw_data.close()
     def _download_full_report(self):
-        raw_data, success = s3.fetch_report(self.job_id, 'static')
+        raw_data, success = s3.fetch_report(self.job_id, self.task, self.job_type, 'static')
         return raw_data
 
     def _download_html(self):
-        raw_data, success = s3.fetch_report(self.job_id, 'static')
+        raw_data, success = s3.fetch_report(self.job_id, self.task, self.job_type, 'html')
         if success:
-            as_zipfile = zipfile.ZipFile(raw_data)
-
             name = None
             for name in as_zipfile.namelist():
                 if 'html' in name:
@@ -104,7 +103,7 @@ class JobResult:
 
     def _download_dynamic(self):
 
-        raw_data, success = s3.fetch_report(self.job_id, 'dynamic')
+        raw_data, success = s3.fetch_report(self.job_id, self.task, self.job_type, 'dynamic')
         if success:
             as_zipfile = zipfile.ZipFile(raw_data)
             name = None
@@ -139,6 +138,7 @@ class JobResult:
     def from_dict(cls, result_dict, parser_dict=Parser.ParserDict):
         job_result_object = cls(crawler_id=result_dict.get('crawler_id'),
                                 job_id=result_dict.get('id'),
+                                job_type=result_dict.get('type'),
                                 started_at=result_dict.get('started_at'),
                                 status_message=result_dict.get(
                                     'status_message'),

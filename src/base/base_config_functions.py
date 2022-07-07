@@ -93,10 +93,19 @@ def kappa():
 
 
 def location():
+    """
+    When re-defining this function, make sure to use valid cities from
+    resources/proxies/valid_cities.json. A version of this should be available on S3 and a
+    wrapper to download the file can be found in src/worker/s3_wrapper.
+
+    Retrurns:str, <Country>-<State>-<City> matching GeoSurf locations. This may change
+    when proxy providers change.
+    """
     return "US-AL-AUBURN"
 
 
 def usage_type():
+    """"""
     choice = \
         r.choices(['only_search', 'only_direct', 'both'], [0.25, 0.25, 0.5])[0]
     return choice

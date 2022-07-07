@@ -80,7 +80,7 @@ class BaseProxy:
 
     def _check_location_non_geosurf(self):
         """
-        type: private
+        job_type: private
         params: self
         Updates location for non geosurf proxies, when a proxy is changed.
         Allways call after update_proxy
@@ -123,7 +123,7 @@ class BaseProxy:
     def as_dict(self, send_info=False):
         return_dict = {"name": self._name,
                        "description": self._description,
-                       "type": self._type,
+                       "job_type": self._type,
                        "hostname": self._hostname,
                        "port": self._port,
                        "username": self.username,
@@ -141,7 +141,7 @@ class BaseProxy:
                            description=proxy_dict.get('description'),
                            # username=proxy_dict.get('username'),
                            # password=proxy_dict.get('password'),
-                           type=proxy_dict.get('type'),
+                           type=proxy_dict.get('job_type'),
                            hostname=proxy_dict.get('hostname'),
                            port=proxy_dict.get('port'),
                            info=ProxyInfo.from_dict(proxy_dict))

@@ -14,7 +14,7 @@ def update_proxies(proxy_type='rotating'):
     proxy_type = proxy_type.lower().strip()
     if proxy_type not in ["rotating", "private", "p", "r"]:
         raise NotImplementedError(
-            "Expected either rotating (r) or private (p) as proxy type.")
+            "Expected either rotating (r) or private (p) as proxy job_type.")
     if proxy_type in ["rotating", "r"]:
         existing_path = PRIMEMOVER_PATH + "/resources/proxies/rotating_proxies.csv"
         new_path = PRIMEMOVER_PATH + "/resources/proxies/rotating_proxies_new.csv"
@@ -31,14 +31,14 @@ def update_proxies(proxy_type='rotating'):
             s3.fetch_private()
     in_proxies = pd.read_csv(new_path)
     new_proxies = in_proxies.loc[in_proxies['active'] == 1][
-        ['provider', 'gateway_ip', 'gateway_ip_port', 'ip', 'type',
+        ['provider', 'gateway_ip', 'gateway_ip_port', 'ip', 'job_type',
          'country_code', 'country_name', 'region_code', 'region_name', 'city',
          'zip', 'lat', 'long', 'geoname_id', 'time_zone_id',
          'time_zone_code', 'proxy_asn', 'proxy_isp', 'loc_id',
          'active']]
     existing_proxies = pd.read_csv(existing_path)
     existing_proxies = existing_proxies.loc[existing_proxies['active'] == 1][
-        ['provider', 'gateway_ip', 'gateway_ip_port', 'ip', 'type',
+        ['provider', 'gateway_ip', 'gateway_ip_port', 'ip', 'job_type',
          'country_code', 'country_name', 'region_code', 'region_name', 'city',
          'zip', 'lat', 'long', 'geoname_id', 'time_zone_id',
          'time_zone_code', 'proxy_asn', 'proxy_isp', 'loc_id',
@@ -47,7 +47,7 @@ def update_proxies(proxy_type='rotating'):
 
     combined = existing_proxies.merge(new_proxies, how='outer',
                                       on=['provider', 'gateway_ip',
-                                          'gateway_ip_port', 'ip', 'type',
+                                          'gateway_ip_port', 'ip', 'job_type',
                                           'proxy_asn',
                                           'proxy_isp'
                                           ], suffixes=(None, "_new"))

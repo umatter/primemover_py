@@ -29,21 +29,23 @@ CLIENT = boto3.client('s3',
                       )
 
 
-def fetch_report(job_id: int, report_type='dynamic'):
+def fetch_report(job_id: int,task, job_type, report_type='dynamic'):
     """
     fetch job report from s3 bucket:
     """
 
     report_type = report_type.lower().strip()
     if not report_type in ['dynamic', 'static', 'html']:
-        raise ValueError('report type must be one of dynamic, static and html')
+        raise ValueError('report job_type must be one of dynamic, static and html')
     in_stream = io.BytesIO()
     try:
         if report_type == 'html':
             file_path = f"finalsource/{report_type}_jobdata_{job_id}"
+        else:
+            file_path = f"reports/{report_type}_jobdata_{job_id}"
         CLIENT.download_fileobj("primemoverrunner",
-                                f"reports/{report_type}_jobdata_{job_id}",
-                                in_stream,
+                                file_path,
+                                in_stream
                                 )
         success = True
     except botocore.exceptions.ClientError as err:

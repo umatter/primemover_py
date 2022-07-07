@@ -15,6 +15,7 @@ from airflow.utils.dates import days_ago
 # These args will get passed on to each operator
 # You can override them on a per-task basis during operator initialization
 import src
+import src_google
 from src.worker.Utilities import string_to_bool
 
 default_args = {
@@ -62,9 +63,9 @@ t2 = PythonOperator(
     task_id="parse_all_results",
     python_callable=src.Results.process_results,
     op_kwargs={"set_reviewed": True,
-               "parser_dict": src.worker.s3_parser.ParserDict,
+               "parser_dict": src_google.worker.google_s3_parser.ParserDict,
                "path_end": "all_data_",
-               "date_time": datetime.now().date,
+               "date": datetime.now().date(),
                "process": "ALL",
                },
     dag=dag)

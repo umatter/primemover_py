@@ -43,7 +43,7 @@ class GoogleSearch(Queue):
             jobs.VisitJob(url='https://www.google.com', captcha_mode='always',
                           task=name))
 
-        # Add Job to select the search field via XPATH and type the search term
+        # Add Job to select the search field via XPATH and job_type the search term
         self.jobs.append(jobs.EnterText(text=term,
                                         selector="//input[@name='q']",
                                         selector_type='XPATH',
@@ -117,7 +117,7 @@ class VisitViaGoogle(Queue):
             jobs.VisitJob(url='https://www.google.com', captcha_mode='always',
                           task=self.name))
 
-        # Add Job to select the search field via XPATH and type the outlets name
+        # Add Job to select the search field via XPATH and job_type the outlets name
         self.jobs.append(jobs.EnterText(text=self._outlet_name,
                                         selector="//input[@name='q']",
                                         selector_type='XPATH',

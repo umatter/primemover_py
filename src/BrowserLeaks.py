@@ -1,10 +1,10 @@
 """Assign desired crawlers the task to visit browserleaks.com and all relevant sub sites
 J.L. 11.2020
 """
-from src.base.UpdateObject import *
-from src.base.TimeHandler import *
+from src.worker.UpdateObject import *
+from src.worker.TimeHandler import *
 from datetime import datetime, timedelta
-import src.base.api_wrapper as api
+import src.worker.api_wrapper as api
 from src.base.base_tasks import BrowserLeaks
 
 from src.base.BaseCrawler import BaseCrawler

@@ -119,7 +119,7 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
         # t_0 = datetime.fromisoformat(queues_1[0].start_at)
         # t_0 = datetime.fromisoformat(
         #     f'{date_time.date().isoformat()}T10:00:00-06:00')
-        t_0 = datetime.now() + timedelta(minutes=10)
+        t_0 = datetime.now() + timedelta(minutes=5)
         print(t_0)
         delta_t_1 = int(delta_t_1)
         for q in queues_1[1:]:

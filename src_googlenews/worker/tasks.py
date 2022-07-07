@@ -39,7 +39,7 @@ class GoogleNewsSearch(Queue):
             )
         )
 
-        # add job to select the search field via XPATH and type the search term
+        # add job to select the search field via XPATH and job_type the search term
         self.jobs.append(Jobs.EnterText(text=term,
                                         selector='//input[@class="Ax4B8 ZAGvjd"]',
                                         selector_type='XPATH',

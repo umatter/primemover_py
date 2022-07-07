@@ -6,7 +6,9 @@ from src.base.BaseProxy import BaseProxy
 from src.base.BaseConfig import BaseConfig
 from src.base.BaseCrawler import BaseCrawler
 
+from src.worker.info import ConfigurationInfo
 from src.worker.TimeHandler import TimeHandler
+from src.worker.utilities import pref_as_dict
 
 from datetime import datetime
 import json
@@ -15,7 +17,11 @@ from src_google.worker import config_functions, preferences
 
 
 class Proxy(BaseProxy):
-
+    """
+    Re-define BaseProxy class. This particular re-definition does not alter the parent class and is hence redundant.
+    I include it here for completeness. If you choose to omit this code, make sure to
+    remove changes to the PROXY_CLASS variable.
+    """
     def __init__(self,
                  username=None,
                  password=None,
@@ -38,6 +44,11 @@ class Proxy(BaseProxy):
 
 
 class Profile(BaseProfile):
+    """
+    Re-Define BaseProfile class. Note, it is essential to update the CONFIGURATION_FUNCTIONS
+    constant.
+    """
+    # Change set of configuration functions to Google Specific setup
     CONFIGURATION_FUNCTIONS = config_functions
 
     def __init__(self,
@@ -73,6 +84,10 @@ class Profile(BaseProfile):
 
 
 class Agent(BaseAgent):
+    """
+    Re-define Base Agent. No changes in this instance. Can be omitted in which case
+    AGENT_CLASS should not be re-defined in Crawler.
+    """
     PROFILE_CLASS = Profile
 
     def __init__(self,
@@ -93,6 +108,9 @@ class Agent(BaseAgent):
 
 
 class Config(BaseConfig):
+    """
+    Re-define BaseConfig.
+    """
     CONFIGURATION_FUNCTIONS = config_functions
 
     def __init__(self,
@@ -112,6 +130,7 @@ class Config(BaseConfig):
                  info=None,
                  date_time=datetime.now()
                  ):
+        self.usage_type = usage_type
         super().__init__(name=name,
                          description=description,
                          psi=psi,
@@ -123,7 +142,6 @@ class Config(BaseConfig):
                          media=media,
                          terms=terms,
                          location=location,
-                         usage_type=usage_type,
                          cookie_pref=cookie_pref,
                          info=info,
                          date_time=date_time)
@@ -145,7 +163,7 @@ class Config(BaseConfig):
             self._media = ""
         else:
             raise TypeError(
-                f'Media should be a list type object containing unique identifiers of online media outlets')
+                f'Media should be a list job_type object containing unique identifiers of online media outlets')
 
     @BaseConfig.terms.setter
     def terms(self, term_dict):
@@ -166,7 +184,33 @@ class Config(BaseConfig):
             self._terms = ""
         else:
             raise TypeError(
-                f'terms should be a dict type object containing search terms')
+                f'terms should be a dict job_type object containing search terms')
+
+    @property
+    def usage_type(self):
+        return self._usage_type
+
+    @usage_type.setter
+    def usage_type(self, val):
+        if (val is None) or (val == "Value not provided at update!"):
+            val = self.CONFIGURATION_FUNCTIONS.usage_type()
+        elif type(val) is str:
+            val = val.lower().strip()
+        if val in ['only_search', 'only_direct', 'both']:
+            self._usage_type = val
+        else:
+            raise ValueError('Not a valid value for usage_type')
+
+    def as_dict(self, send_info=False):
+        base_dict = super().as_dict(send_info)
+        usage_type_preference = {
+            "name": 'usage_type',
+            "value": self.usage_type
+        }
+
+        base_dict["preferences"].append(usage_type_preference)
+
+        return base_dict
 
     def update_config(self, results, new_location, terms=True):
 
@@ -205,6 +249,38 @@ class Config(BaseConfig):
 
         self.history.update_current_status()
         self.history.push()
+
+    @classmethod
+    def from_dict(cls, config_dict, location, date_time=datetime.now()):
+        """
+        Generate config object from single api return
+        Parameters:
+            config_dict: api return of configurations. Note: media and terms
+            must be json job_type objects!
+        """
+        if type(config_dict) is list:
+            config_dict = config_dict[0]
+        pref = pref_as_dict(config_dict.get('preferences', []))
+        usage_type = pref.get('usage_type', None)
+        cookie_pref = pref.get('cookie_pref', None)
+        config_object = cls(name=config_dict.get('name'),
+                            description=config_dict.get('description'),
+                            psi=config_dict['params'][0].get('psi'),
+                            pi=config_dict['params'][0].get('pi'),
+                            alpha=config_dict['params'][0].get('alpha'),
+                            tau=config_dict['params'][0].get('tau'),
+                            beta=config_dict['params'][0].get('beta'),
+                            kappa=config_dict['params'][0].get('kappa'),
+                            media=config_dict['params'][0].get(
+                                'media_outlet_urls'),
+                            terms=config_dict['params'][0].get('search_terms'),
+                            info=ConfigurationInfo.from_dict(config_dict),
+                            location=location,
+                            date_time=date_time,
+                            usage_type=usage_type,
+                            cookie_pref=cookie_pref
+                            )
+        return config_object
 
 
 class Crawler(BaseCrawler):

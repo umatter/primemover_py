@@ -46,7 +46,7 @@ class Queue:
         elif type(val) is float:
             self._delay_min = int(val)
         else:
-            raise TypeError('delay_min should be type int')
+            raise TypeError('delay_min should be job_type int')
 
     @property
     def delay_max(self):
@@ -59,7 +59,7 @@ class Queue:
         elif type(val) is float:
             self._delay_max = int(val)
         else:
-            raise TypeError('delay_min should be type int')
+            raise TypeError('delay_min should be job_type int')
 
     def __str__(self):
         queue_descr = \

@@ -58,7 +58,7 @@ def SelectionParser(behaviors, dynamic_data, job_id):
 
     path_outlets = PRIMEMOVER_PATH + '/resources/input_data/outlets_pool.csv'
     outlets = pd.read_csv(path_outlets,
-                          usecols=['domain', 'redirect_url', 'pi'])
+                          usecols=['domain', 'redirect_url', 'pi'], encoding='utf-16')
     outlets['pi'] = outlets['pi'].astype(float)
 
     for result in dynamic_data['items']:

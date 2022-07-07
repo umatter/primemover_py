@@ -234,6 +234,15 @@ def fetch_experiment(access_token, id):
                      headers={'authorization': f'Bearer {access_token}'})
     return r.json()['data']
 
+def fetch_all_experiments(access_token):
+    """
+    Wrapper function to fetch an existing experiment object
+    Returns:
+        contents of response json at key 'data'
+    """
+    r = requests.get(DOMAIN + f'experiments',
+                     headers={'authorization': f'Bearer {access_token}'})
+    return r.json()['data']
 
 def fetch_agent(id):
     r = requests.get(DOMAIN + f'agents/{id}')

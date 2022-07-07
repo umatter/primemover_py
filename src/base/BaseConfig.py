@@ -11,7 +11,6 @@ from src.base import base_config_functions
 from src.worker.info import ConfigurationInfo
 import json
 import pathlib
-from src.worker.utilities import pref_as_dict
 from src.base.history import S3History
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
@@ -72,7 +71,6 @@ class BaseConfig:
                  media=None,
                  terms=None,
                  location=None,
-                 usage_type=None,
                  cookie_pref=None,
                  info=None,
                  date_time=datetime.now()
@@ -100,7 +98,6 @@ class BaseConfig:
         self.media = media
         self.terms = terms
         self._date_time = date_time
-        self.usage_type = usage_type
         self.cookie_pref = cookie_pref
         if self.info is not None:
             self._history = S3History(self, date_time)
@@ -196,7 +193,7 @@ class BaseConfig:
             self._media = ""
         else:
             raise TypeError(
-                f'Media should be a list type object containing unique identifiers of online media outlets')
+                f'Media should be a list job_type object containing unique identifiers of online media outlets')
 
     @property
     def terms(self):
@@ -217,7 +214,7 @@ class BaseConfig:
             self._terms = ""
         else:
             raise TypeError(
-                f'terms should be a dict type object containing search terms')
+                f'terms should be a dict job_type object containing search terms')
 
     @property
     def location(self):
@@ -241,22 +238,6 @@ class BaseConfig:
     @property
     def history(self):
         return self._history
-
-    @property
-    def usage_type(self):
-        return self._usage_type
-
-    @usage_type.setter
-    def usage_type(self, val):
-        if (val is None) or (val == "Value not provided at update!"):
-            val = self.CONFIGURATION_FUNCTIONS.usage_type()
-        elif type(val) is str:
-            val = val.lower().strip()
-
-        if val in ['only_search', 'only_direct', 'both']:
-            self._usage_type = val
-        else:
-            raise ValueError('Not a valid value for usage_type')
 
     @property
     def cookie_pref(self):
@@ -300,10 +281,6 @@ class BaseConfig:
                 "name": 'location',
                 "value": self.location
             },
-                {
-                    "name": 'usage_type',
-                    "value": self.usage_type
-                },
                 {"name": "cookie_pref",
                  "value": json.dumps(self.cookie_pref)
                  }]
@@ -337,12 +314,11 @@ class BaseConfig:
         Generate config object from single api return
         Parameters:
             config_dict: api return of configurations. Note: media and terms
-            must be json type objects!
+            must be json job_type objects!
         """
         if type(config_dict) is list:
             config_dict = config_dict[0]
         pref = pref_as_dict(config_dict.get('preferences', []))
-        usage_type = pref.get('usage_type', None)
         cookie_pref = pref.get('cookie_pref', None)
         config_object = cls(name=config_dict.get('name'),
                             description=config_dict.get('description'),
@@ -358,7 +334,6 @@ class BaseConfig:
                             info=ConfigurationInfo.from_dict(config_dict),
                             location=location,
                             date_time=date_time,
-                            usage_type=usage_type,
                             cookie_pref=cookie_pref
                             )
         return config_object
