@@ -7,7 +7,9 @@ J.L. 11.2020
 
 import src.worker.jobs as jobs
 import random as r
-
+from datetime import datetime
+import time
+import pytz
 
 class Queue:
     """Base queue class
@@ -21,6 +23,8 @@ class Queue:
     """
     PASS_CRAWLER = False
 
+    LOCAL_TZ = pytz.timezone(time.tzname[0])
+
     def __init__(self,
                  start_at,
                  name="",
@@ -30,7 +34,7 @@ class Queue:
                  ):
         self.description = description
         self.name = name
-        self.start_at = start_at
+        self._start_at = start_at
         self.jobs = []
         self.delay_min = min(delay_min, delay_min)
         self.delay_max = max(delay_max, delay_min)
@@ -60,6 +64,27 @@ class Queue:
             self._delay_max = int(val)
         else:
             raise TypeError('delay_min should be job_type int')
+
+    @property
+    def start_at(self):
+        return self._start_at
+
+    @start_at.setter
+    def start_at(self, val):
+        """
+        Checks if val is a valid datetime and converts to standard isoformat with
+        UTC offset. If no tz is provided defaults to the local timezone of py.
+        """
+        if type(val) is str:
+            t = datetime.fromisoformat(val)
+        elif type(val) is datetime:
+            t = val
+        else:
+            raise TypeError('start_at must be of type datetime or a datetime in isoformat')
+        if t.tzinfo is None or t.tzinfo.utcoffset(t) is None:
+            t = t.replace(tzinfo=self.LOCAL_TZ)
+        self._start_at = t.isoformat()
+        return
 
     def __str__(self):
         queue_descr = \

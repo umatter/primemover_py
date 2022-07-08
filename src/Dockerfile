@@ -21,7 +21,6 @@ COPY /src /primemover_py/src
 COPY /resources /primemover_py/resources
 COPY requirements.txt /primemover_py/
 COPY Makefile.py /primemover_py/
-COPY Main.py /primemover_py/
 
 RUN pip3 install --upgrade setuptools
 

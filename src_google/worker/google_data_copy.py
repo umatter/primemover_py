@@ -1,5 +1,6 @@
 from src_google.worker.classes import Crawler
 
+import json
 import src.auxiliary.result_select as result_select
 from src.base.DataCopy import *
 from src.worker.UpdateObject import UpdateObject

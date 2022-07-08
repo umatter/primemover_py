@@ -114,28 +114,29 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
         # c.add_task(tasks.NeutralGoogleSearch, to_session=session_id,
         #            params={'term': neutral[1]})
     if fixed_times:
+        crawler_list = crawler_list[0:1]
         queues_1 = [c.queues[0] for c in crawler_list]
         queues_1.sort(key=lambda q: datetime.fromisoformat(q.start_at))
         # t_0 = datetime.fromisoformat(queues_1[0].start_at)
         # t_0 = datetime.fromisoformat(
         #     f'{date_time.date().isoformat()}T10:00:00-06:00')
-        t_0 = datetime.now() + timedelta(minutes=5)
+        t_0 = datetime.now() + timedelta(minutes=1)
         print(t_0)
         delta_t_1 = int(delta_t_1)
-        for q in queues_1[1:]:
-            t_0 += timedelta(seconds=delta_t_1)
+        for q in queues_1[0:]:
             q.start_at = t_0.isoformat()
+            t_0 += timedelta(seconds=delta_t_1)
 
         queues_2 = [c.queues[1] for c in crawler_list]
         queues_2.sort(key=lambda q: datetime.fromisoformat(q.start_at))
         # t_0 = datetime.fromisoformat(
         #     f'{date_time.date().isoformat()}T21:00:00-06:00')00
-        t_0 = datetime.now() + timedelta(minutes=40)
+        t_0 += timedelta(minutes=5)
         print(t_0)
-        for q in queues_2[1:]:
-            delta_t_2 = int(delta_t_2)
-            t_0 += timedelta(seconds=delta_t_2)
+        delta_t_2 = int(delta_t_2)
+        for q in queues_2[0:]:
             q.start_at = t_0.isoformat()
+            t_0 += timedelta(seconds=delta_t_2)
 
     with open(PRIMEMOVER_PATH + "/resources/updates/generated.json",
               'w') as file:
@@ -197,7 +198,7 @@ if __name__ == "__main__":
     #     single_update(day_delta=day)
     #     print((datetime.now().date() + timedelta(days=day)).isoformat())
     single_update(date_time=datetime.now(),
-                  experiment_id=49,
+                  experiment_id=48,
                   manual=True,
                   update_preferences=False,
                   update_proxies=False,

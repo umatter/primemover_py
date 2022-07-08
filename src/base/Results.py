@@ -14,12 +14,6 @@ import pandas as pd
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
-with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
-    KEYS = json.load(f)
-
-ACCESS_TOKEN = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
-                                      KEYS['PRIMEMOVER']['password'])
-
 
 class JobResult:
     """
@@ -221,7 +215,7 @@ class SessionResult:
         return self._status_message
 
     @classmethod
-    def from_list(cls, result_list, set_reviewed=True,
+    def from_list(cls, result_list,api_token, set_reviewed=True,
                   parser_dict=Parser.ParserDict):
         session_results = [cls.from_dict(ind_session, parser_dict=parser_dict)
                            for ind_session in
@@ -229,7 +223,7 @@ class SessionResult:
         if set_reviewed:
             for sess in session_results:
                 api_wrapper.set_reviewed(queue_id=sess._queue_id,
-                                         access_token=ACCESS_TOKEN)
+                                         access_token=api_token)
 
         return session_results
 
@@ -329,13 +323,9 @@ def process_results(set_reviewed=True, parser_dict=Parser.ParserDict,
     return 'Success'
 
 
-def fetch_results(date=datetime.now().date()):
-    with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
-        keys = json.load(f)
-    access_token = api_wrapper.get_access(keys['PRIMEMOVER']['username'],
-                                          keys['PRIMEMOVER']['password'])
+def fetch_results(api_token, date=datetime.now().date()):
     try:
-        api_wrapper.fetch_results(access_token=access_token)
+        api_wrapper.fetch_results(access_token=api_token)
         fetch_error = False
     except FileExistsError:
         fetch_error = True
@@ -353,6 +343,14 @@ def fetch_results(date=datetime.now().date()):
 
 if __name__ == "__main__":
     d = datetime.now()
+    PRIMEMOVER_PATH = str(
+        pathlib.Path(__file__).parent.parent.parent.absolute())
+
+    with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
+        KEYS = json.load(f)
+
+    ACCESS_TOKEN = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
+                                          KEYS['PRIMEMOVER']['password'])
     api_wrapper.fetch_results(access_token=ACCESS_TOKEN)
-    process_results(set_reviewed=False, parser_dict=Parser.ParserDict,
-                    path_end='all_data_', date=d)
+    # process_results(set_reviewed=False, parser_dict=Parser.ParserDict,
+    #                 path_end='all_data_', date=d)

@@ -1,5 +1,4 @@
 from datetime import datetime
-import json
 import pathlib
 from src.worker.utilities import pref_as_dict
 import pandas as pd
@@ -9,16 +8,12 @@ from src.worker.UpdateObject import UpdateObject
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
-with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
-    KEYS = json.load(f)
 
-ACCESS_TOKEN = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
-                                      KEYS['PRIMEMOVER']['password'])
 
 from src.base.BaseCrawler import BaseCrawler
 
 
-def extract_data(experiment_id: int, crawler_class = BaseCrawler):
+def extract_data(experiment_id: int,api_token, crawler_class = BaseCrawler):
     """
     Extract_data reads crawlers as seen in the file "resources/updates/generated.csv"
 
@@ -26,7 +21,7 @@ def extract_data(experiment_id: int, crawler_class = BaseCrawler):
     output: pandas DataFrame, columns all parameters set in the configuration functions
     """
 
-    crawler_list_raw = api_wrapper.fetch_experiment(access_token=ACCESS_TOKEN,
+    crawler_list_raw = api_wrapper.fetch_experiment(access_token=api_token,
                                                     id=
                                                     experiment_id)
 

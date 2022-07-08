@@ -24,7 +24,7 @@ from src.worker.Experiment import Experiment
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
-DOMAIN = "https://primemover.wimando.ch/api/v1/"
+DOMAIN = "https://primemoverswitch.wimando.ch/api/v1/"
 
 
 def get_access(e_mail, password):
@@ -159,6 +159,7 @@ def fetch_all_crawlers(access_token,
         json.dump(raw_dict, f, indent='  ')
     return raw_dict
 
+
 def set_reviewed(access_token, queue_id: int):
     """
     Wrapper function to set queue status to reviewed.
@@ -234,6 +235,7 @@ def fetch_experiment(access_token, id):
                      headers={'authorization': f'Bearer {access_token}'})
     return r.json()['data']
 
+
 def fetch_all_experiments(access_token):
     """
     Wrapper function to fetch an existing experiment object
@@ -243,6 +245,7 @@ def fetch_all_experiments(access_token):
     r = requests.get(DOMAIN + f'experiments',
                      headers={'authorization': f'Bearer {access_token}'})
     return r.json()['data']
+
 
 def fetch_agent(id):
     r = requests.get(DOMAIN + f'agents/{id}')

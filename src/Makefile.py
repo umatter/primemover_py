@@ -22,6 +22,7 @@ if __name__ == "__main__":
         os.mkdir('resources/raw_data')
         os.mkdir('resources/updates')
         os.mkdir('resources/input_data')
+        os.mkdir('resources/crawlers')
         os.mkdir('resources/cleaned_data')
     input_val = input('Would you like to add a password to Airflow?')
     if input_val == 'y':

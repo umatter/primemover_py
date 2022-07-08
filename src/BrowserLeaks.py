@@ -14,23 +14,21 @@ import pathlib
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
 
-with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
-    KEYS = json.load(f)
 
-
-def single_update(experiment_id, date_time=datetime.now(), crawler_class=BaseCrawler):
+def single_update(experiment_id, api_token,
+                  date_time=datetime.now(), crawler_class=BaseCrawler):
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=12 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
 
-    key = api.get_access(KEYS['PRIMEMOVER']['username'],
-                         KEYS['PRIMEMOVER']['password'])
-    raw_experiment = api_wrapper.fetch_experiment(access_token=key, id=
+    raw_experiment = api_wrapper.fetch_experiment(access_token=api_token, id=
     experiment_id)
 
-    crawler_list = crawler_class.from_list(raw_experiment['crawlers'], date_time=date_time)
+    crawler_list = crawler_class.from_list(raw_experiment['crawlers'],
+                                           date_time=date_time)
     # crawler_list = UpdateObject(crawler_list, 'config')
-    with open(PRIMEMOVER_PATH + '/resources/other/to_process.json', 'r') as file:
+    with open(PRIMEMOVER_PATH + '/resources/other/to_process.json',
+              'r') as file:
         ids_to_process = json.load(file)
 
     crawler_list_2 = []
@@ -42,7 +40,8 @@ def single_update(experiment_id, date_time=datetime.now(), crawler_class=BaseCra
     # [c.add_task(BrowserLeaks) for c in crawler_list]
 
     queues = [c.queues[0] for c in crawler_list]
-    t_0 = datetime.fromisoformat(f'{date_time.date().isoformat()}T14:42:00+01:00')
+    t_0 = datetime.fromisoformat(
+        f'{date_time.date().isoformat()}T14:42:00+01:00')
     print(t_0)
     delta_t_1 = int(90)
 
