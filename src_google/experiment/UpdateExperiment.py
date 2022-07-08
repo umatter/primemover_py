@@ -12,11 +12,8 @@ import os
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
-with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
-    KEYS = json.load(f)
 
-
-def single_update(date_time, experiment_id, manual=False, fixed_times=False, update_preferences =True,
+def single_update(date_time, experiment_id,api_token, manual=False, fixed_times=False, update_preferences =True,
                   update_proxies=True,
                   delta_t_1=120, delta_t_2=36):
     "Fetch Neutral terms from s3 Bucket"
@@ -38,9 +35,8 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
-    key = api.get_access(KEYS['PRIMEMOVER']['username'],
-                         KEYS['PRIMEMOVER']['password'])
-    raw_experiment = api_wrapper.fetch_experiment(access_token=key, id=
+
+    raw_experiment = api_wrapper.fetch_experiment(access_token=api_token, id=
     experiment_id)
 
     crawler_list = Crawler.from_list(raw_experiment['crawlers'],
@@ -114,7 +110,7 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
         # c.add_task(tasks.NeutralGoogleSearch, to_session=session_id,
         #            params={'term': neutral[1]})
     if fixed_times:
-        crawler_list = crawler_list[0:1]
+        crawler_list = crawler_list[1:2]
         queues_1 = [c.queues[0] for c in crawler_list]
         queues_1.sort(key=lambda q: datetime.fromisoformat(q.start_at))
         # t_0 = datetime.fromisoformat(queues_1[0].start_at)
@@ -164,7 +160,7 @@ def single_update(date_time, experiment_id, manual=False, fixed_times=False, upd
     error_code = None
     if do == 'y':
 
-        return_data = api.push_new(access_token=key,
+        return_data = api.push_new(access_token=api_token,
                                    path=f'{PRIMEMOVER_PATH}/resources/updates/generated.json')
         if return_data.status_code == 200:
             with open(
@@ -197,8 +193,14 @@ if __name__ == "__main__":
     # for day in range(13):
     #     single_update(day_delta=day)
     #     print((datetime.now().date() + timedelta(days=day)).isoformat())
+
+    with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
+        KEYS = json.load(f)
+    key = api.get_access(KEYS['PRIMEMOVER']['username'],
+                         KEYS['PRIMEMOVER']['password'])
     single_update(date_time=datetime.now(),
                   experiment_id=48,
+                  api_token=key,
                   manual=True,
                   update_preferences=False,
                   update_proxies=False,

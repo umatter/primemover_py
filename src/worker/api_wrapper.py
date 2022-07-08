@@ -290,6 +290,6 @@ def delete_exp(access_token, id):
 
 
 def delete_queues_2(access_token, i):
-    resp = requests.delete(DOMAIN + f'queues/{i}',
+    requests.delete(DOMAIN + f'queues/{i}',
                            headers={'authorization': f'Bearer {access_token}'})
-    return resp
+    return None

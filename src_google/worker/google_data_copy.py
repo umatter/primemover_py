@@ -10,17 +10,14 @@ PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
     KEYS = json.load(f)
 
-ACCESS_TOKEN = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
-                                      KEYS['PRIMEMOVER']['password'])
 
-
-def extract_selection_data(experiment_id, path_cleaned_data):
-    # Run with results, not after update!!! Relevant parameters will otherwhise be different.
+def extract_selection_data(experiment_id, api_token, path_cleaned_data):
+    # Run with results, not after update!!! Relevant parameters will otherwise be different.
     path_jobs = f'{PRIMEMOVER_PATH}/{path_cleaned_data}'
-    with open(path_jobs) as f:
-        raw_data = json.load(f)
+    with open(path_jobs) as file:
+        raw_data = json.load(file)
 
-    crawler_list_raw = api_wrapper.fetch_experiment(access_token=ACCESS_TOKEN,
+    crawler_list_raw = api_wrapper.fetch_experiment(access_token=api_token,
                                                     id=
                                                     experiment_id)
 
@@ -90,15 +87,15 @@ def extract_selection_data(experiment_id, path_cleaned_data):
     return data_df
 
 
-def create_copy(experiment_id, date=datetime.now().date()):
+def create_copy(experiment_id, api_token, date=datetime.now().date()):
     date = date.isoformat()
     s3_wrapper.append_csv(f'config_{experiment_id}/single_params.csv',
-                          extract_data(experiment_id))
+                          extract_data(experiment_id, api_token))
     s3_wrapper.append_csv(f'config_{experiment_id}/terms.csv',
                           extract_list_params('terms', experiment_id))
     s3_wrapper.append_csv(f'config_{experiment_id}/media.csv',
                           extract_list_params('media', experiment_id))
-    selection_data = extract_selection_data(experiment_id,
+    selection_data = extract_selection_data(experiment_id, api_token,
                                             f'resources/cleaned_data/{date}.json')
     if len(selection_data) > 0:
         s3_wrapper.append_csv(f'selected_{experiment_id}/selections.csv',
