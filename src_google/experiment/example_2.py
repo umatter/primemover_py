@@ -91,7 +91,7 @@ def launch_experiment(exp_id):
             crawler.agent.multilogin_profile.local_storage = False
             crawler.agent.multilogin_profile.service_worker_cache = False
 
-    [c.add_task(tasks.GoogleSearch_new, params={'term': "Watts Occurring?"}) for c in crawler_list]
+    [c.add_task(tasks.GoogleSearchNew, params={'term': "Watts Occurring?", 'select_result':True}) for c in crawler_list]
 
     queues = [c.queues[0] for c in crawler_list]
     queues.sort(key=lambda qu: datetime.fromisoformat(qu.start_at))

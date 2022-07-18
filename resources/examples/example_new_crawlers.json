@@ -11,11 +11,11 @@
         "params": [
           {
             "pi": 0.0,
-            "psi": 0.16830461004290811,
-            "alpha": 0.318645258985409,
+            "psi": 0.1055355751453475,
+            "alpha": 0.23349754583422677,
             "tau": 1,
-            "kappa": 0,
-            "beta": 0.06078124811695773,
+            "kappa": 1,
+            "beta": 0.05333471820737917,
             "search_terms": [],
             "media_outlet_urls": []
           }
@@ -31,7 +31,7 @@
           },
           {
             "name": "usage_type",
-            "value": "only_search"
+            "value": "both"
           }
         ]
       }
@@ -74,7 +74,8 @@
             "doNotTrack": 0
           },
           "geolocation": {
-            "mode": "BLOCK"
+            "mode": "ALLOW",
+            "fillBasedOnExternalIp": true
           },
           "canvas": {
             "mode": "NOISE"
@@ -89,7 +90,7 @@
       {
         "name": "GoogleSearch",
         "description": "Open Google, enter a search query and select a result.",
-        "start_at": "2022-07-18T17:14:08.272734+01:00",
+        "start_at": "2022-07-18T17:18:44.080052+01:00",
         "jobs": [
           {
             "name": "Visit",
@@ -213,6 +214,100 @@
                 "value": "UP"
               }
             ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "clickSelectionType",
+                "description": "Type of click selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "clickSelector",
+                "description": " click selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "decisionType",
+                "description": "Decision job_type for choosing an item out of the list given by the selector is CALCULATED",
+                "value": "CALCULATED"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "CALCULATED/google_search"
+              },
+              {
+                "name": "task",
+                "description": "This job is part of the task CALCULATED/GoogleSearch ",
+                "value": "CALCULATED/GoogleSearch"
+              },
+              {
+                "name": "criteriaExtractor",
+                "description": "Criteria extractor.",
+                "value": "^(?:https?\\:\\/\\/)?(?:www.)?([^\\/?#]+)(?:[\\/?#]|$)"
+              },
+              {
+                "name": "criteriaSelectionType",
+                "description": "Type of criteria selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "criteriaSelector",
+                "description": " criteria selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "criteriaBase",
+                "description": "Criteria base.",
+                "value": "ATR_href"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "scrollDuration",
+                "description": "Scroll for 5 seconds.",
+                "value": 5
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
           }
         ]
       }
@@ -230,11 +325,11 @@
         "params": [
           {
             "pi": 0.0,
-            "psi": 0.1460409691173131,
-            "alpha": 0.20977912316949943,
+            "psi": 0.08392440760168562,
+            "alpha": 0.451418486133325,
             "tau": 1,
-            "kappa": 1,
-            "beta": 0.02838707541420399,
+            "kappa": 2,
+            "beta": 0.07392673057692484,
             "search_terms": [],
             "media_outlet_urls": []
           }
@@ -250,7 +345,7 @@
           },
           {
             "name": "usage_type",
-            "value": "both"
+            "value": "only_search"
           }
         ]
       }
@@ -293,8 +388,7 @@
             "doNotTrack": 0
           },
           "geolocation": {
-            "mode": "ALLOW",
-            "fillBasedOnExternalIp": true
+            "mode": "BLOCK"
           },
           "canvas": {
             "mode": "NOISE"
@@ -309,7 +403,7 @@
       {
         "name": "GoogleSearch",
         "description": "Open Google, enter a search query and select a result.",
-        "start_at": "2022-07-18T17:12:08.272734+01:00",
+        "start_at": "2022-07-18T17:26:44.080052+01:00",
         "jobs": [
           {
             "name": "Visit",
@@ -433,6 +527,100 @@
                 "value": "UP"
               }
             ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "clickSelectionType",
+                "description": "Type of click selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "clickSelector",
+                "description": " click selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "decisionType",
+                "description": "Decision job_type for choosing an item out of the list given by the selector is CALCULATED",
+                "value": "CALCULATED"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "CALCULATED/google_search"
+              },
+              {
+                "name": "task",
+                "description": "This job is part of the task CALCULATED/GoogleSearch ",
+                "value": "CALCULATED/GoogleSearch"
+              },
+              {
+                "name": "criteriaExtractor",
+                "description": "Criteria extractor.",
+                "value": "^(?:https?\\:\\/\\/)?(?:www.)?([^\\/?#]+)(?:[\\/?#]|$)"
+              },
+              {
+                "name": "criteriaSelectionType",
+                "description": "Type of criteria selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "criteriaSelector",
+                "description": " criteria selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "criteriaBase",
+                "description": "Criteria base.",
+                "value": "ATR_href"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "scrollDuration",
+                "description": "Scroll for 5 seconds.",
+                "value": 5
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
           }
         ]
       }
@@ -449,32 +637,32 @@
         "description": null,
         "params": [
           {
-            "pi": -0.25990979127219926,
-            "psi": 0.06393101631547778,
-            "alpha": 0.337968870061331,
+            "pi": -0.5459364386108407,
+            "psi": 0.026701541527793894,
+            "alpha": 0.29318252091681835,
             "tau": 1,
-            "kappa": 2,
-            "beta": 0.12734543305749374,
+            "kappa": 0,
+            "beta": 0.2879566799156268,
             "search_terms": [
               {
-                "term": "will fight",
-                "pi": -0.273968194772371
+                "term": "climate change",
+                "pi": -0.663695943466887
               },
               {
-                "term": "black and brown",
-                "pi": -0.271370643800764
+                "term": "civil rights act",
+                "pi": -0.30184028713228
               }
             ],
             "media_outlet_urls": [
               {
-                "domain": "news.yahoo.com",
-                "url": "https://news.yahoo.com/",
-                "pi": 0.0208535444250573
+                "domain": "nytimes.com",
+                "url": "https://www.nytimes.com/",
+                "pi": -0.281331780156041
               },
               {
-                "domain": "indystar.com",
-                "url": "https://www.indystar.com/",
-                "pi": -0.138389802645957
+                "domain": "detroit.cbslocal.com",
+                "url": "https://detroit.cbslocal.com/",
+                "pi": 0.182046335668375
               }
             ]
           }
@@ -490,7 +678,7 @@
           },
           {
             "name": "usage_type",
-            "value": "only_search"
+            "value": "both"
           }
         ]
       }
@@ -533,7 +721,8 @@
             "doNotTrack": 0
           },
           "geolocation": {
-            "mode": "BLOCK"
+            "mode": "ALLOW",
+            "fillBasedOnExternalIp": true
           },
           "canvas": {
             "mode": "NOISE"
@@ -548,7 +737,7 @@
       {
         "name": "GoogleSearch",
         "description": "Open Google, enter a search query and select a result.",
-        "start_at": "2022-07-18T17:20:08.272734+01:00",
+        "start_at": "2022-07-18T17:22:44.080052+01:00",
         "jobs": [
           {
             "name": "Visit",
@@ -672,6 +861,100 @@
                 "value": "UP"
               }
             ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "clickSelectionType",
+                "description": "Type of click selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "clickSelector",
+                "description": " click selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "decisionType",
+                "description": "Decision job_type for choosing an item out of the list given by the selector is CALCULATED",
+                "value": "CALCULATED"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "CALCULATED/google_search"
+              },
+              {
+                "name": "task",
+                "description": "This job is part of the task CALCULATED/GoogleSearch ",
+                "value": "CALCULATED/GoogleSearch"
+              },
+              {
+                "name": "criteriaExtractor",
+                "description": "Criteria extractor.",
+                "value": "^(?:https?\\:\\/\\/)?(?:www.)?([^\\/?#]+)(?:[\\/?#]|$)"
+              },
+              {
+                "name": "criteriaSelectionType",
+                "description": "Type of criteria selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "criteriaSelector",
+                "description": " criteria selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "criteriaBase",
+                "description": "Criteria base.",
+                "value": "ATR_href"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "scrollDuration",
+                "description": "Scroll for 5 seconds.",
+                "value": 5
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
           }
         ]
       }
@@ -688,32 +971,32 @@
         "description": null,
         "params": [
           {
-            "pi": -0.15074456392166546,
-            "psi": 0.1503125680766668,
-            "alpha": 0.4700301534627356,
+            "pi": -0.7093733385839102,
+            "psi": 0.06109822080402947,
+            "alpha": 0.34957543946484015,
             "tau": 1,
-            "kappa": 2,
-            "beta": 0.16978563552049158,
+            "kappa": 0,
+            "beta": 0.26997743953110137,
             "search_terms": [
               {
-                "term": "what is lgbtq",
-                "pi": -0.0740185385611011
+                "term": "center for reproductive rights",
+                "pi": -0.437215849056073
               },
               {
-                "term": "pay act",
-                "pi": -0.0702339277590669
+                "term": "background check",
+                "pi": -0.149504889519107
               }
             ],
             "media_outlet_urls": [
               {
-                "domain": "news.yahoo.com",
-                "url": "https://news.yahoo.com/",
-                "pi": 0.0208535444250573
+                "domain": "nytimes.com",
+                "url": "https://www.nytimes.com/",
+                "pi": -0.281331780156041
               },
               {
-                "domain": "indystar.com",
-                "url": "https://www.indystar.com/",
-                "pi": -0.138389802645957
+                "domain": "wdrb.com",
+                "url": "https://www.wdrb.com/",
+                "pi": -0.0905943748130754
               }
             ]
           }
@@ -729,7 +1012,7 @@
           },
           {
             "name": "usage_type",
-            "value": "both"
+            "value": "only_direct"
           }
         ]
       }
@@ -788,7 +1071,7 @@
       {
         "name": "GoogleSearch",
         "description": "Open Google, enter a search query and select a result.",
-        "start_at": "2022-07-18T17:10:08.272734+01:00",
+        "start_at": "2022-07-18T17:20:44.080052+01:00",
         "jobs": [
           {
             "name": "Visit",
@@ -912,6 +1195,100 @@
                 "value": "UP"
               }
             ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "clickSelectionType",
+                "description": "Type of click selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "clickSelector",
+                "description": " click selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "decisionType",
+                "description": "Decision job_type for choosing an item out of the list given by the selector is CALCULATED",
+                "value": "CALCULATED"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "CALCULATED/google_search"
+              },
+              {
+                "name": "task",
+                "description": "This job is part of the task CALCULATED/GoogleSearch ",
+                "value": "CALCULATED/GoogleSearch"
+              },
+              {
+                "name": "criteriaExtractor",
+                "description": "Criteria extractor.",
+                "value": "^(?:https?\\:\\/\\/)?(?:www.)?([^\\/?#]+)(?:[\\/?#]|$)"
+              },
+              {
+                "name": "criteriaSelectionType",
+                "description": "Type of criteria selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "criteriaSelector",
+                "description": " criteria selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "criteriaBase",
+                "description": "Criteria base.",
+                "value": "ATR_href"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "scrollDuration",
+                "description": "Scroll for 5 seconds.",
+                "value": 5
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
           }
         ]
       }
@@ -928,20 +1305,20 @@
         "description": null,
         "params": [
           {
-            "pi": 0.25990979127219926,
-            "psi": 0.14834308961804044,
-            "alpha": 0.26713456591744955,
+            "pi": 0.5459364386108407,
+            "psi": 0.1775287416498254,
+            "alpha": 0.3037447521247313,
             "tau": 1,
-            "kappa": 1,
-            "beta": 0.26614284346409656,
+            "kappa": 2,
+            "beta": 0.18952172668635991,
             "search_terms": [
               {
-                "term": "box office",
-                "pi": 0.336188770879933
+                "term": "chief of executive",
+                "pi": 0.0741986930914715
               },
               {
-                "term": "congressional budget office",
-                "pi": 0.36066129694806
+                "term": "national defense",
+                "pi": 0.479719620963774
               }
             ],
             "media_outlet_urls": [
@@ -951,9 +1328,9 @@
                 "pi": 0.183181386955726
               },
               {
-                "domain": "postandcourier.com",
-                "url": "https://www.postandcourier.com/",
-                "pi": -0.225884275343727
+                "domain": "baltimoresun.com",
+                "url": "https://www.baltimoresun.com/",
+                "pi": -0.282081756748262
               }
             ]
           }
@@ -969,7 +1346,7 @@
           },
           {
             "name": "usage_type",
-            "value": "only_search"
+            "value": "both"
           }
         ]
       }
@@ -1012,8 +1389,7 @@
             "doNotTrack": 0
           },
           "geolocation": {
-            "mode": "ALLOW",
-            "fillBasedOnExternalIp": true
+            "mode": "BLOCK"
           },
           "canvas": {
             "mode": "NOISE"
@@ -1028,7 +1404,7 @@
       {
         "name": "GoogleSearch",
         "description": "Open Google, enter a search query and select a result.",
-        "start_at": "2022-07-18T17:18:08.272734+01:00",
+        "start_at": "2022-07-18T17:24:44.080052+01:00",
         "jobs": [
           {
             "name": "Visit",
@@ -1152,6 +1528,100 @@
                 "value": "UP"
               }
             ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "clickSelectionType",
+                "description": "Type of click selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "clickSelector",
+                "description": " click selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "decisionType",
+                "description": "Decision job_type for choosing an item out of the list given by the selector is CALCULATED",
+                "value": "CALCULATED"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "CALCULATED/google_search"
+              },
+              {
+                "name": "task",
+                "description": "This job is part of the task CALCULATED/GoogleSearch ",
+                "value": "CALCULATED/GoogleSearch"
+              },
+              {
+                "name": "criteriaExtractor",
+                "description": "Criteria extractor.",
+                "value": "^(?:https?\\:\\/\\/)?(?:www.)?([^\\/?#]+)(?:[\\/?#]|$)"
+              },
+              {
+                "name": "criteriaSelectionType",
+                "description": "Type of criteria selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "criteriaSelector",
+                "description": " criteria selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "criteriaBase",
+                "description": "Criteria base.",
+                "value": "ATR_href"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "scrollDuration",
+                "description": "Scroll for 5 seconds.",
+                "value": 5
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
           }
         ]
       }
@@ -1168,20 +1638,20 @@
         "description": null,
         "params": [
           {
-            "pi": 0.15074456392166546,
-            "psi": 0.1517511797251989,
-            "alpha": 0.45797899956094545,
+            "pi": 0.7093733385839102,
+            "psi": 0.02481909968947731,
+            "alpha": 0.4775341016940251,
             "tau": 1,
-            "kappa": 1,
-            "beta": 0.09676752809788797,
+            "kappa": 0,
+            "beta": 0.48323034977653206,
             "search_terms": [
               {
-                "term": "child support",
-                "pi": -0.0169757281354173
+                "term": "free speech",
+                "pi": 0.467408943993915
               },
               {
-                "term": "state farm",
-                "pi": 0.373641045166781
+                "term": "jobs act",
+                "pi": 0.860849196787387
               }
             ],
             "media_outlet_urls": [
@@ -1191,9 +1661,9 @@
                 "pi": 0.0208535444250573
               },
               {
-                "domain": "al.com",
-                "url": "https://www.al.com/",
-                "pi": 0.125619948699506
+                "domain": "iheart.com",
+                "url": "https://www.iheart.com/podcast/",
+                "pi": 0.228520178440562
               }
             ]
           }
@@ -1209,7 +1679,7 @@
           },
           {
             "name": "usage_type",
-            "value": "only_search"
+            "value": "both"
           }
         ]
       }
@@ -1268,7 +1738,7 @@
       {
         "name": "GoogleSearch",
         "description": "Open Google, enter a search query and select a result.",
-        "start_at": "2022-07-18T17:16:08.272734+01:00",
+        "start_at": "2022-07-18T17:28:44.080052+01:00",
         "jobs": [
           {
             "name": "Visit",
@@ -1390,6 +1860,100 @@
                 "name": "scrollDirection",
                 "description": "Scroll up",
                 "value": "UP"
+              }
+            ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "clickSelectionType",
+                "description": "Type of click selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "clickSelector",
+                "description": " click selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "decisionType",
+                "description": "Decision job_type for choosing an item out of the list given by the selector is CALCULATED",
+                "value": "CALCULATED"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "CALCULATED/google_search"
+              },
+              {
+                "name": "task",
+                "description": "This job is part of the task CALCULATED/GoogleSearch ",
+                "value": "CALCULATED/GoogleSearch"
+              },
+              {
+                "name": "criteriaExtractor",
+                "description": "Criteria extractor.",
+                "value": "^(?:https?\\:\\/\\/)?(?:www.)?([^\\/?#]+)(?:[\\/?#]|$)"
+              },
+              {
+                "name": "criteriaSelectionType",
+                "description": "Type of criteria selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "criteriaSelector",
+                "description": " criteria selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "criteriaBase",
+                "description": "Criteria base.",
+                "value": "ATR_href"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "scrollDuration",
+                "description": "Scroll for 5 seconds.",
+                "value": 5
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
               }
             ]
           }

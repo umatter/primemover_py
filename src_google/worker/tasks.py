@@ -19,7 +19,6 @@ import pandas as pd
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 
-
 class GoogleSearch(Queue):
     """
     Conduct a google search and scroll to the bottom of the page
@@ -81,7 +80,7 @@ class GoogleSearch(Queue):
                                          task=name))
 
 
-class GoogleSearch_new(Queue):
+class GoogleSearchNew(Queue):
     """
     Conduct a google search and scroll to the bottom of the page
     """
@@ -126,14 +125,15 @@ class GoogleSearch_new(Queue):
                                      flag=search_type))  # Add Job to select a result randomly
         if select_result:
             self.jobs.append(
-                jobs.SingleSelect(click_selector='.//div[@class="yuRUbf"]/a',
-                                  click_selector_type='XPATH',
-                                  decision_type="CALCULATED",
-                                  criteria_extractor='^(?:https?\:\/\/)?(?:www.)?([^\/?#]+)(?:[\/?#]|$)',
-                                  flag=search_type,
-                                  task=name,
-                                  captcha_mode='always'
-                                  )
+                jobs.SingleSelect_New(
+                    click_selector='.//div[@class="yuRUbf"]/a',
+                    click_selector_type='XPATH',
+                    decision_type="CALCULATED",
+                    criteria_extractor='^(?:https?\:\/\/)?(?:www.)?([^\/?#]+)(?:[\/?#]|$)',
+                    flag=search_type,
+                    task=name,
+                    captcha_mode='always'
+                    )
             )
 
             # Add Job to scroll down 80% of the visited page
@@ -207,7 +207,7 @@ class VisitViaGoogle(Queue):
                                      task=self.name))
 
 
-class VisitViaGoogle_new(Queue):
+class VisitViaGoogleNew(Queue):
     """
         Visit a media outlet and scroll for 2-3 minutes
     """
@@ -239,11 +239,12 @@ class VisitViaGoogle_new(Queue):
 
         # Add Job to select the first result
 
-        self.jobs.append(jobs.SingleSelect(click_selector='.//div[@class="yuRUbf"]/a',
-                                           click_selector_type='XPATH',
-                                           decision_type="FIRST",
-                                           task=self.name)
-                         )
+        self.jobs.append(
+            jobs.SingleSelect_New(click_selector='.//div[@class="yuRUbf"]/a',
+                              click_selector_type='XPATH',
+                              decision_type="FIRST",
+                              task=self.name)
+            )
 
         # Add Job to scroll down the visited page for some time
         self.jobs.append(jobs.Scroll(direction='DOWN',
