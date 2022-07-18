@@ -199,7 +199,7 @@ if __name__ == "__main__":
     key = api.get_access(KEYS['PRIMEMOVER']['username'],
                          KEYS['PRIMEMOVER']['password'])
     single_update(date_time=datetime.now(),
-                  experiment_id=48,
+                  experiment_id=49,
                   api_token=key,
                   manual=True,
                   update_preferences=False,

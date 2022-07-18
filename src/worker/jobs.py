@@ -137,6 +137,44 @@ class EnterText(Job):
 
 
 class SingleSelect(Job):
+    """Click on an element of a website"""
+
+    def __init__(self, selector, selector_type='XPATH',
+                 decision_type='FIRST',
+                 task=None,
+                 flag=None,
+                 captcha_mode='never'):
+        """
+            - selector: string, a valid XPATH|CSS|CLASS|ID for a text field, default: 'XPATH'
+            - selector_type: One of "XPATH|CSS|CLASS|ID"
+            - decision_type: one of "FIRST|LAST|RANDOM|CALCULATED", Method of selecting a result if multiple elements match selector (default: First)
+            - task: (optional) string,  task the job is a part of
+            - flag: (optional) string,  some flag
+            - captcha_mode: str, one of {'always', 'never', 'random'}
+        """
+        super().__init__(job_type='singleselecturljob',
+                         name='Select',
+                         description=f'Select an item and click', task=task,
+                         flag=flag,
+                         captcha_mode=captcha_mode)
+        self.behaviors.append(
+            Behavior.SelectionType(selector_type))
+        self.behaviors.append(
+            Behavior.Selector(selector))
+        self.behaviors.append(
+            Behavior.DecisionType(decision_type))
+        if flag is not None:
+            self.behaviors.append(
+                Behavior.FlagBehavior(f'{decision_type}/{flag}')
+            )
+
+        if task is not None:
+            self.behaviors.append(
+                Behavior.TaskBehavior(f'{decision_type}/{task}')
+            )
+
+
+class SingleSelect_New(Job):
     """
     Click on an element of a website.
 

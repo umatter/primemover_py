@@ -137,6 +137,7 @@ class BaseAgent:
                            info=AgentInfo.from_dict(agent_dict))
         return agent_object
 
+
 if __name__ == '__main__':
     from src.worker import api_wrapper as api
     with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:

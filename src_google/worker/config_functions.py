@@ -42,7 +42,7 @@ def NoiseUtility():
     return float(gumbel(-0.4557735, 0.793006, 1)[0]) / 10
 
 
-def SelectSearchTerms(pi, alpha_hat, tau_hat_ik, k=40):
+def SelectSearchTerms(pi, alpha_hat, tau_hat_ik, k=2):
     """
     Select a subset of all search terms. Terms come from two sepparate pools of terms.
     Arguments:
@@ -69,7 +69,7 @@ def SelectSearchTerms(pi, alpha_hat, tau_hat_ik, k=40):
     return terms
 
 
-def SelectMediaOutlets(alpha_tilde, tau_tilde_ij, pi=0, k=8, local=2):
+def SelectMediaOutlets(alpha_tilde, tau_tilde_ij, pi=0, k=1, local=1):
     """
     Select a subset of all media outlets.
     Arguments:

@@ -153,8 +153,8 @@ class Config(BaseConfig):
                 pi=self._pi,
                 alpha_tilde=self.alpha,
                 tau_tilde_ij=self.tau,
-                k=8,
-                local=2)
+                k=1,
+                local=1)
         elif type(media_in) in {list, dict}:
             self._media = media_in
         elif type(media_in) is str and media_in != "":
@@ -172,7 +172,7 @@ class Config(BaseConfig):
                 pi=self.pi,
                 alpha_hat=self.alpha,
                 tau_hat_ik=self.tau,
-                k=40)
+                k=2)
 
         elif type(term_dict) is list:
             self._terms = term_dict
