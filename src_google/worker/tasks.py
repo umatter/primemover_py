@@ -91,7 +91,7 @@ class GoogleSearchNew(Queue):
                  name='GoogleSearch',
                  description='Open Google, enter a search query and select a result.',
                  search_type='google_search',
-                 select_result=False,
+                 e=False,
                  time_spent=5
                  ):
         self._search_term = term
