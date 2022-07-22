@@ -300,7 +300,7 @@ class BaseProfile:
                 {'name', 'os', 'browser', 'network'}.intersection(val)) == 4:
 
             val['network']['proxy'] = {
-                "job_type": "%%PROXYTYPE%%",
+                "type": "%%PROXYTYPE%%",
                 "host": "%%PROXYHOST%%",
                 "port": "%%PROXYPORT%%",
                 "username": "%%PROXYUSERNAME%%",
@@ -316,7 +316,7 @@ class BaseProfile:
                 "browser": self.browser,
                 "network": {
                     "proxy": {
-                        "job_type": "%%PROXYTYPE%%",
+                        "type": "%%PROXYTYPE%%",
                         "host": "%%PROXYHOST%%",
                         "port": "%%PROXYPORT%%",
                         "username": "%%PROXYUSERNAME%%",
