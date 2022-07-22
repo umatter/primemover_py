@@ -7,7 +7,7 @@ Available Classes:
     - Behavior: base class
     - URL: behavior containing a URL
     - Text: behavior containing Text (Type Job)
-    - SelectionType: behavior containing the job_type of html selector to be used
+    - SelectionType: behavior containing the type of html selector to be used
     - ClickSelectionType: analogous to SelectionType, different variable names
     - CriteriaSelectionType: analogous to SelectionType, different variable names
     - Selector: behavior containing some selector
@@ -80,7 +80,7 @@ class Behavior:
         try:
             self._description = str(desc)
         except:
-            raise TypeError('Description must be convertible to job_type string')
+            raise TypeError('Description must be convertible to type string')
 
     @property
     def value(self):
@@ -170,12 +170,12 @@ class Text(Behavior):
             self._text = str(string)
 
         except:
-            raise TypeError('Text must be coercable to job_type string')
+            raise TypeError('Text must be coercable to type string')
 
 
 class SelectionType(Behavior):
     """
-    SelectionType behavior key value pair, used to share the job_type of some selector
+    SelectionType behavior key value pair, used to share the type of some selector
     Public Attributes:
         - selector_type: string, one of "XPATH|CSS|CLASS|ID"
         - description: a description of the url, default: "Type of selection"
@@ -198,14 +198,14 @@ class SelectionType(Behavior):
             self._selector_type = value
         else:
             raise ValueError(
-                f'selector job_type must be in {{"XPATH", "CSS, "CLASS", "ID"}} got {value} instead.')
+                f'selector type must be in {{"XPATH", "CSS, "CLASS", "ID"}} got {value} instead.')
 
 
 class ClickSelectionType(Behavior):
     """
-    Describes job_type of click_selector, one of "XPATH|CSS|CLASS|ID".
+    Describes type of click_selector, one of "XPATH|CSS|CLASS|ID".
     
-    ClickSelectionType behavior key value pair, used to share what job_type some selector
+    ClickSelectionType behavior key value pair, used to share what type some selector
     Public Attributes:
         - click_selector_type: string, one of "XPATH|CSS|CLASS|ID"
         - description: a description of the url, default: "Type of click selection"
@@ -228,14 +228,14 @@ class ClickSelectionType(Behavior):
             self._click_selector_type = value
         else:
             raise ValueError(
-                f'click selector job_type must be in {{"XPATH", "CSS, "CLASS", "ID"}} got {value} instead.')
+                f'click selector type must be in {{"XPATH", "CSS, "CLASS", "ID"}} got {value} instead.')
 
 
 class CriteriaSelectionType(Behavior):
     """
-    Describes job_type of criteria_selector, one of "XPATH|CSS|CLASS|ID".
+    Describes type of criteria_selector, one of "XPATH|CSS|CLASS|ID".
     
-    CriteriaSelectionType behavior key value pair, used to share what job_type some selector
+    CriteriaSelectionType behavior key value pair, used to share what type some selector
     Public Attributes:
         - criteria_selector_type: string, one of "XPATH|CSS|CLASS|ID"
         - description: a description of the url, default: "Type of criteria selection"
@@ -258,7 +258,7 @@ class CriteriaSelectionType(Behavior):
             self._criteria_selector_type = value
         else:
             raise ValueError(
-                f'criteria selector job_type must be in {{"XPATH", "CSS, "CLASS", "ID"}} got {value} instead.')
+                f'criteria selector type must be in {{"XPATH", "CSS, "CLASS", "ID"}} got {value} instead.')
 
 
 class Selector(Behavior):
@@ -266,7 +266,7 @@ class Selector(Behavior):
     selector behavior key value pair, used to share a html selector
     Public Attributes:
         - selector: string, a valid XPATH|CSS|CLASS|ID selector
-        - kind: string, what is the selector? use to specify purpose or job_type (optional)
+        - kind: string, what is the selector? use to specify purpose or type (optional)
     """
 
     def __init__(self, selector, kind=""):
@@ -293,7 +293,7 @@ class ClickSelector(Behavior):
     Click selector behavior key value pair, used to share a html selector
     Public Attributes:
         - selector: string, a valid XPATH|CSS|CLASS|ID selector
-        - kind: string, what is the selector? use to specify purpose or job_type
+        - kind: string, what is the selector? use to specify purpose or type
     """
 
     def __init__(self, click_selector, kind=""):
@@ -319,7 +319,7 @@ class CriteriaSelector(Behavior):
     Criteria selector behavior key value pair, used to share a html selector
     Public Attributes:
         - selector: string, a valid XPATH|CSS|CLASS|ID selector
-        - kind: string, what is the selector? use to specify purpose or job_type
+        - kind: string, what is the selector? use to specify purpose or type
     """
 
     def __init__(self, criteria_selector, kind=""):
@@ -349,7 +349,7 @@ class DecisionType(Behavior):
         self.decision_type = decision_type
 
         super().__init__(name='decisionType', value=self.decision_type,
-                         description=f'Decision job_type for choosing an item out of the list given by the selector is {self.decision_type}',
+                         description=f'Decision type for choosing an item out of the list given by the selector is {self.decision_type}',
                          )
 
     @property
@@ -363,7 +363,7 @@ class DecisionType(Behavior):
             self._decision_type = value
         else:
             raise ValueError(
-                f'decision job_type must be in {{"FIRST", "LAST, "RANDOM","CLACULATED"}} got {value} instead.')
+                f'decision type must be in {{"FIRST", "LAST, "RANDOM","CLACULATED"}} got {value} instead.')
 
 
 class ScrollDuration(Behavior):
@@ -395,7 +395,7 @@ class ScrollDuration(Behavior):
             raise Warning(
                 f'Scroll duration expects an integer >0, {d} has been rounded up to {self.duration}')
         else:
-            raise TypeError('Scroll duration must be of job_type int')
+            raise TypeError('Scroll duration must be of type int')
 
 
 class ScrollDirection(Behavior):
@@ -425,7 +425,7 @@ class ScrollDirection(Behavior):
         try:
             d = d.upper().strip()
         except AttributeError:
-            raise TypeError(f'Direction must be of job_type string')
+            raise TypeError(f'Direction must be of type string')
         if d in ['UP', 'U']:
             self._direction = 'UP'
         elif d in ['DOWN', 'D']:
@@ -493,12 +493,12 @@ class WaitSeconds(Behavior):
             raise Warning(
                 f'Wait duration expects an integer >0, {d} has been rounded up to {self.duration}')
         else:
-            raise TypeError('Wait duration must be of job_type int')
+            raise TypeError('Wait duration must be of type int')
 
 
 class AppendReturn(Behavior):
     """
-    AppendReturn behavior key value pair, used to determine wheter to hit return in job_type job
+    AppendReturn behavior key value pair, used to determine wheter to hit return in type job
     Public Attributes:
         - send_return, boolean
     """
@@ -527,7 +527,7 @@ class AppendReturn(Behavior):
             self._send_return = val
         else:
             raise TypeError(
-                f'send_return must be job_type bool or a string "true"/"false", received {val}')
+                f'send_return must be type bool or a string "true"/"false", received {val}')
 
 
 class TypingMode(Behavior):
@@ -561,7 +561,7 @@ class TypingMode(Behavior):
                     f'send_return must be one of {{"DIRECT","SIMULATED_KEEPINGTYPOS","SIMULATED_FIXINGTYPOS","SIMULATED_NOTYPOS"}}, got {val}')
         else:
             raise TypeError(
-                f'mode must be job_type str')
+                f'mode must be type str')
 
 
 class TaskBehavior(Behavior):
@@ -586,7 +586,7 @@ class TaskBehavior(Behavior):
             self._task = val
         else:
             raise TypeError(
-                f'task must be job_type str')
+                f'task must be type str')
 
 
 class FlagBehavior(Behavior):
@@ -714,5 +714,5 @@ class Action(Behavior):
                     f'Action must be one of {{"ACCEPT","REJECT"}}, got {val}')
         else:
             raise TypeError(
-                f'action must be job_type str')
+                f'action must be type str')
 

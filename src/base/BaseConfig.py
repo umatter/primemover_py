@@ -12,6 +12,7 @@ from src.worker.info import ConfigurationInfo
 import json
 import pathlib
 from src.base.history import S3History
+from src.worker.utilities import pref_as_dict
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
@@ -214,7 +215,7 @@ class BaseConfig:
             self._terms = ""
         else:
             raise TypeError(
-                f'terms should be a dict job_type object containing search terms')
+                f'terms should be a dict type object containing search terms')
 
     @property
     def location(self):
@@ -314,7 +315,7 @@ class BaseConfig:
         Generate config object from single api return
         Parameters:
             config_dict: api return of configurations. Note: media and terms
-            must be json job_type objects!
+            must be json type objects!
         """
         if type(config_dict) is list:
             config_dict = config_dict[0]

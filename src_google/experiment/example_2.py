@@ -118,4 +118,4 @@ if __name__ == "__main__":
 
     key = api.get_access(KEYS['PRIMEMOVER']['username'],
                          KEYS['PRIMEMOVER']['password'])
-    launch_experiment(exp_id=49)
+    print(launch_experiment(exp_id=49))

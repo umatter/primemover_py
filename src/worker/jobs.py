@@ -236,7 +236,7 @@ class SingleSelect_New(Job):
         
         # if decision_type is CALCULATED, a regex (criteria_extractor) is required
         if criteria_extractor is None and decision_type == 'CALCULATED':
-            raise ValueError('Criteria extractor required for decision job_type CALCULATED.')
+            raise ValueError('Criteria extractor required for decision type CALCULATED.')
         elif criteria_extractor is not None and decision_type == 'CALCULATED':
             self.behaviors.append(
                 Behavior.CriteriaExtractorBehavior(criteria_extractor)
@@ -245,7 +245,7 @@ class SingleSelect_New(Job):
         if decision_type == 'CALCULATED':
             # raise error if a new criteria_selector_type is given, but no new criteria_selector
             if criteria_selector_type is not None and criteria_selector is None:
-                raise ValueError('New criteria selector job_type given, but no new criteria selector was given.')
+                raise ValueError('New criteria selector type given, but no new criteria selector was given.')
             # if a new criteria_selector is given, but no new criteria_selector_type, it is assumed that the
             # criteria_selector_type is equivalent to the click_selector_type
             elif criteria_selector_type is None and criteria_selector is not None:
