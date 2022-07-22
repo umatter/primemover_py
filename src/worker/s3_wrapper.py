@@ -29,7 +29,7 @@ CLIENT = boto3.client('s3',
                       )
 
 
-def fetch_report(job_id: int,task, job_type, report_type='dynamic'):
+def fetch_report(job_id: int, task, job_type, report_type='dynamic'):
     """
     fetch job report from s3 bucket:
     """

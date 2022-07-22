@@ -3,9 +3,9 @@ Task(s) for GoogleNews Search.
 
 """
 
-from src.worker import Tasks
+from src.base import base_tasks
 from src.worker.PrimemoverQueue import Queue
-from src.worker import Jobs
+from src.worker import jobs
 
 
 class GoogleNewsSearch(Queue):
@@ -27,11 +27,11 @@ class GoogleNewsSearch(Queue):
                          description=description)
 
         # add job to visit a webpage (YouTube)
-        self.jobs.append(Jobs.VisitJob(url='https://www.news.google.com'))
+        self.jobs.append(jobs.VisitJob(url='https://www.news.google.com'))
 
         # add job to click button (agree) (check if needed)
         self.jobs.append(
-            Jobs.SingleSelect(
+            jobs.SingleSelect(
                 selector="//button[@class='VfPpkd-LgbsSe VfPpkd-LgbsSe-OWXEXe-k8QpJ VfPpkd-LgbsSe-OWXEXe-dgl2Hf nCP5yc AjY5Oe DuMIQc']",
                 selector_type='XPATH',
                 flag=search_type,
@@ -40,7 +40,7 @@ class GoogleNewsSearch(Queue):
         )
 
         # add job to select the search field via XPATH and job_type the search term
-        self.jobs.append(Jobs.EnterText(text=term,
+        self.jobs.append(jobs.EnterText(text=term,
                                         selector='//input[@class="Ax4B8 ZAGvjd"]',
                                         selector_type='XPATH',
                                         send_return=True,
@@ -50,20 +50,20 @@ class GoogleNewsSearch(Queue):
                          )
 
         # add job to wait one second (articles take some time to load)
-        self.jobs.append(Jobs.Wait(time=1))
+        self.jobs.append(jobs.Wait(time=1))
 
         # add job to scroll to bottom
-        self.jobs.append(Jobs.Scroll(direction='DOWN',
+        self.jobs.append(jobs.Scroll(direction='DOWN',
                                      duration=5))
 
         # add job to scroll up
-        self.jobs.append(Jobs.Scroll(direction='UP',
+        self.jobs.append(jobs.Scroll(direction='UP',
                                      percentage=100))
 
         # add job to select a result randomly
         if select_result:
             self.jobs.append(
-                Jobs.SingleSelect(selector='/html/body/c-wiz[2]/div/div[2]/div[2]/div/main/c-wiz/div[1]/div',
+                jobs.SingleSelect(selector='/html/body/c-wiz[2]/div/div[2]/div[2]/div/main/c-wiz/div[1]/div',
                                   selector_type='XPATH',
                                   decision_type="CALCULATED",
                                   flag=search_type,
@@ -72,5 +72,5 @@ class GoogleNewsSearch(Queue):
             )
 
             # add job to scroll down 80% of the visited page
-            self.jobs.append(Jobs.Scroll(direction='DOWN',
+            self.jobs.append(jobs.Scroll(direction='DOWN',
                                          percentage=80))

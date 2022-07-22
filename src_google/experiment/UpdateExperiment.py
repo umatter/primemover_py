@@ -41,6 +41,7 @@ def single_update(date_time, experiment_id,api_token, manual=False, fixed_times=
 
     crawler_list = Crawler.from_list(raw_experiment['crawlers'],
                                              date_time=date_time)
+
     crawler_list = UpdateObject(crawler_list, Config)
     "Compute Proxy Changes"
     if update_proxies:
