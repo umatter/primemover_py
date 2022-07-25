@@ -4,7 +4,7 @@ We begin by creating a new experiment with a single crawler and assigning it a t
 For the time being we will simply use the base classes found in src/base. Begin by importing
 the base crawler and base configurations object.
 
-```
+```python
 from src.base.BaseCrawler import BaseCrawler
 from src.base.BaseConfig import BaseConfig
 ```
@@ -14,7 +14,7 @@ username key pairs for proxies and the s3 bucket. (I am working to remove the ne
 for this file to ensure keys are not stored in plain text). Create a new file "resources/other/keys.json"
 and fill it with the following fields.
 
-```
+```json
 {"GEOSURF": {"username": "<username>"", "password": "<password>"},
 "ROTATING": {"username": "<username>", "password": "<password>"},
 "PRIVATE": {"username": "<username>", "password": "<password>"},
@@ -25,7 +25,7 @@ and fill it with the following fields.
 In particular, py checks whether Geosurf proxies and their
 locations are valid. To do so, we need to download a list of valid cities from our
 s3 bucket. To do so, load the s3_wrapper module and fetch the relevant files.
-`
+`python
 from src.worker import s3_wrapper
 s3_wrapper.update_valid_cities()
 `
@@ -35,23 +35,30 @@ to validate that locations will be accepted by the proxy providers and to comput
 times in the local timezone of the bot.
 For the time being let us simply generate a base crawler and see how we can set and change parameters.
 
-`
+```python
 first_crawler = BaseCrawler()
-`
+```
 The easiest way to see the whole crawler is by using the "as_dict()" method.
 
-`first_crawler.as_dict()`
+```python
+first_crawler.as_dict()
+```
 
 This should look very similar to the example at "resources/examples/example_base_crawler.json"
 
 We have three options to change parameters. Consider the location. The current default is Auburn Alabama
 "US-AL-AUBURN". Let's change it to Phoenix Arizona "US-AZ-PHOENIX". Notice, that it occurs twice.
 Once as part of the agent and once in configuration. Changing the parameter retroactively
-by running ```first_crawler.agent.location = "US-AZ-PHOENIX"```
+by running
+```python
+first_crawler.agent.location = "US-AZ-PHOENIX"
+```
 
 and 
 
-```first_crawler.configuration.location = "US-AZ-PHOENIX"``` 
+```python
+first_crawler.configuration.location = "US-AZ-PHOENIX"
+``` 
 
 is therefore slightly unsafe.
 These risks become more critical as the generation of crawlers becomes more complex. 
@@ -63,7 +70,7 @@ based of the config function. Therefore, we can generate a crawler in Phoenix Ar
 either by changing the defaults or by generating a config object ourselves and then passing it to the crawler. 
 Let's begin by considering the second approach. 
 
-```
+```python
 first_config = BaseConfig(location='US-AZ-PHOENIX')
 second_crawler = BaseCrawler(configuration = first_config)
 print(second_crawler.agent.location)
@@ -76,17 +83,20 @@ If we want our crawler to do something we need to assign it tasks. Checkout
 Almost all experiments begin by having crawlers visit browser leaks inorder to ensure that no information
 has leaked and that the agent looks as expected. To assign a browser leaks task to our crawler, simpl use the add_task method.
 
-```
+```python
 from src.base import base_tasks as tasks
 second_crawler.add_task(tasks.BrowserLeaks)
 ```
 To see the Queue you generated, run
-`second_crawler.queues[0].as_dict()`.
+```python
+second_crawler.queues[0].as_dict()
+```
+.
 Notice, that the queues start_time seems somewhat arbitrary. It has been randomly generated
 by the TimeHandler function from a pre-set interval. 
 You could set the specific crawlers schedule by assigning it a new one before you generate the Queue.
 
-```
+```python
 from src.worker.TimeHandler import TimeHandler
 second_crawler.schedule = TimeHandler(second_crawler.agent.location,
                                          interval=120,
@@ -98,7 +108,7 @@ Note, there is a global schedule parameter, that ensures queues do not clash wit
 
 The actual times used will be from the intersection of these ranges. To change the global schedule
 run
-```
+```python
 TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
@@ -109,7 +119,7 @@ two queues. Note, this sets the schedule for all crawlers, you generate, not jus
 
 This scheduler is perhaps a little cumbersome so we can instead simply set a new time for our Queue
 by manually overriding the generated time. 
-```
+```python
 from datetime import datetime, timedelta
 t_0 = datetime.now() + timedelta(minutes=1)
 second_crawler.queues[0].start_at = t_0
@@ -118,7 +128,7 @@ The queue is now set to start in one minute local time.
 
 If we push the crawler now, it is not entirely clear which experiment it belongs to.
 Let us instead generate a new experiment and assign the crawler.
-```
+```python
 from src.worker.Experiment import Experiment
     exp = Experiment(
         name='Test Experiment',
@@ -128,7 +138,8 @@ from src.worker.Experiment import Experiment
 ```
 This code only generates an empty, local experiment. We need an experiment id to be assigned by the API.
 Load the API wrapper and connect to the api by generating keys.
-```
+```python
+import src.worker.api_wrapper as api
 key = api.get_access("<username>"], "<password>")
     exp_return = api.new_experiment(api_token, exp.as_dict())
     exp_id = Experiment.from_dict(exp_return).id
@@ -136,10 +147,12 @@ key = api.get_access("<username>"], "<password>")
 ```
 If you already have a test experiment setup you may just want to use that experiment id instead.
 Assign the experiment id to the crawler (you can also assign the experiment id when first generating the crawler).
-`second_crawler.experiment_id = exp_id`
+```python
+second_crawler.experiment_id = exp_id
+```
 
 It is now time to push the new crawler to the API.
-```
+```python
 import json
 import pathlib
 
@@ -158,5 +171,12 @@ with open(
         f'{PRIMEMOVER_PATH}/resources/crawlers/experiment_first_steps_{datetime.now().date().isoformat()}.json',
         'w') as file:
     json.dump(data_as_dict, file, indent='  ')
-print(exp_id)```
+print(exp_id)
+```
+Having generated a crawler with a queue, we would now like to have a look at the results.
+We use the src/base/Results.py module to do so.
+First let us download the results. 
 
+```python
+
+```
