@@ -39,7 +39,7 @@ class BrowserLeaks(Queue):
     def __init__(self, start_at):
         super().__init__(start_at=start_at,
                          name='BrowserLeaks',
-                         description='Visit a browserleaks.com and extract all data.')
+                         description='Visit browserleaks.com and extract all data.')
         # IP site
         self.jobs.append(
             jobs.VisitJob(url="https://browserleaks.com/ip", flag='leak_ip',

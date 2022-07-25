@@ -188,12 +188,12 @@ def upload_data(filename, path):
 
 
 def fetch_valid_cities():
-    path = '/resources/other/valid_cities.json'
+    path = '/resources/input_data/valid_cities.json'
     return fetch_file(path, "valid_cities.json")
 
 
 def update_valid_cities():
-    path = '/resources/other/valid_cities.json'
+    path = '/resources/input_data/valid_cities.json'
     file_path = PRIMEMOVER_PATH + path
     locations = fetch_valid_cities()
     locations.update(fetch_private_json())

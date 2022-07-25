@@ -144,7 +144,8 @@ class BaseCrawler:
         elif type(config) is self.CONFIG_CLASS:
             self._configuration = config
         else:
-            raise TypeError(f'configuration must be a  a  CONFIGURATION_FUNCTIONS object')
+            raise TypeError(
+                f'configuration must be a  a  CONFIGURATION_FUNCTIONS object')
 
     @property
     def agent(self):
@@ -157,7 +158,7 @@ class BaseCrawler:
             name = self._name.replace('Crawler', 'Agent')
             name = name.replace('crawler', 'agent')
             self._agent = self.AGENT_CLASS(name=name,
-                                location=self._configuration.location)
+                                           location=self._configuration.location)
 
         elif type(agent_in) is self.AGENT_CLASS:
             self.send_agent = False
@@ -251,9 +252,9 @@ class BaseCrawler:
                     start_at = self.schedule.new_time()
                 to_session = util.new_key(self.queues)
                 self.queues[to_session] = Queue(start_at=start_at,
-                                                      name=f'Session_{to_session}',
-                                                      delay_min=1,
-                                                      delay_max=10)
+                                                name=f'Session_{to_session}',
+                                                delay_min=1,
+                                                delay_max=10)
             self.queues[to_session] + new_queue_object
         # add to queue list as new session
         else:
@@ -347,7 +348,8 @@ class BaseCrawler:
                                  crawler_dict.get('configuration'),
                                  location=agent.location, date_time=date_time),
                              agent=agent,
-                             proxy=cls.PROXY_CLASS.from_dict(crawler_dict.get('proxy')),
+                             proxy=cls.PROXY_CLASS.from_dict(
+                                 crawler_dict.get('proxy')),
                              crawler_info=CrawlerInfo.from_dict(crawler_dict),
                              experiment_id=crawler_dict.get('experiment_id'),
                              date_time=date_time
@@ -382,6 +384,7 @@ class BaseCrawler:
                 if res.get('pi') is not None:
                     results_valid.append(res)
 
-        self.configuration.update_config(results_valid, update_location, terms=terms)
+        self.configuration.update_config(results_valid, update_location,
+                                         terms=terms)
 
         return self

@@ -6,8 +6,12 @@
 /resources/raw_data
 /resources/raw_html
 /resources/updates
-/resources/input_data
 /resources/keys
+/resourcs/input_data/neutral_searchterms_pool.json
+/resourcs/input_data/neutraldomains_pool.csv
+/resourcs/input_data/outlets_pool.csv
+/resourcs/input_data/outlets_pool_local.csv
+
 /resources/election_experiment
 /resources/examples/test_update_py_old.json
 /new proxy text
