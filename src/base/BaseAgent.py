@@ -32,7 +32,7 @@ class BaseAgent:
         - identification: string, MultiLogin (Not sure why the runner needs this, best not change)
     """
     # Load list of cities to later confirm whether the cities passed will be accepted by the runner
-    with open(PRIMEMOVER_PATH + "/resources/other/valid_cities.json",
+    with open(PRIMEMOVER_PATH + "/resources/input_data/valid_cities.json",
               'r') as file:
         LOCATION_LIST = list(json.load(file).keys())
 

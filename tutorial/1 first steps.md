@@ -101,14 +101,15 @@ from src.worker.TimeHandler import TimeHandler
 second_crawler.schedule = TimeHandler(second_crawler.agent.location,
                                          interval=120,
                                          wake_time=10 * 60 * 60,
-                                         bed_time=17 * 60 * 60,
-                                         date_time=self._date_time)
+                                         bed_time=17 * 60 * 60
+                                         )
 ```
 Note, there is a global schedule parameter, that ensures queues do not clash with each other or runner downtime.
 
 The actual times used will be from the intersection of these ranges. To change the global schedule
 run
 ```python
+from src.worker.TimeHandler import Schedule
 TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
@@ -130,20 +131,22 @@ If we push the crawler now, it is not entirely clear which experiment it belongs
 Let us instead generate a new experiment and assign the crawler.
 ```python
 from src.worker.Experiment import Experiment
-    exp = Experiment(
-        name='Test Experiment',
-        description='A first step towards using primemover_py',
-        contact='you',
-    )
+exp = Experiment(
+    name='Test Experiment',
+    description='A first step towards using primemover_py',
+    contact='you',
+)
 ```
 This code only generates an empty, local experiment. We need an experiment id to be assigned by the API.
 Load the API wrapper and connect to the api by generating keys.
 ```python
 import src.worker.api_wrapper as api
-key = api.get_access("<username>"], "<password>")
-    exp_return = api.new_experiment(api_token, exp.as_dict())
-    exp_id = Experiment.from_dict(exp_return).id
-    print(exp_id)
+api_token = api.get_access("<username>", "<password>")
+
+exp_return = api.new_experiment(api_token, exp.as_dict())
+exp_id = Experiment.from_dict(exp_return).id
+
+print(exp_id)
 ```
 If you already have a test experiment setup you may just want to use that experiment id instead.
 Assign the experiment id to the crawler (you can also assign the experiment id when first generating the crawler).
@@ -157,12 +160,12 @@ import json
 import pathlib
 
 #base path to local directory (careful! the parent.parent... list needs to match the levels to return to the root folder. 3 parents, assumes we are 3 folders deep ) 
-PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
 
-
+#Note, the API expects a list of crawlers
 with open(PRIMEMOVER_PATH + "/resources/crawlers/experiment_first_steps.json",
               'w') as file:
-        json.dump([crawler.as_dict() for crawler in crawler_list], file,
+        json.dump([second_crawler.as_dict()], file,
                   indent='  ')
 return_data = api.push_new(access_token=api_token,
                            path=PRIMEMOVER_PATH + "/resources/crawlers/experiment_first_steps.json")
@@ -178,5 +181,8 @@ We use the src/base/Results.py module to do so.
 First let us download the results. 
 
 ```python
-
+from src.base import Results
+Results.fetch_results(api_token=api_token)
 ```
+The raw results will have been saved under "resources/raw_data/<todays_date>". 
+If you wish to run fetch results again on the same day you will have to delete or rename this file.

@@ -255,7 +255,7 @@ class IndividualSchedule(Schedule):
 
 class TimeHandler:
     GLOBAL_SCHEDULE = Schedule()
-    with open(PRIMEMOVER_PATH + "/resources/other/valid_cities.json",
+    with open(PRIMEMOVER_PATH + "/resources/input_data/valid_cities.json",
               'r') as file:
         LOC_TIMEZONE_DICT = json.load(file)
 
