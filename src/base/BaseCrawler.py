@@ -23,7 +23,6 @@ class BaseCrawler:
 
     Public arguments:
         - name: string, optional but recomended, can be used to store information for processing
-            passing  <<some_name>>/<<flag>> will set the flag parameter if none is set.
         - description: string, optional
         - configuration: a configuration object.
             default: generates a new config object with all parameters determined
@@ -42,8 +41,8 @@ class BaseCrawler:
             default: 0
         - crawler_info: CrawlerInfo object (optional) if one is passed, this is output and can be used by the API
             to overwrite an existing crawler on the API
-        - flag: set a flag for the crawler. This will be added to the name. Only pass if no flag is passed as part of the name,
-            ideally pass a name or a flag.
+        - flag: set a flag for the crawler. This will be added to the name. Only pass if no flag is passed as part of the configuration, the configuration
+            flag will override the flag set here.
         - experiment_id: int, (in development)
         - day_delta: set tasks to be executed on different day. This can be used to itterate into the future easily.
 
@@ -72,14 +71,17 @@ class BaseCrawler:
                  experiment_id=None,
                  date_time=datetime.now()
                  ):
-        self.flag = flag
         self._description = description
-        self.name = name
-        if self.flag is None and self._name is not None:
-            split_name = self._name.split('/')
-            if len(split_name) > 1:
-                self.flag = split_name[1]
-        self.configuration = configuration
+        self.flag = flag
+
+        if configuration is not None:
+            self.name = name
+            self.configuration = configuration
+            self.name = self.name
+        else:
+            self.name = name
+            self.configuration = configuration
+
         self.send_agent = False
         self.agent = agent
         self._date_time = date_time
@@ -90,6 +92,14 @@ class BaseCrawler:
         self._testing = testing
         self._crawler_info = crawler_info
         self.experiment_id = experiment_id
+
+    @property
+    def flag(self):
+        return self._flag
+
+    @flag.setter
+    def flag(self, val):
+        self._flag = val
 
     @property
     def name(self):
@@ -103,6 +113,8 @@ class BaseCrawler:
             else:
                 self._name = f'Crawler_{BaseCrawler.CRAWLER_NR}'
             BaseCrawler.CRAWLER_NR += 1
+        elif self.flag is not None and val.split('/')[-1] != self.flag:
+            self._name = f'{val}/{self.flag}'
         else:
             self._name = val
 
@@ -140,12 +152,19 @@ class BaseCrawler:
     def configuration(self, config):
         if config is None:
             self._configuration = self.CONFIG_CLASS(
-                name=self._name.replace('Crawler', 'CONFIGURATION_FUNCTIONS'))
+                name=self.name.replace('Crawler', 'Config'))
         elif type(config) is self.CONFIG_CLASS:
+
+            if config.flag is None:
+                config.flag = self.flag
+            else:
+                self.flag = config.flag
+            if config.name is None:
+                config.name = self.name.replace('Crawler', 'Config')
             self._configuration = config
         else:
             raise TypeError(
-                f'configuration must be a  a  CONFIGURATION_FUNCTIONS object')
+                f'configuration must be a  a  Config object')
 
     @property
     def agent(self):
@@ -194,7 +213,7 @@ class BaseCrawler:
             - dictionary version of object, valid format for primemover_api
         """
         return_dict = {
-            "name": self._name,
+            "name": self.name,
             "description": self._description,
             "active": self.active,
             "testing": self._testing,
@@ -342,17 +361,18 @@ class BaseCrawler:
     @classmethod
     def _single_crawler(cls, crawler_dict, date_time):
         agent = cls.AGENT_CLASS.from_dict(crawler_dict.get('agent'))
+        config = cls.CONFIG_CLASS.from_dict(
+            crawler_dict.get('configuration'),
+            location=agent.location, date_time=date_time)
         crawler_object = cls(name=crawler_dict.get('name'),
                              description=crawler_dict.get('description'),
-                             configuration=cls.CONFIG_CLASS.from_dict(
-                                 crawler_dict.get('configuration'),
-                                 location=agent.location, date_time=date_time),
+                             configuration=config,
                              agent=agent,
                              proxy=cls.PROXY_CLASS.from_dict(
                                  crawler_dict.get('proxy')),
                              crawler_info=CrawlerInfo.from_dict(crawler_dict),
                              experiment_id=crawler_dict.get('experiment_id'),
-                             date_time=date_time
+                             date_time=date_time,
                              )
         crawler_object.send_agent = False
         return crawler_object

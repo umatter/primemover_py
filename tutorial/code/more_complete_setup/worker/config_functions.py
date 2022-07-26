@@ -8,9 +8,11 @@ import random as r
 import pandas as pd
 from numpy.random import gumbel
 import pathlib
-from src_google.worker.preferences import search_utility_v_ik, media_utility_u_ij
+from tutorial.code.more_complete_setup.worker.preferences import \
+    search_utility_v_ik, media_utility_u_ij
 
-PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
+PRIMEMOVER_PATH = str(
+    pathlib.Path(__file__).parent.parent.parent.parent.parent.absolute())
 
 
 def Psi():
@@ -134,28 +136,9 @@ def SelectMediaOutlets(alpha_tilde, tau_tilde_ij, pi=0, k=1, local=1):
     chosen = r.sample(list(outlets_local.index), k=local)
 
     outlets += [{'domain': outlets_local.loc[i]['domain'],
-                        'url': outlets_local.loc[i]['redirect_url'],
-                        'pi': outlets_local.loc[i]['pi']} for
-                       i in chosen]
-    return outlets
-
-
-def update_media_outlets(outlets, pi, alpha_tilde, tau_tilde_ij, k=10):
-    utilities = []
-    for outlet in outlets:
-        epsilon_ij = NoiseUtility()
-        utilities.append(((media_utility_u_ij(pi_i=pi,
-                                              pi_tilde_j=outlet['pi'],
-                                              epsilon_ij=epsilon_ij,
-                                              alpha_tilde=alpha_tilde,
-                                              tau_tilde_ij=tau_tilde_ij),
-                           outlet['domain'],
-                           outlet['url'],
-                           outlet['pi'])))
-    utilities.sort()
-    max_K = utilities[-k:]
-    outlets = [{'domain': domain, 'url': url, 'pi': pi} for
-               util, domain, url, pi in max_K]
+                 'url': outlets_local.loc[i]['redirect_url'],
+                 'pi': outlets_local.loc[i]['pi']} for
+                i in chosen]
     return outlets
 
 
@@ -276,7 +259,7 @@ def select_local_outlets(path_in, path_local_out, nr_per_state=2):
         Select nr_per_state number of local news outlets per state in outlets input
     """
 
-    outlets = pd.read_csv(path_in,encoding='utf-16',
+    outlets = pd.read_csv(path_in, encoding='utf-16',
                           usecols=['domain', 'state', 'redirect_url',
                                    'avg_users_us_percent',
                                    'avg_reach_permillion', 'pi', 'pop2019',
@@ -293,13 +276,11 @@ def select_local_outlets(path_in, path_local_out, nr_per_state=2):
                   0:nr_per_state]
     for state in states[1:]:
         outlets_out = pd.concat((outlets_out,
-            outlets.loc[outlets['state'] == state].iloc[0:nr_per_state]), axis=0, join='outer')
+                                 outlets.loc[outlets['state'] == state].iloc[
+                                 0:nr_per_state]), axis=0, join='outer')
     outlets_out = outlets_out.reset_index(drop=True)
     outlets_out.to_csv(path_local_out, header=True)
 
 
 if __name__ == "__main__":
-    a = SelectMediaOutlets(15, 1, 1, 'US-CA')
-    print(a)
-    b = SelectSearchTerms(0, 1, 0, 10)
-    print(b)
+    print(PRIMEMOVER_PATH)

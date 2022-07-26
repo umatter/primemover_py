@@ -53,7 +53,7 @@ class BaseProfile:
 
         self.os = os
         self.name = name
-        self.browser = browser
+        self._browser = browser
 
         privacy_setting = False
         if privacy_setting:

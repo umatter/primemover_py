@@ -13,7 +13,8 @@ import json
 import pathlib
 
 PRIMEMOVER_PATH = str(
-        pathlib.Path(__file__).parent.parent.absolute())
+    pathlib.Path(__file__).parent.parent.parent.absolute())
+
 
 def first_crawler(api_token, update_valid_cities=False, push=True):
     """

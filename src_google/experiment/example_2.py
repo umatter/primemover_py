@@ -50,7 +50,7 @@ def launch_experiment(exp_id):
 
     # generate neutral configurations
     config_list_neutral = [
-        Config(name='CONFIGURATION_FUNCTIONS/neutral', location=l, pi=0,
+        Config(name='Config', location=l, pi=0, flag='neutral',
                media=[], terms=[]) for
         l in 1 * GEO_SURF_PROXIES]
     # generate crawlers from neutral configs
@@ -59,11 +59,11 @@ def launch_experiment(exp_id):
         c in
         config_list_neutral]
     # generate left and right configs with opposing pi in each location
-    config_list_left = [Config(name='CONFIGURATION_FUNCTIONS/left', location=l)
+    config_list_left = [Config(name='Config/left', location=l)
                         for l in
                         1 * GEO_SURF_PROXIES]
     config_list_right = [
-        Config(name='CONFIGURATION_FUNCTIONS/right',
+        Config(name='Config/right',
                location=left_config.location,
                pi=-left_config.pi) for left_config in
         config_list_left]

@@ -125,14 +125,21 @@ class BaseAgent:
     def from_dict(cls, agent_dict):
         if type(agent_dict) is list:
             agent_dict = agent_dict[0]
+        elif type(agent_dict) is dict:
+            agent_dict = agent_dict
         elif type(agent_dict) is str:
             agent_dict = json.loads(agent_dict)
+        if type(agent_dict.get('multilogin_profile')) is dict:
+            multi_profile = agent_dict.get('multilogin_profile')
+        else:
+            multi_profile = json.loads(agent_dict.get(
+                'multilogin_profile'))
+
         agent_object = cls(name=agent_dict.get('name'),
                            description=agent_dict.get('description'),
                            identification=agent_dict.get('identification'),
                            multilogin_id=agent_dict.get('multilogin_id'),
-                           multilogin_profile=cls.PROFILE_CLASS.from_dict(json.loads(agent_dict.get(
-                               'multilogin_profile'))),
+                           multilogin_profile=cls.PROFILE_CLASS.from_dict(multi_profile),
                            location=agent_dict.get('location'),
                            info=AgentInfo.from_dict(agent_dict))
         return agent_object

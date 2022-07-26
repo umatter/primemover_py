@@ -6,16 +6,16 @@
     "testing": 0,
     "configuration": [
       {
-        "name": "CONFIGURATION_FUNCTIONS/neutral",
+        "name": "CONFIGURATION_FUNCTIONSl",
         "description": null,
         "params": [
           {
             "pi": 0.0,
-            "psi": 0.1827132344320482,
-            "alpha": 0.34747771857091136,
+            "psi": 0.18392306391243107,
+            "alpha": 0.25009402138683323,
             "tau": 1,
             "kappa": 0,
-            "beta": 0.34606572155332277,
+            "beta": 0.4892996797604465,
             "search_terms": [],
             "media_outlet_urls": []
           }
@@ -30,8 +30,12 @@
             "value": "{\"accept_all\": true}"
           },
           {
+            "name": "flag",
+            "value": "neutral"
+          },
+          {
             "name": "usage_type",
-            "value": "only_direct"
+            "value": "both"
           }
         ]
       }
@@ -40,7 +44,7 @@
       {
         "name": "Proxy_0/neutral",
         "description": "Proxy",
-        "job_type": "GEOSURF",
+        "type": "GEOSURF",
         "hostname": "state.geosurf.io",
         "port": 8000,
         "username": "167462",
@@ -61,7 +65,7 @@
           "browser": "mimic",
           "network": {
             "proxy": {
-              "job_type": "%%PROXYTYPE%%",
+              "type": "%%PROXYTYPE%%",
               "host": "%%PROXYHOST%%",
               "port": "%%PROXYPORT%%",
               "username": "%%PROXYUSERNAME%%",
@@ -90,7 +94,7 @@
       {
         "name": "GoogleSearch",
         "description": "Open Google, enter a search query and select a result.",
-        "start_at": "2022-07-22T14:28:54.037236+01:00",
+        "start_at": "2022-07-26T16:31:34.307319+01:00",
         "jobs": [
           {
             "name": "Visit",
@@ -247,7 +251,7 @@
               },
               {
                 "name": "decisionType",
-                "description": "Decision job_type for choosing an item out of the list given by the selector is CALCULATED",
+                "description": "Decision type for choosing an item out of the list given by the selector is CALCULATED",
                 "value": "CALCULATED"
               },
               {
@@ -320,16 +324,16 @@
     "testing": 0,
     "configuration": [
       {
-        "name": "CONFIGURATION_FUNCTIONS/neutral",
+        "name": "CONFIGURATION_FUNCTIONSl",
         "description": null,
         "params": [
           {
             "pi": 0.0,
-            "psi": 0.058416709148293805,
-            "alpha": 0.29453782055030453,
+            "psi": 0.025486107644841896,
+            "alpha": 0.36741645732262496,
             "tau": 1,
-            "kappa": 2,
-            "beta": 0.0017250006381147598,
+            "kappa": 1,
+            "beta": 8.710622859064987e-05,
             "search_terms": [],
             "media_outlet_urls": []
           }
@@ -344,6 +348,10 @@
             "value": "{\"accept_all\": true}"
           },
           {
+            "name": "flag",
+            "value": "neutral"
+          },
+          {
             "name": "usage_type",
             "value": "both"
           }
@@ -354,7 +362,7 @@
       {
         "name": "Proxy_1/neutral",
         "description": "Proxy",
-        "job_type": "GEOSURF",
+        "type": "GEOSURF",
         "hostname": "state.geosurf.io",
         "port": 8000,
         "username": "167462",
@@ -375,7 +383,7 @@
           "browser": "mimic",
           "network": {
             "proxy": {
-              "job_type": "%%PROXYTYPE%%",
+              "type": "%%PROXYTYPE%%",
               "host": "%%PROXYHOST%%",
               "port": "%%PROXYPORT%%",
               "username": "%%PROXYUSERNAME%%",
@@ -403,7 +411,7 @@
       {
         "name": "GoogleSearch",
         "description": "Open Google, enter a search query and select a result.",
-        "start_at": "2022-07-22T14:18:54.037236+01:00",
+        "start_at": "2022-07-26T16:23:34.307319+01:00",
         "jobs": [
           {
             "name": "Visit",
@@ -560,7 +568,7 @@
               },
               {
                 "name": "decisionType",
-                "description": "Decision job_type for choosing an item out of the list given by the selector is CALCULATED",
+                "description": "Decision type for choosing an item out of the list given by the selector is CALCULATED",
                 "value": "CALCULATED"
               },
               {
@@ -637,32 +645,32 @@
         "description": null,
         "params": [
           {
-            "pi": -0.96777194474453,
-            "psi": 0.05702169119811909,
-            "alpha": 0.40738200977705563,
+            "pi": -0.4926628084309783,
+            "psi": 0.1406646474994806,
+            "alpha": 0.44770858675178593,
             "tau": 1,
-            "kappa": 2,
-            "beta": 0.2271420771010783,
+            "kappa": 1,
+            "beta": 0.02661654378513012,
             "search_terms": [
               {
-                "term": "affordable act care",
-                "pi": -0.897303634548273
+                "term": "unemployment benefits",
+                "pi": -0.493792702495255
               },
               {
-                "term": "fight justice",
-                "pi": -0.829215447281919
+                "term": "enrollment period",
+                "pi": -0.316088351310242
               }
             ],
             "media_outlet_urls": [
               {
-                "domain": "washingtonpost.com",
-                "url": "https://www.washingtonpost.com/",
-                "pi": -0.385642276674195
+                "domain": "nytimes.com",
+                "url": "https://www.nytimes.com/",
+                "pi": -0.281331780156041
               },
               {
-                "domain": "wcax.com",
-                "url": "https://www.wcax.com/",
-                "pi": -0.362743424441097
+                "domain": "detroit.cbslocal.com",
+                "url": "https://detroit.cbslocal.com/",
+                "pi": 0.182046335668375
               }
             ]
           }
@@ -677,8 +685,12 @@
             "value": "{\"accept_all\": true}"
           },
           {
+            "name": "flag",
+            "value": "left"
+          },
+          {
             "name": "usage_type",
-            "value": "only_search"
+            "value": "both"
           }
         ]
       }
@@ -687,7 +699,7 @@
       {
         "name": "Proxy_2/left",
         "description": "Proxy",
-        "job_type": "GEOSURF",
+        "type": "GEOSURF",
         "hostname": "state.geosurf.io",
         "port": 8000,
         "username": "167462",
@@ -708,7 +720,7 @@
           "browser": "mimic",
           "network": {
             "proxy": {
-              "job_type": "%%PROXYTYPE%%",
+              "type": "%%PROXYTYPE%%",
               "host": "%%PROXYHOST%%",
               "port": "%%PROXYPORT%%",
               "username": "%%PROXYUSERNAME%%",
@@ -721,7 +733,8 @@
             "doNotTrack": 0
           },
           "geolocation": {
-            "mode": "BLOCK"
+            "mode": "ALLOW",
+            "fillBasedOnExternalIp": true
           },
           "canvas": {
             "mode": "NOISE"
@@ -736,7 +749,7 @@
       {
         "name": "GoogleSearch",
         "description": "Open Google, enter a search query and select a result.",
-        "start_at": "2022-07-22T14:26:54.037236+01:00",
+        "start_at": "2022-07-26T16:25:34.307319+01:00",
         "jobs": [
           {
             "name": "Visit",
@@ -893,7 +906,7 @@
               },
               {
                 "name": "decisionType",
-                "description": "Decision job_type for choosing an item out of the list given by the selector is CALCULATED",
+                "description": "Decision type for choosing an item out of the list given by the selector is CALCULATED",
                 "value": "CALCULATED"
               },
               {
@@ -970,32 +983,32 @@
         "description": null,
         "params": [
           {
-            "pi": -0.004885229995556961,
-            "psi": 0.007418729770957789,
-            "alpha": 0.20491757066248012,
+            "pi": -0.6962743421541093,
+            "psi": 0.181827402844288,
+            "alpha": 0.4869250303588137,
             "tau": 1,
-            "kappa": 0,
-            "beta": 0.44187654915407204,
+            "kappa": 1,
+            "beta": 0.30249661313480636,
             "search_terms": [
               {
-                "term": "white people black people",
-                "pi": -0.133196913206984
+                "term": "access health",
+                "pi": -0.685242574163867
               },
               {
-                "term": "i still rise maya angelou",
-                "pi": 0.100484082192852
+                "term": "student loan",
+                "pi": -0.444593451271154
               }
             ],
             "media_outlet_urls": [
               {
-                "domain": "us.cnn.com",
-                "url": "https://us.cnn.com/",
-                "pi": -0.0900301126479086
+                "domain": "news.yahoo.com",
+                "url": "https://news.yahoo.com/",
+                "pi": 0.0208535444250573
               },
               {
-                "domain": "desmoinesregister.com",
-                "url": "https://www.desmoinesregister.com/",
-                "pi": 0.0086231521088899
+                "domain": "philadelphia.cbslocal.com",
+                "url": "https://philadelphia.cbslocal.com/",
+                "pi": -0.0736923470967024
               }
             ]
           }
@@ -1010,6 +1023,10 @@
             "value": "{\"accept_all\": true}"
           },
           {
+            "name": "flag",
+            "value": "left"
+          },
+          {
             "name": "usage_type",
             "value": "both"
           }
@@ -1020,7 +1037,7 @@
       {
         "name": "Proxy_3/left",
         "description": "Proxy",
-        "job_type": "GEOSURF",
+        "type": "GEOSURF",
         "hostname": "state.geosurf.io",
         "port": 8000,
         "username": "167462",
@@ -1041,7 +1058,7 @@
           "browser": "mimic",
           "network": {
             "proxy": {
-              "job_type": "%%PROXYTYPE%%",
+              "type": "%%PROXYTYPE%%",
               "host": "%%PROXYHOST%%",
               "port": "%%PROXYPORT%%",
               "username": "%%PROXYUSERNAME%%",
@@ -1070,7 +1087,7 @@
       {
         "name": "GoogleSearch",
         "description": "Open Google, enter a search query and select a result.",
-        "start_at": "2022-07-22T14:24:54.037236+01:00",
+        "start_at": "2022-07-26T16:27:34.307319+01:00",
         "jobs": [
           {
             "name": "Visit",
@@ -1227,7 +1244,7 @@
               },
               {
                 "name": "decisionType",
-                "description": "Decision job_type for choosing an item out of the list given by the selector is CALCULATED",
+                "description": "Decision type for choosing an item out of the list given by the selector is CALCULATED",
                 "value": "CALCULATED"
               },
               {
@@ -1304,32 +1321,32 @@
         "description": null,
         "params": [
           {
-            "pi": 0.96777194474453,
-            "psi": 0.009959695902484446,
-            "alpha": 0.3014064144410996,
+            "pi": 0.4926628084309783,
+            "psi": 0.020149638691381578,
+            "alpha": 0.21423373699152998,
             "tau": 1,
-            "kappa": 0,
-            "beta": 0.4434632395340167,
+            "kappa": 2,
+            "beta": 0.3916102226557369,
             "search_terms": [
               {
-                "term": "get kids",
-                "pi": 0.45715453874312
+                "term": "free of speech",
+                "pi": 0.467408943993915
               },
               {
-                "term": "george bush",
-                "pi": 0.702707090799832
+                "term": "supported president",
+                "pi": 0.511082608549518
               }
             ],
             "media_outlet_urls": [
               {
-                "domain": "nation.foxnews.com",
-                "url": "https://nation.foxnews.com/",
-                "pi": 0.712113344498536
+                "domain": "finance.yahoo.com",
+                "url": "https://finance.yahoo.com/",
+                "pi": 0.183181386955726
               },
               {
-                "domain": "wdrb.com",
-                "url": "https://www.wdrb.com/",
-                "pi": -0.0905943748130754
+                "domain": "iheart.com",
+                "url": "https://www.iheart.com/podcast/",
+                "pi": 0.228520178440562
               }
             ]
           }
@@ -1344,6 +1361,10 @@
             "value": "{\"accept_all\": true}"
           },
           {
+            "name": "flag",
+            "value": "right"
+          },
+          {
             "name": "usage_type",
             "value": "only_search"
           }
@@ -1354,7 +1375,7 @@
       {
         "name": "Proxy_4/right",
         "description": "Proxy",
-        "job_type": "GEOSURF",
+        "type": "GEOSURF",
         "hostname": "state.geosurf.io",
         "port": 8000,
         "username": "167462",
@@ -1375,7 +1396,7 @@
           "browser": "mimic",
           "network": {
             "proxy": {
-              "job_type": "%%PROXYTYPE%%",
+              "type": "%%PROXYTYPE%%",
               "host": "%%PROXYHOST%%",
               "port": "%%PROXYPORT%%",
               "username": "%%PROXYUSERNAME%%",
@@ -1404,7 +1425,7 @@
       {
         "name": "GoogleSearch",
         "description": "Open Google, enter a search query and select a result.",
-        "start_at": "2022-07-22T14:20:54.037236+01:00",
+        "start_at": "2022-07-26T16:33:34.307319+01:00",
         "jobs": [
           {
             "name": "Visit",
@@ -1561,7 +1582,7 @@
               },
               {
                 "name": "decisionType",
-                "description": "Decision job_type for choosing an item out of the list given by the selector is CALCULATED",
+                "description": "Decision type for choosing an item out of the list given by the selector is CALCULATED",
                 "value": "CALCULATED"
               },
               {
@@ -1638,20 +1659,20 @@
         "description": null,
         "params": [
           {
-            "pi": 0.004885229995556961,
-            "psi": 0.10457811132697742,
-            "alpha": 0.28866589548921484,
+            "pi": 0.6962743421541093,
+            "psi": 0.03907118817242723,
+            "alpha": 0.4424594414764932,
             "tau": 1,
             "kappa": 2,
-            "beta": 0.1844588521604134,
+            "beta": 0.2119389912609051,
             "search_terms": [
               {
-                "term": "county social services",
-                "pi": -0.0067284165617288
+                "term": "record low temperature",
+                "pi": 0.756467116116939
               },
               {
-                "term": "sandy hook",
-                "pi": -0.14891302470127
+                "term": "border security",
+                "pi": 0.565166545427275
               }
             ],
             "media_outlet_urls": [
@@ -1661,9 +1682,9 @@
                 "pi": 0.183181386955726
               },
               {
-                "domain": "inforum.com",
-                "url": "https://www.inforum.com/",
-                "pi": -0.200420129486419
+                "domain": "tennessean.com",
+                "url": "https://www.tennessean.com/",
+                "pi": 0.0505473573016102
               }
             ]
           }
@@ -1678,8 +1699,12 @@
             "value": "{\"accept_all\": true}"
           },
           {
+            "name": "flag",
+            "value": "right"
+          },
+          {
             "name": "usage_type",
-            "value": "only_search"
+            "value": "both"
           }
         ]
       }
@@ -1688,7 +1713,7 @@
       {
         "name": "Proxy_5/right",
         "description": "Proxy",
-        "job_type": "GEOSURF",
+        "type": "GEOSURF",
         "hostname": "state.geosurf.io",
         "port": 8000,
         "username": "167462",
@@ -1709,7 +1734,7 @@
           "browser": "mimic",
           "network": {
             "proxy": {
-              "job_type": "%%PROXYTYPE%%",
+              "type": "%%PROXYTYPE%%",
               "host": "%%PROXYHOST%%",
               "port": "%%PROXYPORT%%",
               "username": "%%PROXYUSERNAME%%",
@@ -1722,8 +1747,7 @@
             "doNotTrack": 0
           },
           "geolocation": {
-            "mode": "ALLOW",
-            "fillBasedOnExternalIp": true
+            "mode": "BLOCK"
           },
           "canvas": {
             "mode": "NOISE"
@@ -1738,7 +1762,7 @@
       {
         "name": "GoogleSearch",
         "description": "Open Google, enter a search query and select a result.",
-        "start_at": "2022-07-22T14:22:54.037236+01:00",
+        "start_at": "2022-07-26T16:29:34.307319+01:00",
         "jobs": [
           {
             "name": "Visit",
@@ -1895,7 +1919,7 @@
               },
               {
                 "name": "decisionType",
-                "description": "Decision job_type for choosing an item out of the list given by the selector is CALCULATED",
+                "description": "Decision type for choosing an item out of the list given by the selector is CALCULATED",
                 "value": "CALCULATED"
               },
               {

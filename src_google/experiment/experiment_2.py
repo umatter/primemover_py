@@ -48,8 +48,9 @@ def distribute_proxies(location_groups, exp_id, proxy_credentials,
                     if type(pi_right) == str:
                         print('string error occoured!')
                         print(crawler_list[-1].as_dict())
-                    config = Config(name='CONFIGURATION_FUNCTIONS/left',
+                    config = Config(name='CONFIGURATION_FUNCTIONS',
                                     location=location,
+                                    flag='left',
                                     pi=-pi_right)
                     pi_right = None
                 else:

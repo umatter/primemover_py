@@ -28,6 +28,8 @@ def Pi(flag=None):
         pi = r.uniform(-1, 0)
     elif flag == 'right':
         pi = r.uniform(0, 1)
+    elif flag == 'neutral':
+        pi = 0
     else:
         pi = r.uniform(-1, 1)
     return pi
@@ -102,14 +104,6 @@ def location():
     when proxy providers change.
     """
     return "US-AL-AUBURN"
-
-
-def usage_type():
-    """"""
-    choice = \
-        r.choices(['only_search', 'only_direct', 'both'], [0.25, 0.25, 0.5])[0]
-    return choice
-
 
 def cookie_pref():
     pref = {'accept_all': True}

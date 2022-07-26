@@ -6,6 +6,8 @@
 from src.worker.PrimemoverQueue import Queue
 from src.worker import jobs
 
+from src.base.base_tasks import VisitDirect
+
 import src_google.worker.preferences as pref
 from src_google.worker.config_functions import NoiseUtility
 
@@ -17,67 +19,6 @@ import pathlib
 import pandas as pd
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
-
-
-class GoogleSearch(Queue):
-    """
-    Conduct a google search and scroll to the bottom of the page
-    """
-
-    def __init__(self,
-                 term,
-                 start_at,
-                 name='GoogleSearch',
-                 description='Open Google, enter a search query and select a result.',
-                 search_type='google_search',
-                 select_result=False,
-                 time_spent=5
-                 ):
-        self._search_term = term
-        self._time_spent = time_spent
-        super().__init__(start_at=start_at,
-                         name=name,
-                         description=description)
-        # Add Job to Visit a webpage (google)
-        self.jobs.append(
-            jobs.VisitJob(url='https://www.google.com', captcha_mode='always',
-                          task=name))
-
-        # Add Job to select the search field via XPATH and type the search term
-        self.jobs.append(jobs.EnterText(text=term,
-                                        selector="//input[@name='q']",
-                                        selector_type='XPATH',
-                                        send_return=True,
-                                        type_mode="SIMULATED_FIXINGTYPOS",
-                                        task=name,
-                                        captcha_mode='always'),
-
-                         )
-        # Add Job to scroll to bottom
-        self.jobs.append(jobs.Scroll(direction='DOWN',
-                                     percentage=100,
-                                     captcha_mode='always', task=name))
-        self.jobs.append(jobs.Scroll(direction='UP',
-                                     percentage=100,
-                                     captcha_mode='always',
-                                     task=name,
-                                     flag=search_type))  # Add Job to select a result randomly
-        if select_result:
-            self.jobs.append(
-                jobs.SingleSelect(selector='.//div[@class="yuRUbf"]/a',
-                                  selector_type='XPATH',
-                                  decision_type="CALCULATED",
-                                  flag=search_type,
-                                  task=name,
-                                  captcha_mode='always'
-                                  )
-            )
-
-            # Add Job to scroll down 80% of the visited page
-            self.jobs.append(jobs.Scroll(direction='DOWN',
-                                         duration=self._time_spent,
-                                         captcha_mode='always',
-                                         task=name))
 
 
 class GoogleSearchNew(Queue):
@@ -96,6 +37,8 @@ class GoogleSearchNew(Queue):
                  ):
         self._search_term = term
         self._time_spent = time_spent
+        self._search_type = search_type
+        self._select_result = select_result
         super().__init__(start_at=start_at,
                          name=name,
                          description=description)
@@ -122,18 +65,18 @@ class GoogleSearchNew(Queue):
                                      percentage=100,
                                      captcha_mode='always',
                                      task=name,
-                                     flag=search_type))  # Add Job to select a result randomly
-        if select_result:
+                                     flag=self._search_type))  # Add Job to select a result randomly
+        if self._select_result:
             self.jobs.append(
                 jobs.SingleSelect_New(
                     click_selector='.//div[@class="yuRUbf"]/a',
                     click_selector_type='XPATH',
                     decision_type="CALCULATED",
                     criteria_extractor='^(?:https?\:\/\/)?(?:www.)?([^\/?#]+)(?:[\/?#]|$)',
-                    flag=search_type,
+                    flag=self._search_type,
                     task=name,
                     captcha_mode='always'
-                    )
+                )
             )
 
             # Add Job to scroll down 80% of the visited page
@@ -143,24 +86,67 @@ class GoogleSearchNew(Queue):
                                          task=name))
 
 
-class VisitDirect(Queue):
+class GoogleSearch(Queue):
     """
-        Visit a media outlet and scroll for 2-3 minutes
+    Conduct a google search and scroll to the bottom of the page
     """
 
-    def __init__(self, outlet_url, start_at):
-        self._outlet_url = outlet_url
-        self._duration = r.randint(30, 60)  # choose scroll time in seconds
+    def __init__(self,
+                 term,
+                 start_at,
+                 name='GoogleSearch',
+                 description='Open Google, enter a search query and select a result.',
+                 search_type='google_search',
+                 select_result=False,
+                 time_spent=5
+                 ):
+        self._search_term = term
+        self._time_spent = time_spent
+        self._select_result = select_result
+        self._search_type = search_type
         super().__init__(start_at=start_at,
-                         name='Visit Direct',
-                         description='Visit a media outlet and scroll for 2-3 minutes.')
-        # Add Job to Visit a media outlet
-        self.jobs.append(jobs.VisitJob(url=self._outlet_url, task=self.name))
+                         name=name,
+                         description=description)
+        # Add Job to Visit a webpage (google)
+        self.jobs.append(
+            jobs.VisitJob(url='https://www.google.com', captcha_mode='always',
+                          task=name))
 
-        # Add Job to scroll down for random time between 1 and 3 minutes
+        # Add Job to select the search field via XPATH and type the search term
+        self.jobs.append(jobs.EnterText(text=term,
+                                        selector="//input[@name='q']",
+                                        selector_type='XPATH',
+                                        send_return=True,
+                                        type_mode="SIMULATED_FIXINGTYPOS",
+                                        task=name,
+                                        captcha_mode='always'),
+
+                         )
+        # Add Job to scroll to bottom
         self.jobs.append(jobs.Scroll(direction='DOWN',
-                                     duration=self._duration,
-                                     task=self.name))
+                                     percentage=100,
+                                     captcha_mode='always', task=name))
+        self.jobs.append(jobs.Scroll(direction='UP',
+                                     percentage=100,
+                                     captcha_mode='always',
+                                     task=name,
+                                     flag=self._search_type))  # Add Job to select a result randomly
+        if self._select_result:
+            self.jobs.append(
+                jobs.SingleSelect(selector='.//div[@class="yuRUbf"]/a',
+                                  selector_type='XPATH',
+                                  decision_type="CALCULATED",
+                                  flag=self._search_type,
+                                  task=name,
+                                  captcha_mode='always'
+                                  )
+            )
+
+            # Add Job to scroll down 80% of the visited page
+            self.jobs.append(jobs.Scroll(direction='DOWN',
+                                         duration=self._time_spent,
+                                         captcha_mode='always',
+                                         task=name))
 
 
 class VisitViaGoogle(Queue):
@@ -241,10 +227,10 @@ class VisitViaGoogleNew(Queue):
 
         self.jobs.append(
             jobs.SingleSelect_New(click_selector='.//div[@class="yuRUbf"]/a',
-                              click_selector_type='XPATH',
-                              decision_type="FIRST",
-                              task=self.name)
-            )
+                                  click_selector_type='XPATH',
+                                  decision_type="FIRST",
+                                  task=self.name)
+        )
 
         # Add Job to scroll down the visited page for some time
         self.jobs.append(jobs.Scroll(direction='DOWN',

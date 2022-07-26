@@ -47,7 +47,7 @@ class S3History:
             self._py_object = value
             self._object_id = value.info.agent_id
         else:
-            raise TypeError('expected object of job_type CONFIGURATION_FUNCTIONS, Proxy or Agent')
+            raise TypeError('expected object of type BaseConfig, Proxy or Agent')
 
     def update_current_status(self):
         if self._object_class == 'agent':

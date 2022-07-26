@@ -1,7 +1,7 @@
 """
-Establishes the CONFIGURATION_FUNCTIONS class, mirroring the configurations object in the primemover api
+Establishes the BaseConfig class, mirroring the configurations object in the primemover api
 any parameters that are not set upon init are generated according to the
-CONFIGURATION_FUNCTIONS file.
+configuration_functions file.
 
 J.L. 11.2020
 """
@@ -23,7 +23,7 @@ class BaseConfig:
     In case this is required, extend the class.
 
     Public attributes:
-         - name: string, optional but recomended, can be used to store information for processing
+         - name: string, optional but recommended, can be used to store information for processing
             use some_name/flag to add a flag to the configuration object.
             (It is part of the name attribute, to ensure availability on api return)
          - description: string, optional
@@ -50,6 +50,7 @@ class BaseConfig:
             this is required for geosurf compatibility, restriction may be altered
             in future release
             default: set according to CONFIGURATION_FUNCTIONS
+         - flag: contains some lable for the config objwct, will be identical to that of the crawler.
     Private attributes:
         - info: should only be set using existing crawlers, via from_dict method.
     """
@@ -74,16 +75,14 @@ class BaseConfig:
                  location=None,
                  cookie_pref=None,
                  info=None,
+                 flag=None,
                  date_time=datetime.now()
                  ):
 
         self.name = name
         self.description = description
         self._info = info
-        if (self.name is not None) and ('/' in self.name):
-            self._flag = self.name.split('/')[1]
-        else:
-            self._flag = None
+        self.flag = flag
 
         self.psi = psi
         self.pi = pi
@@ -110,8 +109,25 @@ class BaseConfig:
         return self._info
 
     @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, val):
+        val = str(val)
+        self._name = val
+
+    @property
     def flag(self):
         return self._flag
+
+    @flag.setter
+    def flag(self, val):
+        if (val is None) and (self.name is not None) and ('/' in self.name):
+            self._flag = self.name.split('/')[1]
+        else:
+            self._flag = val
+
 
     @property
     def psi(self):
@@ -284,7 +300,10 @@ class BaseConfig:
             },
                 {"name": "cookie_pref",
                  "value": json.dumps(self.cookie_pref)
-                 }]
+                 },
+                {"name": "flag",
+                 "value": self.flag}
+            ]
         }
         if send_info and self._info is not None:
             for key, value in self._info.as_dict().items():
@@ -320,7 +339,9 @@ class BaseConfig:
         if type(config_dict) is list:
             config_dict = config_dict[0]
         pref = pref_as_dict(config_dict.get('preferences', []))
-        cookie_pref = pref.get('cookie_pref', None)
+        if ('location' in pref.keys()) and (location is not None):
+            pref['location'] = location
+
         config_object = cls(name=config_dict.get('name'),
                             description=config_dict.get('description'),
                             psi=config_dict['params'][0].get('psi'),
@@ -333,8 +354,7 @@ class BaseConfig:
                                 'media_outlet_urls'),
                             terms=config_dict['params'][0].get('search_terms'),
                             info=ConfigurationInfo.from_dict(config_dict),
-                            location=location,
                             date_time=date_time,
-                            cookie_pref=cookie_pref
+                            **pref
                             )
         return config_object
