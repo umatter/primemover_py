@@ -82,7 +82,7 @@ class Queue:
         else:
             raise TypeError('start_at must be of type datetime or a datetime in isoformat')
         if t.tzinfo is None or t.tzinfo.utcoffset(t) is None:
-            t = t.replace(tzinfo=self.LOCAL_TZ)
+            t = t.astimezone()
         self._start_at = t.isoformat()
         return
 

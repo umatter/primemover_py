@@ -655,3 +655,88 @@ The load procedure is identical to that in the first steps case.
 
 ```
 
+### New Queues
+Having created our crawlers, we can start sending them new Queues.
+This consists of three parts:
+1. Fetching the Crawlers
+2. Adding Queues locally
+3. Uploading to the API
+
+We therefore begin by downloading the crawlers. This is where the experiment ID comes in handy.
+```python
+from src_google.worker.classes import Crawler, Config
+from src.worker import s3_wrapper, Experiment
+from src_google.worker import tasks
+from src.worker.UpdateObject import *
+from src.worker.ReplaceProxies import update_all_proxies
+from src.worker.TimeHandler import Schedule, TimeHandler
+from datetime import datetime, timedelta
+import src.worker.api_wrapper as api
+import json
+import pathlib
+import os
+
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
+
+
+def single_update(date_time, experiment_id,api_token):
+    #Again we set the global schedule
+    TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
+                                           start_at=14 * 60 * 60,
+                                           end_at=(9 + 24) * 60 * 60)
+    # Fetch the experiment we created earlier
+    raw_experiment = api_wrapper.fetch_experiment(access_token=api_token, id=
+    experiment_id)
+    
+    # Create python objects from the json returned by the API
+    crawler_list = Crawler.from_list(raw_experiment['crawlers'],
+                                             date_time=date_time)
+```
+This gets us back to the exact same point that we were at when we added
+the browser leaks queues to the crawlers during the initial setup. As such, we can 
+simply add Queues at this point!
+
+```python
+    for crawler in crawler_list:
+        # create a queue and begin by accepting Googles cookie preferences
+        session_id = crawler.add_task(tasks.HandleCookiesGoogle, to_session=True)
+        #in the same browser session, conduct a 
+        session_id = crawler.add_task(tasks.SetGooglePreferences,
+                                         to_session=session_id,
+                                         params={'nr_results': 30, 'set_language': "English"})
+        if crawler.flag in {'left', 'right'} and \
+                crawler.configuration.usage_type in {'only_search', 'both',
+                                                        None}:
+            crawler.add_task(tasks.PoliticalSearch,
+                                to_session=session_id)
+            # individual.add_task(tasks.PoliticalSearch,
+            #                     to_session=session_id)
+        if crawler.flag in {'left', 'right'} and \
+                crawler.configuration.usage_type in {'only_direct', 'both',
+                                                        None}:
+            crawler.add_task(tasks.VisitMedia,
+                                to_session=session_id)
+            # individual.add_task(tasks.VisitMedia,
+            #                     to_session=session_id)
+
+        if crawler.configuration.usage_type in {'only_direct', 'both', None}:
+            crawler.add_task(tasks.VisitNeutralDirect,
+                                to_session=session_id)
+            crawler.add_task(tasks.VisitNeutralDirect,
+                                to_session=session_id)
+
+        crawler.add_task(tasks.NeutralGoogleSearch, to_session=session_id,
+                            params={'term': neutral[0]})
+
+    for crawler in crawler_list:
+        crawler.schedule = TimeHandler("US-CA-LOS_ANGELES",
+                                 interval=120,
+                                 wake_time=18 * 60 * 60,
+                                 bed_time=21 * 60 * 60,
+                                 date_time=date_time)
+        session_id = c.add_task(tasks.HandleCookiesGoogle,
+                                to_session=True)
+        c.add_task(tasks.NeutralGoogleSearch, to_session=session_id,
+                   params={'term': neutral[0]})
+
+```
