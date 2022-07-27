@@ -664,17 +664,13 @@ This consists of three parts:
 
 We therefore begin by downloading the crawlers. This is where the experiment ID comes in handy.
 ```python
-from src_google.worker.classes import Crawler, Config
-from src.worker import s3_wrapper, Experiment
-from src_google.worker import tasks
-from src.worker.UpdateObject import *
-from src.worker.ReplaceProxies import update_all_proxies
+from tutorial.code.more_complete_setup.worker.classes import Crawler
+from tutorial.code.more_complete_setup.worker import tasks
 from src.worker.TimeHandler import Schedule, TimeHandler
 from datetime import datetime, timedelta
-import src.worker.api_wrapper as api
+import src.worker.api_wrapper as api_wrapper
 import json
 import pathlib
-import os
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
@@ -697,46 +693,58 @@ the browser leaks queues to the crawlers during the initial setup. As such, we c
 simply add Queues at this point!
 
 ```python
-    for crawler in crawler_list:
-        # create a queue and begin by accepting Googles cookie preferences
-        session_id = crawler.add_task(tasks.HandleCookiesGoogle, to_session=True)
-        #in the same browser session, conduct a 
-        session_id = crawler.add_task(tasks.SetGooglePreferences,
-                                         to_session=session_id,
-                                         params={'nr_results': 30, 'set_language': "English"})
-        if crawler.flag in {'left', 'right'} and \
-                crawler.configuration.usage_type in {'only_search', 'both',
-                                                        None}:
-            crawler.add_task(tasks.PoliticalSearch,
-                                to_session=session_id)
-            # individual.add_task(tasks.PoliticalSearch,
-            #                     to_session=session_id)
-        if crawler.flag in {'left', 'right'} and \
-                crawler.configuration.usage_type in {'only_direct', 'both',
-                                                        None}:
-            crawler.add_task(tasks.VisitMedia,
-                                to_session=session_id)
-            # individual.add_task(tasks.VisitMedia,
-            #                     to_session=session_id)
+import tutorial.code.more_complete_setup.worker.tasks as tasks 
+for crawler in crawler_list:
+    # create a queue and begin by accepting Googles cookie preferences
+    session_id = crawler.add_task(tasks.HandleCookiesGoogle, to_session=True)
 
-        if crawler.configuration.usage_type in {'only_direct', 'both', None}:
-            crawler.add_task(tasks.VisitNeutralDirect,
-                                to_session=session_id)
-            crawler.add_task(tasks.VisitNeutralDirect,
-                                to_session=session_id)
+    if crawler.flag in {'left', 'right'} and \
+            crawler.configuration.usage_type != 'only_direct':
+        crawler.add_task(tasks.PoliticalSearch,
+                            to_session=session_id)
+    if crawler.flag in {'left', 'right'} and \
+            crawler.configuration.usage_type != 'only_search':
+        crawler.add_task(tasks.VisitMediaNoUtility,
+                            to_session=session_id)
 
-        crawler.add_task(tasks.NeutralGoogleSearch, to_session=session_id,
-                            params={'term': neutral[0]})
-
-    for crawler in crawler_list:
-        crawler.schedule = TimeHandler("US-CA-LOS_ANGELES",
-                                 interval=120,
-                                 wake_time=18 * 60 * 60,
-                                 bed_time=21 * 60 * 60,
-                                 date_time=date_time)
-        session_id = c.add_task(tasks.HandleCookiesGoogle,
-                                to_session=True)
-        c.add_task(tasks.NeutralGoogleSearch, to_session=session_id,
-                   params={'term': neutral[0]})
-
+    crawler.add_task(tasks.GoogleSearch, to_session=session_id,
+                        params={'term': 'Joe Biden'})
 ```
+As we did before, we can reset the start times of the queues we just generated. But let us increase
+time between queues to three minutes to give the runner more time to handle the tasks we assigned.
+```python
+t_0 = datetime.now() + timedelta(minutes=5)
+for crawler in crawler_list:
+    crawler.queues[0].start_at = t_0
+    t_0 + timedelta(minutes = 2, seconds=30)
+```
+The only thing left to do is sending the queues to the API. The process is identical to before. (Note, the option 
+"object_ids" determines if the IDs assigned by the API should be sent with objects below the crawler level.)
+```python
+with open(PRIMEMOVER_PATH + "/resources/updates/generated.json",
+          'w') as file:
+    json.dump(
+        [crawler.as_dict(object_ids=False) for crawler in crawler_list],
+        file,
+        indent='  ')
+        return_data = api_wrapper.push_new(access_token=api_token,
+                               path=f'{PRIMEMOVER_PATH}/resources/updates/generated.json')
+    # can only store return data if status code == 200
+    if return_data.status_code == 200:
+        with open(
+                f'{PRIMEMOVER_PATH}/resources/updates/{date_time.date().isoformat()}.json',
+                'w') as file:
+            json.dump(return_data.json(), file, indent='  ')
+```
+
+At this point we have created a new set of crawlers, and have the ability to assign them new queues. As in first steps we would
+also like to take a look at the results returned by the runner. As before, we begin by fetching the completed queues from the API.
+```python
+from src.base import Results
+Results.fetch_results(api_token=api_token)
+```
+This is not particularly useful, even if we filter out the crawlers that we are interested in,
+we need to identify the specific jobs we are interested in and parse the information from the
+reports stored in the s3 Bucket. Results.py is intended to handle this, but we will first need to extend the 
+methods that it uses to parse the results.
+

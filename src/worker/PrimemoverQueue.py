@@ -11,6 +11,7 @@ from datetime import datetime
 import time
 import pytz
 
+
 class Queue:
     """Base queue class
     Public Arguments:
@@ -22,8 +23,6 @@ class Queue:
         - delay_max: int, max wait time between appended queues in seconds
     """
     PASS_CRAWLER = False
-
-    LOCAL_TZ = pytz.timezone(time.tzname[0])
 
     def __init__(self,
                  start_at,
@@ -80,7 +79,8 @@ class Queue:
         elif type(val) is datetime:
             t = val
         else:
-            raise TypeError('start_at must be of type datetime or a datetime in isoformat')
+            raise TypeError(
+                'start_at must be of type datetime or a datetime in isoformat')
         if t.tzinfo is None or t.tzinfo.utcoffset(t) is None:
             t = t.astimezone()
         self._start_at = t.isoformat()

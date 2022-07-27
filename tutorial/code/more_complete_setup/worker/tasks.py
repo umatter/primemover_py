@@ -153,7 +153,7 @@ class VisitMediaNoUtility(VisitDirect):
 
     def __init__(self, crawler, start_at):
         media = crawler.configuration.media
-        url = r.choice(list(media.values()))
+        url = r.choice(media).get('url')
         super().__init__(outlet_url=url,
                          start_at=start_at)
 
