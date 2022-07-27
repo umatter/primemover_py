@@ -41,7 +41,7 @@ def single_update(date_time, experiment_id, api_token, send_queues=True):
     t_0 = datetime.now() + timedelta(minutes=5)
     for crawler in crawler_list:
         crawler.queues[0].start_at = t_0
-        t_0 + timedelta(minutes=2, seconds=30)
+        t_0 += timedelta(minutes=2, seconds=30)
 
     with open(PRIMEMOVER_PATH + "/resources/updates/generated.json",
               'w') as file:
@@ -51,6 +51,7 @@ def single_update(date_time, experiment_id, api_token, send_queues=True):
             indent='  ')
     if not send_queues:
         return f'queues have been generated at {PRIMEMOVER_PATH}/resources/updates/generated.json, but not sent'
+
     return_data = api_wrapper.push_new(access_token=api_token,
                                        path=f'{PRIMEMOVER_PATH}/resources/updates/generated.json')
     # can only store return data if status code == 200
@@ -69,4 +70,4 @@ if __name__ == "__main__":
         KEYS = json.load(f)
     key = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
                                  KEYS['PRIMEMOVER']['password'])
-    print(single_update(date_time =datetime.now(), experiment_id=49, api_token=key, send_queues=False))
+    print(single_update(date_time =datetime.now(), experiment_id=49, api_token=key, send_queues=True))

@@ -592,11 +592,11 @@ it uses different defaults and has the usage_type parameter.
 A single user does not make an experiment so let us generate 10 instead. In previous
 experiments we often generated bots in pairs of 5, 1 neutral (pi=0) 2 left (pi<0) and 2 right (pi>0)
 where the ones on the left had the exact opposite pi of those on the right. This time 
-let us place the bots in Oakland California "US-CA-OAKLAND" and New York "US-NY-NEW_YORK".
+let us place the bots in Oakland California "US-CA-OAKLAND" and New York "US-CA-OAKLAND".
 
 ```python
-GEO_SURF_PROXIES = ["US-CO-COLORADO_SPRINGS",
-                        "US-OK-OKLAHOMA_CITY"]
+GEO_SURF_PROXIES = ["US-CA-OAKLAND",
+                        "US-CA-OAKLAND"]
 # generate neutral configurations
 # Giving a configuration a name <Name>/<text> assigns the configuration the flag <text>. This can then be used for configuring or assigning
 # different tasks
@@ -634,7 +634,7 @@ a browser leaks queue and reset the time to a fixed interval between queues.
 t_0 = datetime.now() + timedelta(minutes=5)
 for crawler in crawler_list:
     crawler.queues[0].start_at = t_0
-    t_0 + timedelta(minutes = 2)
+    t_0 += timedelta(minutes = 2)
 ```
 The load procedure is identical to that in the first steps case.
 
@@ -716,7 +716,7 @@ time between queues to three minutes to give the runner more time to handle the 
 t_0 = datetime.now() + timedelta(minutes=5)
 for crawler in crawler_list:
     crawler.queues[0].start_at = t_0
-    t_0 + timedelta(minutes = 2, seconds=30)
+    t_0 += timedelta(minutes = 2, seconds=30)
 ```
 The only thing left to do is sending the queues to the API. The process is identical to before. (Note, the option 
 "object_ids" determines if the IDs assigned by the API should be sent with objects below the crawler level.)

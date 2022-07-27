@@ -13,6 +13,7 @@ from src.worker.Experiment import Experiment
 
 import json
 import pathlib
+import pdb
 
 PRIMEMOVER_PATH = str(
     pathlib.Path(__file__).parent.parent.parent.parent.parent.absolute())
@@ -34,7 +35,7 @@ def first_experiment(api_token, update_files=False, push=True):
         description='A first step towards using primemover_py',
         contact='you',
     )
-    if push:
+    if push :
         exp_return = api.new_experiment(api_token, exp.as_dict())
         exp_id = Experiment.from_dict(exp_return).id
     else:
@@ -46,8 +47,8 @@ def first_experiment(api_token, update_files=False, push=True):
                                            start_at=14 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
 
-    GEO_SURF_PROXIES = ["US-CO-COLORADO_SPRINGS",
-                        "US-OK-OKLAHOMA_CITY"]
+    GEO_SURF_PROXIES = ["US-CA-OAKLAND",
+                        "US-CA-OAKLAND"]
     # generate neutral configurations
     # Giving a configuration a name <Name>/<text> assigns the configuration the flag <text>. This can then be used for configuring or assigning
     # different tasks
@@ -81,7 +82,7 @@ def first_experiment(api_token, update_files=False, push=True):
     t_0 = datetime.now() + timedelta(minutes=5)
     for crawler in crawler_list:
         crawler.queues[0].start_at = t_0
-        t_0 + timedelta(minutes=2)
+        t_0 += timedelta(minutes=2)
 
     with open(
             PRIMEMOVER_PATH + "/resources/crawlers/more_complete_setup.json",
@@ -91,7 +92,8 @@ def first_experiment(api_token, update_files=False, push=True):
 
     if push:
         return_data = api.push_new(access_token=api_token,
-                                   path=PRIMEMOVER_PATH + "/resources/crawlers/experiment_first_steps.json")
+                                   path=PRIMEMOVER_PATH + "/resources/crawlers/more_complete_setup.json")
+
         data_as_dict = json.loads(return_data.text)
         with open(
                 f'{PRIMEMOVER_PATH}/resources/crawlers/more_complete_setup_{datetime.now().date().isoformat()}.json',
@@ -106,4 +108,4 @@ if __name__ == "__main__":
         KEYS = json.load(f)
     key = api.get_access(KEYS['PRIMEMOVER']['username'],
                          KEYS['PRIMEMOVER']['password'])
-    first_experiment(key, False, False)
+    first_experiment(key, False, True)

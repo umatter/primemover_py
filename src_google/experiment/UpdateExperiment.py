@@ -120,7 +120,7 @@ def single_update(date_time, experiment_id,api_token, manual=False, fixed_times=
         t_0 = datetime.now() + timedelta(minutes=1)
         print(t_0)
         delta_t_1 = int(delta_t_1)
-        for q in queues_1[0:]:
+        for q in queues_1:
             q.start_at = t_0.isoformat()
             t_0 += timedelta(seconds=delta_t_1)
 
@@ -131,7 +131,7 @@ def single_update(date_time, experiment_id,api_token, manual=False, fixed_times=
         t_0 += timedelta(minutes=5)
         print(t_0)
         delta_t_2 = int(delta_t_2)
-        for q in queues_2[0:]:
+        for q in queues_2:
             q.start_at = t_0.isoformat()
             t_0 += timedelta(seconds=delta_t_2)
 

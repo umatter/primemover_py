@@ -215,7 +215,7 @@ class SessionResult:
         return self._status_message
 
     @classmethod
-    def from_list(cls, result_list,api_token, set_reviewed=True,
+    def from_list(cls, result_list, api_token, set_reviewed=True,
                   parser_dict=Parser.ParserDict):
         session_results = [cls.from_dict(ind_session, parser_dict=parser_dict)
                            for ind_session in
@@ -281,13 +281,14 @@ def generate_summary(session_data):
     return failed_task_df, summary
 
 
-def process_results(set_reviewed=True, parser_dict=Parser.ParserDict,
+def process_results(api_token, set_reviewed=True, parser_dict=Parser.ParserDict,
                     path_end='', date=datetime.now().date(), process = None):
     path = f'{PRIMEMOVER_PATH}/resources/raw_data/{date.isoformat()}.json'
 
     with open(path, 'r') as file:
         raw_data = json.load(file)
     session_data = SessionResult.from_list(raw_data['data'],
+                                           api_token = api_token,
                                            set_reviewed=set_reviewed,
                                            parser_dict=parser_dict)
 

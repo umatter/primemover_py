@@ -117,6 +117,7 @@ def launch_experiment(api_token, proxy_credentials):
 
     exp_return = api.new_experiment(api_token, exp.as_dict())
     exp_id = Experiment.from_dict(exp_return).id
+
     TimeHandler.GLOBAL_SCHEDULE = Schedule(start_at=10 * 60 * 60,
                                            end_at=(10 + 23) * 60 * 60,
                                            interval=600,
