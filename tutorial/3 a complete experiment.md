@@ -9,4 +9,8 @@ Updating crawler preferences requires two components. First, we need to alter th
 and Config.update_config methods. Second we need to parse the reports that are relevant
 for any updating behavior and pass this to these functions.
 
-So, as before, we re-define the methods in the worker/classes file.
+So, as before, we re-define the methods in the "worker/classes" file.
+First the update method for the Config object.
+```python
+
+```
