@@ -434,6 +434,10 @@ To avoid loading issues, we briefly scroll to the bottom of the page and back up
                                      task=name,
                                      flag=self._search_type))  # Add Job to select a result randomly
 ```
+It is critical to use the flag parameter at some point in order to identify the job for parsing later! Having multiple jobs with
+the same flag will lead to both being parsed. This is not true for the single select job, as this job changes the assigned flag
+to "<decision_type>/<flag>". 
+
 Finally, if desired, we select a result and scroll through the page we are now on.
 The job SingleSelect_New will replace the old SingleSelect job in the upcoming version
 of the runner. It allows the use of the criteria extractor field to guide a decision process
@@ -746,5 +750,96 @@ Results.fetch_results(api_token=api_token)
 This is not particularly useful, even if we filter out the crawlers that we are interested in,
 we need to identify the specific jobs we are interested in and parse the information from the
 reports stored in the s3 Bucket. Results.py is intended to handle this, but we will first need to extend the 
-methods that it uses to parse the results.
+methods that it uses to parse the results. Checkout src/base/s3_parser.py to see what is already available.
+To create parsers for different jobs, we begin by importing the base_s3_parser module.
+```python
+from src.base.base_s3_parser import *
+```
+Let us build two different new Parsers of Google search results. The first will simply take a results page and return
+the rank, title, body and url of each search result along with the search term that led to this result.
+Any parser function will be passed three arguments.
+1. All behaviors of the job being parsed
+2. report data, which can be just the html or the dynamic report (what data to pass here, will be determined by the parser dict)
+3. job_id
 
+Even if the specific parser does not require three fields, they must exist to prevent an error.
+The base assumption of our parser will be that we are passed data from a task that has navigated 
+us to where we expect to be. We begin by establishing some baseline information. In particular,
+we confirm that the html from the report is not empty
+and check that there is no reference to captchas 
+
+```python
+def GoogleParser(behaviors, raw_html, job_id):
+    if raw_html is None:
+        return {'issue': 'unknown'}
+
+    if 'captcha' in str(raw_html):
+        print(f'Captcha: {job_id} ')
+        return {'issue': 'Captcha'}
+```
+Next we extract the aforementioned information we are interested in using beautiful soup.
+Note, there is a small tool in src.worker.utility to extract the domain from a URL.
+```python
+from bs4 import BeautifulSoup
+from src.worker.utilities import extract_domain
+def GoogleParser(behaviors, raw_html, job_id):
+    ...
+    soup = BeautifulSoup(raw_html, "html.parser")
+    results_in = soup.find_all(class_='g')
+    if len(results_in) == 0:
+        results_in = soup.find_all(class_='rc')
+    
+    parsed_data = []
+    for rank, result in enumerate(results_in):
+        try:
+            url = result.find('a').get('href')
+        except:
+            url = ''
+            print('URL is missing')
+        try:
+            domain = extract_domain(url)
+        except:
+            domain = ''
+    
+        try:
+            title = result.find('h3').text
+        except:
+            title = ''
+            # Title is missing
+        try:
+            body = result.find(class_='IsZvec').text
+        except:
+            # Body is missing
+            body = ''
+```
+Finally, all data gathered should be summarized in a single dictionary.
+```python
+    ...
+    parsed_data.append(
+            {'rank': rank, 'title': title, 'url': url,
+             'body': body,
+             'domain': domain})
+
+    return parsed_data
+```
+To tell the functions of the Results module to use this new parser, we add it to a parser dict. We have already imported the 
+base pareser dict which checks for browser leaks tasks and captchas. Let us add our new parser to this dict.
+The parser dict works by assigning a parser to a job if the flag matches. The google search tasks we built earlier assign
+flags twice. Once: <search_type> and once <selection_type>/<seach_type>. For the time being we want to use our
+parser for the scroll job which assigns <search_type>. This will therefore be the key for our dictionary entries.
+we pass two parameters:
+- method: the parser we just defined
+- data: the portion of the report the parser requires as its second argument. For our parser
+    this is 'html'
+```python
+ParserDict['google_search'] = {'method': GoogleParser, 'data': 'html'}
+ParserDict['political'] = {'method': GoogleParser,
+                           'data': 'html'}
+```
+After fetching our results as before, we can now run:
+```python
+from src.base import Results
+#import the parser dict we just updated
+from tutorial.code.more_complete_setup.worker.google_s3_parser import ParserDict
+Results.process_results(api_token=key,set_reviewed=False,parser_dict=ParserDict, path_end='parsed_')
+```

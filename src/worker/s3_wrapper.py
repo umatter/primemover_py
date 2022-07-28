@@ -29,7 +29,7 @@ CLIENT = boto3.client('s3',
                       )
 
 
-def fetch_report(job_id: int, task, job_type, report_type='dynamic'):
+def fetch_report(job_id: int,  job_type, task = 'NULL', report_type='dynamic'):
     """
     fetch job report from s3 bucket:
     """
@@ -40,9 +40,11 @@ def fetch_report(job_id: int, task, job_type, report_type='dynamic'):
     in_stream = io.BytesIO()
     try:
         if report_type == 'html':
-            file_path = f"finalsource/{report_type}_jobdata_{job_id}"
+            file_path = f"finalsource/page-finalsource-{job_type}-{task}-{job_id}"
+        elif report_type == 'static':
+            file_path = f"reports/static-jobdata-{job_type}-{task}-{job_id}"
         else:
-            file_path = f"reports/{report_type}_jobdata_{job_id}"
+            file_path = f"reports/dynamic_jobdata_{job_id}"
         CLIENT.download_fileobj("primemoverrunner",
                                 file_path,
                                 in_stream
@@ -57,8 +59,8 @@ def fetch_report(job_id: int, task, job_type, report_type='dynamic'):
     return in_stream, success
 
 
-def download_dynamic(job_id):
-    raw_data, success = fetch_report(job_id, 'dynamic')
+def download_dynamic(job_id, job_type, task):
+    raw_data, success = fetch_report(job_id, job_type, task, 'dynamic')
     if success:
         as_zipfile = zipfile.ZipFile(raw_data)
         name = None
@@ -70,6 +72,20 @@ def download_dynamic(job_id):
     else:
         raw_dict = {}
     return raw_dict, success
+
+
+def download_finalsource(job_id, job_type, task):
+    raw_data, success = fetch_report(job_id, job_type, task, 'html')
+    if success:
+        as_zipfile = zipfile.ZipFile(raw_data)
+        name = None
+        for name in as_zipfile.namelist():
+            if 'html' in name:
+                break
+        raw_html = as_zipfile.read(name)
+    else:
+        raw_html = ""
+    return raw_html, success
 
 
 def check_file(filename, bucket='primemoverpy'):

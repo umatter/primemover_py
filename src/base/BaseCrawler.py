@@ -390,21 +390,7 @@ class BaseCrawler:
         if update_location is not None:
             self.agent.location = update_location
             self.send_agent = True
-        results_valid = []
-        if results is not None:
-            relevant_results = results.get(str(self._crawler_info.crawler_id),
-                                           'skip')
-            if relevant_results == 'skip':
-                return self
-            results_selected = [result.get('data') for result in
-                                relevant_results]
 
-            results_selected = list(filter(None, results_selected))
-            for res in results_selected:
-                if res.get('pi') is not None:
-                    results_valid.append(res)
-
-        self.configuration.update_config(results_valid, update_location,
+        self.configuration.update_config(None, update_location,
                                          terms=terms)
-
         return self

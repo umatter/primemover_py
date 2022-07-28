@@ -8,7 +8,6 @@ import json
 from datetime import datetime
 import pathlib
 import src.worker.s3_wrapper as s3
-import zipfile
 import io
 import pandas as pd
 
@@ -79,35 +78,17 @@ class JobResult:
                                 'job_id': self.job_id}
             if type(raw_data) == io.BytesIO:
                 raw_data.close()
+
     def _download_full_report(self):
-        raw_data, success = s3.fetch_report(self.job_id, self.task, self.job_type, 'static')
+        raw_data, success = s3.fetch_report(self.job_id, self.job_type, self.task, 'static')
         return raw_data
 
     def _download_html(self):
-        raw_data, success = s3.fetch_report(self.job_id, self.task, self.job_type, 'html')
-        if success:
-            name = None
-            for name in as_zipfile.namelist():
-                if 'html' in name:
-                    break
-            raw_html = as_zipfile.read(name)
-        else:
-            raw_html = None
+        raw_html, success = s3.download_finalsource(self.job_id, self.job_type, self.task)
         return raw_html, success
 
     def _download_dynamic(self):
-
-        raw_data, success = s3.fetch_report(self.job_id, self.task, self.job_type, 'dynamic')
-        if success:
-            as_zipfile = zipfile.ZipFile(raw_data)
-            name = None
-            for name in as_zipfile.namelist():
-                if 'json' in name:
-                    break
-            raw_json = as_zipfile.read(name)
-            raw_dict = json.loads(raw_json)
-        else:
-            raw_dict = {}
+        raw_dict, success = s3.download_finalsource(self.job_id, self.job_type, self.task)
         return raw_dict, success
 
     def _extract_flags(self):
