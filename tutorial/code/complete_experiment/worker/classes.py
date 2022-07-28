@@ -208,6 +208,45 @@ class Config(BaseConfig):
         else:
             raise ValueError('Not a valid value for usage_type')
 
+    def update_config(self, results, new_location, terms=True):
+
+        """
+        Update self according to results
+        """
+        if self.info is not None:
+            self.history.pull_existing()
+
+        if new_location is not None:
+            self.location = new_location
+        kappa_j_t = self.kappa
+        if results is not None and len(results) > 0:
+            pi_0 = self.pi
+            for outlet in results:
+                if 2 == self.kappa:
+                    if not outlet['known']:
+                        kappa_j_t = 1
+                    else:
+                        kappa_j_t = 0
+
+                self.pi = preferences.political_orientation_pi_i_t(
+                    psi_i=self.psi, kappa_j_t_prev=kappa_j_t,
+                    pi_tilde_j_prev=outlet['pi'], pi_i_prev=self.pi)
+
+            self.media = self.CONFIGURATION_FUNCTIONS.update_media_outlets(
+                outlets=self.media + results, alpha_tilde=self.alpha,
+                pi=self.pi,
+                tau_tilde_ij=self.tau, k=10)
+            if terms and pi_0 != self.pi:
+                self.terms = self.CONFIGURATION_FUNCTIONS.SelectSearchTerms(
+                    pi=self.pi,
+                    alpha_hat=self.alpha,
+                    tau_hat_ik=self.tau,
+                    k=40)
+
+        self.history.update_current_status()
+        self.history.push()
+
+
     def as_dict(self, send_info=False):
         base_dict = super().as_dict(send_info)
         usage_type_preference = {
@@ -262,3 +301,32 @@ class Crawler(BaseCrawler):
                                          date_time=self._date_time)
         else:
             self._schedule = val
+
+    def update_crawler(self, results=None, proxy_update=None, terms=True):
+        update_location = None
+        if proxy_update is not None:
+            update_location = self.proxy.update_proxy(proxy_update)
+            if update_location == 'not updated':
+                update_location = None
+
+        if update_location is not None:
+            self.agent.location = update_location
+            self.send_agent = True
+
+        results_valid = []
+        if results is not None:
+            relevant_results = results.get(str(self._crawler_info.crawler_id),
+                                           'skip')
+            if relevant_results == 'skip':
+                return self
+            results_selected = [result.get('data') for result in
+                                relevant_results]
+
+            results_selected = list(filter(None, results_selected))
+            for res in results_selected:
+                if res.get('pi') is not None:
+                    results_valid.append(res)
+
+        self.configuration.update_config(results_valid, update_location,
+                                         terms=terms)
+        return self

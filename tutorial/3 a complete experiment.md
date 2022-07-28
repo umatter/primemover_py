@@ -5,37 +5,8 @@ automated updates to crawlers and the automation of all processes.
 We begin with the setup from the previous section "a more complete setup" and extend it.
 
 ### Updating
-The crawler and configuration object have update methods. By default, the method BaseCrawler.update_crawler
-expects a dictionary as displayed below and will pass any information in 'data' to the configuration objects update
-function.
-```json
-{
-  "1610": [
-    {
-      "finished_at": null,
-      "status_code": null,
-      "status_message": null,
-      "flag": "CALCULATED/neutral",
-      "data": null,
-      "job_id": 1553033
-    },
-    {
-      "finished_at": null,
-      "status_code": null,
-      "status_message": null,
-      "flag": "CALCULATED/neutral",
-      "data": null,
-      "job_id": 1553040
-    }
-  ],
-  "1611": [
-    {
-      "finished_at": null,
-      "status_code": null,
-      "status_message": null,
-      "flag": "CALCULATED/neutral",
-      "data": null,
-      "job_id": 1553095
-    }
-  ]}
-```
+Updating crawler preferences requires two components. First, we need to alter the Crawler.update_crawler 
+and Config.update_config methods. Second we need to parse the reports that are relevant
+for any updating behavior and pass this to these functions.
+
+So, as before, we re-define the methods in the worker/classes file.
