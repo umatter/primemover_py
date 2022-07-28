@@ -1,0 +1,1988 @@
+[
+  {
+    "name": "Crawler_0/neutral",
+    "description": "Crawler created through py",
+    "active": 1,
+    "testing": 0,
+    "configuration": [
+      {
+        "name": "CONFIGURATION_FUNCTIONSl",
+        "description": null,
+        "params": [
+          {
+            "pi": 0.0,
+            "psi": 0.18392306391243107,
+            "alpha": 0.25009402138683323,
+            "tau": 1,
+            "kappa": 0,
+            "beta": 0.4892996797604465,
+            "search_terms": [],
+            "media_outlet_urls": []
+          }
+        ],
+        "preferences": [
+          {
+            "name": "location",
+            "value": "US-CO-COLORADO_SPRINGS"
+          },
+          {
+            "name": "cookie_pref",
+            "value": "{\"accept_all\": true}"
+          },
+          {
+            "name": "flag",
+            "value": "neutral"
+          },
+          {
+            "name": "usage_type",
+            "value": "both"
+          }
+        ]
+      }
+    ],
+    "proxy": [
+      {
+        "name": "Proxy_0/neutral",
+        "description": "Proxy",
+        "type": "GEOSURF",
+        "hostname": "state.geosurf.io",
+        "port": 8000,
+        "username": "167462",
+        "password": "$SyntheticUsersLimbo2022"
+      }
+    ],
+    "experiment_id": 49,
+    "agent": [
+      {
+        "name": "Agent_0/neutral",
+        "description": "This is the agent",
+        "location": "US-CO-COLORADO_SPRINGS",
+        "identification": "MultiLogin",
+        "multilogin_id": null,
+        "multilogin_profile": {
+          "name": "%%AGENTID%%",
+          "os": "win",
+          "browser": "mimic",
+          "network": {
+            "proxy": {
+              "type": "%%PROXYTYPE%%",
+              "host": "%%PROXYHOST%%",
+              "port": "%%PROXYPORT%%",
+              "username": "%%PROXYUSERNAME%%",
+              "password": "%%PROXYPASSWORD%%"
+            },
+            "dns": []
+          },
+          "navigator": {
+            "language": "en-US,en;q=0.5",
+            "doNotTrack": 0
+          },
+          "geolocation": {
+            "mode": "ALLOW",
+            "fillBasedOnExternalIp": true
+          },
+          "canvas": {
+            "mode": "NOISE"
+          },
+          "storage": {
+            "local": true
+          }
+        }
+      }
+    ],
+    "queues": [
+      {
+        "name": "GoogleSearch",
+        "description": "Open Google, enter a search query and select a result.",
+        "start_at": "2022-07-26T16:31:34.307319+01:00",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.google.com",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "https://www.google.com"
+              }
+            ]
+          },
+          {
+            "name": "Enter Text",
+            "type": "entertextfieldjob",
+            "description": "Enter text into the defined field",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "text",
+                "description": "Text to enter",
+                "value": "Watts Occurring?"
+              },
+              {
+                "name": "selectionType",
+                "description": "Type of selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "//input[@name='q']"
+              },
+              {
+                "name": "appendReturn",
+                "description": "Optional field: appends a return key after the text given if true.",
+                "value": true
+              },
+              {
+                "name": "typingMode",
+                "description": "Optional field: How the text is entered into the field",
+                "value": "SIMULATED_FIXINGTYPOS"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "length",
+                "description": "Scroll 100.0 of window.",
+                "value": 100.0
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll up",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "length",
+                "description": "Scroll 100.0 of window.",
+                "value": 100.0
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll up",
+                "value": "UP"
+              }
+            ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "clickSelectionType",
+                "description": "Type of click selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "clickSelector",
+                "description": " click selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "decisionType",
+                "description": "Decision type for choosing an item out of the list given by the selector is CALCULATED",
+                "value": "CALCULATED"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "CALCULATED/google_search"
+              },
+              {
+                "name": "task",
+                "description": "This job is part of the task CALCULATED/GoogleSearch ",
+                "value": "CALCULATED/GoogleSearch"
+              },
+              {
+                "name": "criteriaExtractor",
+                "description": "Criteria extractor.",
+                "value": "^(?:https?\\:\\/\\/)?(?:www.)?([^\\/?#]+)(?:[\\/?#]|$)"
+              },
+              {
+                "name": "criteriaSelectionType",
+                "description": "Type of criteria selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "criteriaSelector",
+                "description": " criteria selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "criteriaBase",
+                "description": "Criteria base.",
+                "value": "ATR_href"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "scrollDuration",
+                "description": "Scroll for 5 seconds.",
+                "value": 5
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Crawler_1/neutral",
+    "description": "Crawler created through py",
+    "active": 1,
+    "testing": 0,
+    "configuration": [
+      {
+        "name": "CONFIGURATION_FUNCTIONSl",
+        "description": null,
+        "params": [
+          {
+            "pi": 0.0,
+            "psi": 0.025486107644841896,
+            "alpha": 0.36741645732262496,
+            "tau": 1,
+            "kappa": 1,
+            "beta": 8.710622859064987e-05,
+            "search_terms": [],
+            "media_outlet_urls": []
+          }
+        ],
+        "preferences": [
+          {
+            "name": "location",
+            "value": "US-OK-OKLAHOMA_CITY"
+          },
+          {
+            "name": "cookie_pref",
+            "value": "{\"accept_all\": true}"
+          },
+          {
+            "name": "flag",
+            "value": "neutral"
+          },
+          {
+            "name": "usage_type",
+            "value": "both"
+          }
+        ]
+      }
+    ],
+    "proxy": [
+      {
+        "name": "Proxy_1/neutral",
+        "description": "Proxy",
+        "type": "GEOSURF",
+        "hostname": "state.geosurf.io",
+        "port": 8000,
+        "username": "167462",
+        "password": "$SyntheticUsersLimbo2022"
+      }
+    ],
+    "experiment_id": 49,
+    "agent": [
+      {
+        "name": "Agent_1/neutral",
+        "description": "This is the agent",
+        "location": "US-OK-OKLAHOMA_CITY",
+        "identification": "MultiLogin",
+        "multilogin_id": null,
+        "multilogin_profile": {
+          "name": "%%AGENTID%%",
+          "os": "win",
+          "browser": "mimic",
+          "network": {
+            "proxy": {
+              "type": "%%PROXYTYPE%%",
+              "host": "%%PROXYHOST%%",
+              "port": "%%PROXYPORT%%",
+              "username": "%%PROXYUSERNAME%%",
+              "password": "%%PROXYPASSWORD%%"
+            },
+            "dns": []
+          },
+          "navigator": {
+            "language": "en-US,en;q=0.5",
+            "doNotTrack": 0
+          },
+          "geolocation": {
+            "mode": "BLOCK"
+          },
+          "canvas": {
+            "mode": "NOISE"
+          },
+          "storage": {
+            "local": true
+          }
+        }
+      }
+    ],
+    "queues": [
+      {
+        "name": "GoogleSearch",
+        "description": "Open Google, enter a search query and select a result.",
+        "start_at": "2022-07-26T16:23:34.307319+01:00",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.google.com",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "https://www.google.com"
+              }
+            ]
+          },
+          {
+            "name": "Enter Text",
+            "type": "entertextfieldjob",
+            "description": "Enter text into the defined field",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "text",
+                "description": "Text to enter",
+                "value": "Watts Occurring?"
+              },
+              {
+                "name": "selectionType",
+                "description": "Type of selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "//input[@name='q']"
+              },
+              {
+                "name": "appendReturn",
+                "description": "Optional field: appends a return key after the text given if true.",
+                "value": true
+              },
+              {
+                "name": "typingMode",
+                "description": "Optional field: How the text is entered into the field",
+                "value": "SIMULATED_FIXINGTYPOS"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "length",
+                "description": "Scroll 100.0 of window.",
+                "value": 100.0
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll up",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "length",
+                "description": "Scroll 100.0 of window.",
+                "value": 100.0
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll up",
+                "value": "UP"
+              }
+            ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "clickSelectionType",
+                "description": "Type of click selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "clickSelector",
+                "description": " click selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "decisionType",
+                "description": "Decision type for choosing an item out of the list given by the selector is CALCULATED",
+                "value": "CALCULATED"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "CALCULATED/google_search"
+              },
+              {
+                "name": "task",
+                "description": "This job is part of the task CALCULATED/GoogleSearch ",
+                "value": "CALCULATED/GoogleSearch"
+              },
+              {
+                "name": "criteriaExtractor",
+                "description": "Criteria extractor.",
+                "value": "^(?:https?\\:\\/\\/)?(?:www.)?([^\\/?#]+)(?:[\\/?#]|$)"
+              },
+              {
+                "name": "criteriaSelectionType",
+                "description": "Type of criteria selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "criteriaSelector",
+                "description": " criteria selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "criteriaBase",
+                "description": "Criteria base.",
+                "value": "ATR_href"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "scrollDuration",
+                "description": "Scroll for 5 seconds.",
+                "value": 5
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Crawler_2/left",
+    "description": "Crawler created through py",
+    "active": 1,
+    "testing": 0,
+    "configuration": [
+      {
+        "name": "CONFIGURATION_FUNCTIONS/left",
+        "description": null,
+        "params": [
+          {
+            "pi": -0.4926628084309783,
+            "psi": 0.1406646474994806,
+            "alpha": 0.44770858675178593,
+            "tau": 1,
+            "kappa": 1,
+            "beta": 0.02661654378513012,
+            "search_terms": [
+              {
+                "term": "unemployment benefits",
+                "pi": -0.493792702495255
+              },
+              {
+                "term": "enrollment period",
+                "pi": -0.316088351310242
+              }
+            ],
+            "media_outlet_urls": [
+              {
+                "domain": "nytimes.com",
+                "url": "https://www.nytimes.com/",
+                "pi": -0.281331780156041
+              },
+              {
+                "domain": "detroit.cbslocal.com",
+                "url": "https://detroit.cbslocal.com/",
+                "pi": 0.182046335668375
+              }
+            ]
+          }
+        ],
+        "preferences": [
+          {
+            "name": "location",
+            "value": "US-CO-COLORADO_SPRINGS"
+          },
+          {
+            "name": "cookie_pref",
+            "value": "{\"accept_all\": true}"
+          },
+          {
+            "name": "flag",
+            "value": "left"
+          },
+          {
+            "name": "usage_type",
+            "value": "both"
+          }
+        ]
+      }
+    ],
+    "proxy": [
+      {
+        "name": "Proxy_2/left",
+        "description": "Proxy",
+        "type": "GEOSURF",
+        "hostname": "state.geosurf.io",
+        "port": 8000,
+        "username": "167462",
+        "password": "$SyntheticUsersLimbo2022"
+      }
+    ],
+    "experiment_id": 49,
+    "agent": [
+      {
+        "name": "Agent_2/left",
+        "description": "This is the agent",
+        "location": "US-CO-COLORADO_SPRINGS",
+        "identification": "MultiLogin",
+        "multilogin_id": null,
+        "multilogin_profile": {
+          "name": "%%AGENTID%%",
+          "os": "win",
+          "browser": "mimic",
+          "network": {
+            "proxy": {
+              "type": "%%PROXYTYPE%%",
+              "host": "%%PROXYHOST%%",
+              "port": "%%PROXYPORT%%",
+              "username": "%%PROXYUSERNAME%%",
+              "password": "%%PROXYPASSWORD%%"
+            },
+            "dns": []
+          },
+          "navigator": {
+            "language": "en-US,en;q=0.5",
+            "doNotTrack": 0
+          },
+          "geolocation": {
+            "mode": "ALLOW",
+            "fillBasedOnExternalIp": true
+          },
+          "canvas": {
+            "mode": "NOISE"
+          },
+          "storage": {
+            "local": true
+          }
+        }
+      }
+    ],
+    "queues": [
+      {
+        "name": "GoogleSearch",
+        "description": "Open Google, enter a search query and select a result.",
+        "start_at": "2022-07-26T16:25:34.307319+01:00",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.google.com",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "https://www.google.com"
+              }
+            ]
+          },
+          {
+            "name": "Enter Text",
+            "type": "entertextfieldjob",
+            "description": "Enter text into the defined field",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "text",
+                "description": "Text to enter",
+                "value": "Watts Occurring?"
+              },
+              {
+                "name": "selectionType",
+                "description": "Type of selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "//input[@name='q']"
+              },
+              {
+                "name": "appendReturn",
+                "description": "Optional field: appends a return key after the text given if true.",
+                "value": true
+              },
+              {
+                "name": "typingMode",
+                "description": "Optional field: How the text is entered into the field",
+                "value": "SIMULATED_FIXINGTYPOS"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "length",
+                "description": "Scroll 100.0 of window.",
+                "value": 100.0
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll up",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "length",
+                "description": "Scroll 100.0 of window.",
+                "value": 100.0
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll up",
+                "value": "UP"
+              }
+            ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "clickSelectionType",
+                "description": "Type of click selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "clickSelector",
+                "description": " click selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "decisionType",
+                "description": "Decision type for choosing an item out of the list given by the selector is CALCULATED",
+                "value": "CALCULATED"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "CALCULATED/google_search"
+              },
+              {
+                "name": "task",
+                "description": "This job is part of the task CALCULATED/GoogleSearch ",
+                "value": "CALCULATED/GoogleSearch"
+              },
+              {
+                "name": "criteriaExtractor",
+                "description": "Criteria extractor.",
+                "value": "^(?:https?\\:\\/\\/)?(?:www.)?([^\\/?#]+)(?:[\\/?#]|$)"
+              },
+              {
+                "name": "criteriaSelectionType",
+                "description": "Type of criteria selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "criteriaSelector",
+                "description": " criteria selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "criteriaBase",
+                "description": "Criteria base.",
+                "value": "ATR_href"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "scrollDuration",
+                "description": "Scroll for 5 seconds.",
+                "value": 5
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Crawler_3/left",
+    "description": "Crawler created through py",
+    "active": 1,
+    "testing": 0,
+    "configuration": [
+      {
+        "name": "CONFIGURATION_FUNCTIONS/left",
+        "description": null,
+        "params": [
+          {
+            "pi": -0.6962743421541093,
+            "psi": 0.181827402844288,
+            "alpha": 0.4869250303588137,
+            "tau": 1,
+            "kappa": 1,
+            "beta": 0.30249661313480636,
+            "search_terms": [
+              {
+                "term": "access health",
+                "pi": -0.685242574163867
+              },
+              {
+                "term": "student loan",
+                "pi": -0.444593451271154
+              }
+            ],
+            "media_outlet_urls": [
+              {
+                "domain": "news.yahoo.com",
+                "url": "https://news.yahoo.com/",
+                "pi": 0.0208535444250573
+              },
+              {
+                "domain": "philadelphia.cbslocal.com",
+                "url": "https://philadelphia.cbslocal.com/",
+                "pi": -0.0736923470967024
+              }
+            ]
+          }
+        ],
+        "preferences": [
+          {
+            "name": "location",
+            "value": "US-OK-OKLAHOMA_CITY"
+          },
+          {
+            "name": "cookie_pref",
+            "value": "{\"accept_all\": true}"
+          },
+          {
+            "name": "flag",
+            "value": "left"
+          },
+          {
+            "name": "usage_type",
+            "value": "both"
+          }
+        ]
+      }
+    ],
+    "proxy": [
+      {
+        "name": "Proxy_3/left",
+        "description": "Proxy",
+        "type": "GEOSURF",
+        "hostname": "state.geosurf.io",
+        "port": 8000,
+        "username": "167462",
+        "password": "$SyntheticUsersLimbo2022"
+      }
+    ],
+    "experiment_id": 49,
+    "agent": [
+      {
+        "name": "Agent_3/left",
+        "description": "This is the agent",
+        "location": "US-OK-OKLAHOMA_CITY",
+        "identification": "MultiLogin",
+        "multilogin_id": null,
+        "multilogin_profile": {
+          "name": "%%AGENTID%%",
+          "os": "win",
+          "browser": "mimic",
+          "network": {
+            "proxy": {
+              "type": "%%PROXYTYPE%%",
+              "host": "%%PROXYHOST%%",
+              "port": "%%PROXYPORT%%",
+              "username": "%%PROXYUSERNAME%%",
+              "password": "%%PROXYPASSWORD%%"
+            },
+            "dns": []
+          },
+          "navigator": {
+            "language": "en-US,en;q=0.5",
+            "doNotTrack": 0
+          },
+          "geolocation": {
+            "mode": "ALLOW",
+            "fillBasedOnExternalIp": true
+          },
+          "canvas": {
+            "mode": "NOISE"
+          },
+          "storage": {
+            "local": true
+          }
+        }
+      }
+    ],
+    "queues": [
+      {
+        "name": "GoogleSearch",
+        "description": "Open Google, enter a search query and select a result.",
+        "start_at": "2022-07-26T16:27:34.307319+01:00",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.google.com",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "https://www.google.com"
+              }
+            ]
+          },
+          {
+            "name": "Enter Text",
+            "type": "entertextfieldjob",
+            "description": "Enter text into the defined field",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "text",
+                "description": "Text to enter",
+                "value": "Watts Occurring?"
+              },
+              {
+                "name": "selectionType",
+                "description": "Type of selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "//input[@name='q']"
+              },
+              {
+                "name": "appendReturn",
+                "description": "Optional field: appends a return key after the text given if true.",
+                "value": true
+              },
+              {
+                "name": "typingMode",
+                "description": "Optional field: How the text is entered into the field",
+                "value": "SIMULATED_FIXINGTYPOS"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "length",
+                "description": "Scroll 100.0 of window.",
+                "value": 100.0
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll up",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "length",
+                "description": "Scroll 100.0 of window.",
+                "value": 100.0
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll up",
+                "value": "UP"
+              }
+            ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "clickSelectionType",
+                "description": "Type of click selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "clickSelector",
+                "description": " click selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "decisionType",
+                "description": "Decision type for choosing an item out of the list given by the selector is CALCULATED",
+                "value": "CALCULATED"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "CALCULATED/google_search"
+              },
+              {
+                "name": "task",
+                "description": "This job is part of the task CALCULATED/GoogleSearch ",
+                "value": "CALCULATED/GoogleSearch"
+              },
+              {
+                "name": "criteriaExtractor",
+                "description": "Criteria extractor.",
+                "value": "^(?:https?\\:\\/\\/)?(?:www.)?([^\\/?#]+)(?:[\\/?#]|$)"
+              },
+              {
+                "name": "criteriaSelectionType",
+                "description": "Type of criteria selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "criteriaSelector",
+                "description": " criteria selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "criteriaBase",
+                "description": "Criteria base.",
+                "value": "ATR_href"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "scrollDuration",
+                "description": "Scroll for 5 seconds.",
+                "value": 5
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Crawler_4/right",
+    "description": "Crawler created through py",
+    "active": 1,
+    "testing": 0,
+    "configuration": [
+      {
+        "name": "CONFIGURATION_FUNCTIONS/right",
+        "description": null,
+        "params": [
+          {
+            "pi": 0.4926628084309783,
+            "psi": 0.020149638691381578,
+            "alpha": 0.21423373699152998,
+            "tau": 1,
+            "kappa": 2,
+            "beta": 0.3916102226557369,
+            "search_terms": [
+              {
+                "term": "free of speech",
+                "pi": 0.467408943993915
+              },
+              {
+                "term": "supported president",
+                "pi": 0.511082608549518
+              }
+            ],
+            "media_outlet_urls": [
+              {
+                "domain": "finance.yahoo.com",
+                "url": "https://finance.yahoo.com/",
+                "pi": 0.183181386955726
+              },
+              {
+                "domain": "iheart.com",
+                "url": "https://www.iheart.com/podcast/",
+                "pi": 0.228520178440562
+              }
+            ]
+          }
+        ],
+        "preferences": [
+          {
+            "name": "location",
+            "value": "US-CO-COLORADO_SPRINGS"
+          },
+          {
+            "name": "cookie_pref",
+            "value": "{\"accept_all\": true}"
+          },
+          {
+            "name": "flag",
+            "value": "right"
+          },
+          {
+            "name": "usage_type",
+            "value": "only_search"
+          }
+        ]
+      }
+    ],
+    "proxy": [
+      {
+        "name": "Proxy_4/right",
+        "description": "Proxy",
+        "type": "GEOSURF",
+        "hostname": "state.geosurf.io",
+        "port": 8000,
+        "username": "167462",
+        "password": "$SyntheticUsersLimbo2022"
+      }
+    ],
+    "experiment_id": 49,
+    "agent": [
+      {
+        "name": "Agent_4/right",
+        "description": "This is the agent",
+        "location": "US-CO-COLORADO_SPRINGS",
+        "identification": "MultiLogin",
+        "multilogin_id": null,
+        "multilogin_profile": {
+          "name": "%%AGENTID%%",
+          "os": "win",
+          "browser": "mimic",
+          "network": {
+            "proxy": {
+              "type": "%%PROXYTYPE%%",
+              "host": "%%PROXYHOST%%",
+              "port": "%%PROXYPORT%%",
+              "username": "%%PROXYUSERNAME%%",
+              "password": "%%PROXYPASSWORD%%"
+            },
+            "dns": []
+          },
+          "navigator": {
+            "language": "en-US,en;q=0.5",
+            "doNotTrack": 0
+          },
+          "geolocation": {
+            "mode": "ALLOW",
+            "fillBasedOnExternalIp": true
+          },
+          "canvas": {
+            "mode": "NOISE"
+          },
+          "storage": {
+            "local": true
+          }
+        }
+      }
+    ],
+    "queues": [
+      {
+        "name": "GoogleSearch",
+        "description": "Open Google, enter a search query and select a result.",
+        "start_at": "2022-07-26T16:33:34.307319+01:00",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.google.com",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "https://www.google.com"
+              }
+            ]
+          },
+          {
+            "name": "Enter Text",
+            "type": "entertextfieldjob",
+            "description": "Enter text into the defined field",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "text",
+                "description": "Text to enter",
+                "value": "Watts Occurring?"
+              },
+              {
+                "name": "selectionType",
+                "description": "Type of selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "//input[@name='q']"
+              },
+              {
+                "name": "appendReturn",
+                "description": "Optional field: appends a return key after the text given if true.",
+                "value": true
+              },
+              {
+                "name": "typingMode",
+                "description": "Optional field: How the text is entered into the field",
+                "value": "SIMULATED_FIXINGTYPOS"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "length",
+                "description": "Scroll 100.0 of window.",
+                "value": 100.0
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll up",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "length",
+                "description": "Scroll 100.0 of window.",
+                "value": 100.0
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll up",
+                "value": "UP"
+              }
+            ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "clickSelectionType",
+                "description": "Type of click selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "clickSelector",
+                "description": " click selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "decisionType",
+                "description": "Decision type for choosing an item out of the list given by the selector is CALCULATED",
+                "value": "CALCULATED"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "CALCULATED/google_search"
+              },
+              {
+                "name": "task",
+                "description": "This job is part of the task CALCULATED/GoogleSearch ",
+                "value": "CALCULATED/GoogleSearch"
+              },
+              {
+                "name": "criteriaExtractor",
+                "description": "Criteria extractor.",
+                "value": "^(?:https?\\:\\/\\/)?(?:www.)?([^\\/?#]+)(?:[\\/?#]|$)"
+              },
+              {
+                "name": "criteriaSelectionType",
+                "description": "Type of criteria selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "criteriaSelector",
+                "description": " criteria selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "criteriaBase",
+                "description": "Criteria base.",
+                "value": "ATR_href"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "scrollDuration",
+                "description": "Scroll for 5 seconds.",
+                "value": 5
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Crawler_5/right",
+    "description": "Crawler created through py",
+    "active": 1,
+    "testing": 0,
+    "configuration": [
+      {
+        "name": "CONFIGURATION_FUNCTIONS/right",
+        "description": null,
+        "params": [
+          {
+            "pi": 0.6962743421541093,
+            "psi": 0.03907118817242723,
+            "alpha": 0.4424594414764932,
+            "tau": 1,
+            "kappa": 2,
+            "beta": 0.2119389912609051,
+            "search_terms": [
+              {
+                "term": "record low temperature",
+                "pi": 0.756467116116939
+              },
+              {
+                "term": "border security",
+                "pi": 0.565166545427275
+              }
+            ],
+            "media_outlet_urls": [
+              {
+                "domain": "finance.yahoo.com",
+                "url": "https://finance.yahoo.com/",
+                "pi": 0.183181386955726
+              },
+              {
+                "domain": "tennessean.com",
+                "url": "https://www.tennessean.com/",
+                "pi": 0.0505473573016102
+              }
+            ]
+          }
+        ],
+        "preferences": [
+          {
+            "name": "location",
+            "value": "US-OK-OKLAHOMA_CITY"
+          },
+          {
+            "name": "cookie_pref",
+            "value": "{\"accept_all\": true}"
+          },
+          {
+            "name": "flag",
+            "value": "right"
+          },
+          {
+            "name": "usage_type",
+            "value": "both"
+          }
+        ]
+      }
+    ],
+    "proxy": [
+      {
+        "name": "Proxy_5/right",
+        "description": "Proxy",
+        "type": "GEOSURF",
+        "hostname": "state.geosurf.io",
+        "port": 8000,
+        "username": "167462",
+        "password": "$SyntheticUsersLimbo2022"
+      }
+    ],
+    "experiment_id": 49,
+    "agent": [
+      {
+        "name": "Agent_5/right",
+        "description": "This is the agent",
+        "location": "US-OK-OKLAHOMA_CITY",
+        "identification": "MultiLogin",
+        "multilogin_id": null,
+        "multilogin_profile": {
+          "name": "%%AGENTID%%",
+          "os": "win",
+          "browser": "mimic",
+          "network": {
+            "proxy": {
+              "type": "%%PROXYTYPE%%",
+              "host": "%%PROXYHOST%%",
+              "port": "%%PROXYPORT%%",
+              "username": "%%PROXYUSERNAME%%",
+              "password": "%%PROXYPASSWORD%%"
+            },
+            "dns": []
+          },
+          "navigator": {
+            "language": "en-US,en;q=0.5",
+            "doNotTrack": 0
+          },
+          "geolocation": {
+            "mode": "BLOCK"
+          },
+          "canvas": {
+            "mode": "NOISE"
+          },
+          "storage": {
+            "local": true
+          }
+        }
+      }
+    ],
+    "queues": [
+      {
+        "name": "GoogleSearch",
+        "description": "Open Google, enter a search query and select a result.",
+        "start_at": "2022-07-26T16:29:34.307319+01:00",
+        "jobs": [
+          {
+            "name": "Visit",
+            "type": "visitjob",
+            "description": "Visit https://www.google.com",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "url",
+                "description": "URL",
+                "value": "https://www.google.com"
+              }
+            ]
+          },
+          {
+            "name": "Enter Text",
+            "type": "entertextfieldjob",
+            "description": "Enter text into the defined field",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "text",
+                "description": "Text to enter",
+                "value": "Watts Occurring?"
+              },
+              {
+                "name": "selectionType",
+                "description": "Type of selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "selector",
+                "description": " selector",
+                "value": "//input[@name='q']"
+              },
+              {
+                "name": "appendReturn",
+                "description": "Optional field: appends a return key after the text given if true.",
+                "value": true
+              },
+              {
+                "name": "typingMode",
+                "description": "Optional field: How the text is entered into the field",
+                "value": "SIMULATED_FIXINGTYPOS"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "length",
+                "description": "Scroll 100.0 of window.",
+                "value": 100.0
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by length",
+            "type": "scrollbylengthjob",
+            "description": "Scroll up",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "length",
+                "description": "Scroll 100.0 of window.",
+                "value": 100.0
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll up",
+                "value": "UP"
+              }
+            ]
+          },
+          {
+            "name": "Select",
+            "type": "singleselecturljob",
+            "description": "Select an item and click",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "google_search"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "clickSelectionType",
+                "description": "Type of click selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "clickSelector",
+                "description": " click selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "decisionType",
+                "description": "Decision type for choosing an item out of the list given by the selector is CALCULATED",
+                "value": "CALCULATED"
+              },
+              {
+                "name": "flag",
+                "description": "",
+                "value": "CALCULATED/google_search"
+              },
+              {
+                "name": "task",
+                "description": "This job is part of the task CALCULATED/GoogleSearch ",
+                "value": "CALCULATED/GoogleSearch"
+              },
+              {
+                "name": "criteriaExtractor",
+                "description": "Criteria extractor.",
+                "value": "^(?:https?\\:\\/\\/)?(?:www.)?([^\\/?#]+)(?:[\\/?#]|$)"
+              },
+              {
+                "name": "criteriaSelectionType",
+                "description": "Type of criteria selection",
+                "value": "XPATH"
+              },
+              {
+                "name": "criteriaSelector",
+                "description": " criteria selector",
+                "value": ".//div[@class=\"yuRUbf\"]/a"
+              },
+              {
+                "name": "criteriaBase",
+                "description": "Criteria base.",
+                "value": "ATR_href"
+              }
+            ]
+          },
+          {
+            "name": "Scroll by duration",
+            "type": "scrollbydurationjob",
+            "description": "Scroll down",
+            "behaviors": [
+              {
+                "name": "task",
+                "description": "This job is part of the task GoogleSearch ",
+                "value": "GoogleSearch"
+              },
+              {
+                "name": "captchaMode",
+                "description": "",
+                "value": "always"
+              },
+              {
+                "name": "scrollDuration",
+                "description": "Scroll for 5 seconds.",
+                "value": 5
+              },
+              {
+                "name": "scrollDirection",
+                "description": "Scroll down",
+                "value": "DOWN"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

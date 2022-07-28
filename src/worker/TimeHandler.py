@@ -8,8 +8,7 @@ TODO extend possibilities for time generation. In particular add option to get t
 """
 
 import random as r
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 import pytz
 import time
 import json
@@ -256,7 +255,7 @@ class IndividualSchedule(Schedule):
 
 class TimeHandler:
     GLOBAL_SCHEDULE = Schedule()
-    with open(PRIMEMOVER_PATH + "/resources/other/valid_cities.json",
+    with open(PRIMEMOVER_PATH + "/resources/input_data/valid_cities.json",
               'r') as file:
         LOC_TIMEZONE_DICT = json.load(file)
 

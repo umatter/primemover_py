@@ -1,0 +1,54 @@
+{
+  "name": "Crawler_0",
+    "description": "Crawler created through py",
+    "active": 1,
+    "testing": 0,
+    "configuration": [{
+        "name": "CONFIGURATION_FUNCTIONS_0",
+        "description": "None",
+        "params": [{
+            "pi": -0.6274336475269788,
+            "psi": 0.08494765606239299,
+            "alpha": 0.22530785334870873,
+            "tau": 1,
+            "kappa": 2,
+            "beta": 0.24930536009670035,
+            "search_terms": [],
+            "media_outlet_urls": []
+            }],
+        "preferences": [
+            {"name": "location", "value": "US-AL-AUBURN"},
+            {"name": "cookie_pref", "value": "{'accept_all': true}"}]
+        }],
+    "proxy": [{
+        "name": "Proxy_0",
+        "description": "Proxy",
+        "type": "GEOSURF",
+        "hostname": "state.geosurf.io",
+        "port": 8000,
+        "username": "<username>",
+        "password": "<password>"}],
+    "agent": [{
+        "name": "Agent_0",
+      "description": "This is the agent",
+        "location": "US-AL-AUBURN",
+        "identification": "MultiLogin",
+        "multilogin_id": "None",
+        "multilogin_profile": {
+            "name": "%%AGENTID%%",
+            "os": "win",
+            "browser": "mimic",
+            "network": {"proxy": {
+                "type": "%%PROXYTYPE%%",
+                "host": "%%PROXYHOST%%",
+                "port": "%%PROXYPORT%%",
+                "username": "%%PROXYUSERNAME%%",
+                "password": "%%PROXYPASSWORD%%"},
+            "dns": []},
+            "navigator": {
+                "language": "en-US,en;q=0.5",
+                "doNotTrack": 0},
+                "geolocation": {"mode": "ALLOW", "fillBasedOnExternalIp": "True"},
+                "canvas": {"mode": "NOISE"},
+                "storage": {"local": "True"}}}],
+        "queues": []}

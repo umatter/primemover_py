@@ -27,9 +27,9 @@ class AmazonSearch(Queue):
         # add job to visit a webpage (Amazon)
         self.jobs.append(Jobs.VisitJob(url='https://www.amazon.com'))
 
-        # add job to select the search field via XPATH and type the search term
+        # add job to select the search field via XPATH and job_type the search term
         self.jobs.append(Jobs.EnterText(text=term,
-                                        selector='//input[@type="text"]',
+                                        selector='//input[@job_type="text"]',
                                         selector_type='XPATH',
                                         send_return=True,
                                         type_mode="SIMULATED_FIXINGTYPOS",
@@ -46,7 +46,7 @@ class AmazonSearch(Queue):
         # add job to select a result randomly; select based on channel, click on search result
         if select_result:
             self.jobs.append(
-                Jobs.SingleSelect(click_selector="//div/span[@data-component-type='s-product-image']/a/@href | //li/div/a[2]/@href | //div[@class='rhf-footer']//li/span/a/@href",
+                Jobs.SingleSelect(click_selector="//div/span[@data-component-job_type='s-product-image']/a/@href | //li/div/a[2]/@href | //div[@class='rhf-footer']//li/span/a/@href",
                                   click_selector_type='XPATH',
                                   criteria_extractor="(?<=\/dp\/)(.*?)(?=\/)",
                                   criteria_selector_type='XPATH',
