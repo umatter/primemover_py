@@ -201,7 +201,7 @@ The TimeHandler has already randomized the order, and we can use this fact.
             t_0 += timedelta(seconds=delta_t_2)
 
 ```
-where we will set delta_t_1 and delta_t_2 externaly.
+where we will set delta_t_1 and delta_t_2 externally.
 
 
 ### Changes to the setup
@@ -419,3 +419,32 @@ t6 = PythonOperator(
     dag=dag
 )
 ```
+It is essential to set the experiment ID as a variable once we have created the experiment!
+
+Tasks seven and eight are more administrative. Task seven sends an E-Mail on success.
+While task 8 delete old files to prevent the server from running out of disc space.
+```python
+
+t7 = PythonOperator(
+    task_id="send_mail",
+    python_callable=src.base.Notify.send_update,
+    op_kwargs={"email_list": Variable.get("email_list",
+                                          deserialize_json=True),
+               "password": Variable.get("email_password", "password_missing"),
+               "date": datetime.now().date()},
+    dag=dag)
+
+t8 = PythonOperator(
+    task_id="cleanup",
+    python_callable=src.worker.CleanUp.cleanup,
+    op_kwargs={"date_time": datetime.now(),
+               "nr_days": 5},
+    dag=dag)
+```
+As a final line, we will need to add the order in which tasks are to be executed.
+```python
+t1 >> t2 >> t3 >> t4 >> t5 >> t6 >> t7 >> t8
+```
+It might also be worthwile to create smaller versions of the DAG running from 5 to 8 for example. This is helpful when
+some portion of the DAG fails, as we won't have to re-run all of it and will avoid mistakes in the final
+output.
