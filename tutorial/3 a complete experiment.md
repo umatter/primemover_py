@@ -140,6 +140,70 @@ for sending new queues, by adding
 before generating new queues. This code checks if parsed results that we can use
 for updating exist and if so, passes these to the update crawler method of each crawler.
 
+Let us also add some new tasks. In particular, let us add a "neutral" search. The search terms
+come from the s3 bucket and are to be searched one after the other, one each day.
+This is to occour in a separate Queue.
+
+First, we load the neutral terms
+```python
+ "Fetch Neutral terms from s3 Bucket"
+    neutral_path = PRIMEMOVER_PATH + '/resources/input_data/neutral_searchterms_pool.json'
+    if not os.path.exists(neutral_path):
+        neutral_in = s3_wrapper.fetch_neutral()
+    else:
+        with open(neutral_path) as file:
+            neutral_in = json.load(file)
+    nr_neutral = 1
+    neutral = []
+    if len(neutral_in) < nr_neutral:
+        neutral_in += s3_wrapper.fetch_neutral()
+        with open(neutral_path, 'w') as file:
+            json.dump(neutral_in, file)
+    for i in range(nr_neutral):
+        neutral.append(neutral_in.pop(0))
+```
+To add a separate Queue from the one we have already assigned, we simply don't pass the 
+session_id. If we also want these Queues to be scheduled separately, we can replace the
+crawlers' scheduler.
+```python
+    for c in crawler_list:
+        c.schedule = TimeHandler("US-CA-LOS_ANGELES",
+                                 interval=120,
+                                 wake_time=18 * 60 * 60,
+                                 bed_time=21 * 60 * 60,
+                                 date_time=date_time)
+        session_id = c.add_task(tasks.HandleCookiesGoogle,
+                                to_session=True)
+        c.add_task(tasks.NeutralGoogleSearch, to_session=session_id,
+                   params={'term': neutral[1]})
+```
+
+Finally, we will handle the reset of start times differently this time. First of all,
+the previous setups only had one queue per crawler, and we were able to simply select queues[0].
+Secondly, the previous setup had crawlers search in the same order every time. 
+The TimeHandler has already randomized the order, and we can use this fact.
+```python
+        queues_1 = [c.queues[0] for c in crawler_list]
+        queues_1.sort(key=lambda q: datetime.fromisoformat(q.start_at))
+        t_0 = datetime.fromisoformat(queues_1[0].start_at)
+        delta_t_1 = int(delta_t_1)
+        for q in queues_1:
+            q.start_at = t_0.isoformat()
+            t_0 += timedelta(seconds=delta_t_1)
+
+        queues_2 = [c.queues[1] for c in crawler_list]
+        queues_2.sort(key=lambda q: datetime.fromisoformat(q.start_at))
+        t_0 = datetime.fromisoformat(
+            f'{date_time.date().isoformat()}T21:00:00-06:00')
+        delta_t_2 = int(delta_t_2)
+        for q in queues_2:
+            q.start_at = t_0.isoformat()
+            t_0 += timedelta(seconds=delta_t_2)
+
+```
+where we will set delta_t_1 and delta_t_2 externaly.
+
+
 ### Changes to the setup
 For the purposes of this setup I have made a few changes that I don't believe to warrant 
 further discussion. In particular, I have added more tasks from the Google Experiment and created 
@@ -321,9 +385,37 @@ t4 = PythonOperator(
 This particular experiment includes the automated selection of search results. Since
 this is implemented in the runner, primemover_py includes a copy of the selection functionality
 and can be run to validate the selection. This is done using google_data_copy.py. The base version of the module
-src/base/DataCopy.py 's  setup copy function simply copies all parameters of the configuration object into s3.
+src/base/DataCopy.py 's  setup copy function simply copies all parameters of the configuration object into s3. 
+If this is a desired feature, in a new experiment, you can orientate yourself using this 
+function, else simply use the base DataCopy function.
+```python
+t5 = PythonOperator(
+    task_id="csv_hist",
+    python_callable=complete_experiment.worker.google_data_copy.create_copy,
+    op_kwargs={"experiment_id": Variable.get("experiment_id", "id_missing"),
+               "date": datetime.now().date(),
+               "api_credentials": Variable.get("PRIMEMOVER",
+                                               deserialize_json=True)
+               },
+    retries=2,
+    dag=dag
+)
+```
+This task fails occasionally due to connection issues. Hence the retries are set to 2.
+
+Nextup is the core of the update:
 ```python
 
+t6 = PythonOperator(
+    task_id="update_crawlers",
+    python_callable=complete_experiment.experiment.update_experiment.single_update,
+    op_kwargs={"date_time": datetime.now(),
+               "experiment_id": Variable.get("experiment_id", "id_missing"),
+               "delta_t_1": int(Variable.get("delta_t_1", 120)),
+               "delta_t_2": int(Variable.get("delta_t_2", 36)),
+               "api_credentials": Variable.get("PRIMEMOVER",
+                                               deserialize_json=True)
+               },
+    dag=dag
+)
 ```
-
-

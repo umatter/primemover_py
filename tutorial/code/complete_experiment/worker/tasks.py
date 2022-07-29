@@ -5,7 +5,8 @@
 from src.worker.PrimemoverQueue import Queue
 from src.worker import jobs
 from tutorial.code.more_complete_setup.worker import preferences as pref
-from tutorial.code.more_complete_setup.worker.config_functions import NoiseUtility
+from tutorial.code.more_complete_setup.worker.config_functions import \
+    NoiseUtility
 
 from src.base.base_tasks import VisitDirect
 
@@ -134,7 +135,7 @@ class GoogleSearchNew(Queue):
                     flag=self._search_type,
                     task=name,
                     captcha_mode='always'
-                    )
+                )
             )
 
             # Add Job to scroll down 80% of the visited page
@@ -142,7 +143,6 @@ class GoogleSearchNew(Queue):
                                          duration=self._time_spent,
                                          captcha_mode='always',
                                          task=name))
-
 
 
 class VisitMediaNoUtility(VisitDirect):
@@ -279,3 +279,13 @@ class PoliticalSearch(GoogleSearch):
                          search_type='political',
                          select_result=True,
                          time_spent=30)
+
+
+class NeutralGoogleSearch(GoogleSearch):
+    def __init__(self, term, start_at):
+        super().__init__(term=term,
+                         name='search_google_neutral',
+                         start_at=start_at,
+                         search_type='neutral',
+                         select_result=True,
+                         time_spent=5)

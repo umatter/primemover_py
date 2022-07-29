@@ -26,7 +26,7 @@ def single_update(date_time, experiment_id, api_credentials, manual=False, fixed
     else:
         with open(neutral_path) as file:
             neutral_in = json.load(file)
-    nr_neutral = 1
+    nr_neutral = 2
     neutral = []
     if len(neutral_in) < nr_neutral:
         neutral_in += s3_wrapper.fetch_neutral()
@@ -110,11 +110,10 @@ def single_update(date_time, experiment_id, api_credentials, manual=False, fixed
         session_id = c.add_task(tasks.HandleCookiesGoogle,
                                 to_session=True)
         c.add_task(tasks.NeutralGoogleSearch, to_session=session_id,
-                   params={'term': neutral[0]})
+                   params={'term': neutral[1]})
         # c.add_task(tasks.NeutralGoogleSearch, to_session=session_id,
         #            params={'term': neutral[1]})
     if fixed_times:
-        crawler_list = crawler_list[1:2]
         queues_1 = [c.queues[0] for c in crawler_list]
         queues_1.sort(key=lambda q: datetime.fromisoformat(q.start_at))
         # t_0 = datetime.fromisoformat(queues_1[0].start_at)

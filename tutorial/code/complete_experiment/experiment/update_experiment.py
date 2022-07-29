@@ -1,17 +1,37 @@
-from tutorial.code.more_complete_setup.worker.classes import Crawler
-from tutorial.code.more_complete_setup.worker import tasks
+from tutorial.code.complete_experiment.worker.classes import Crawler
+from tutorial.code.complete_experiment.worker import tasks
 from src.worker.TimeHandler import Schedule, TimeHandler
 from datetime import datetime, timedelta
 import src.worker.api_wrapper as api_wrapper
 import json
 import pathlib
+from src.worker import s3_wrapper
+import os
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.parent.parent.absolute())
 
 
-def single_update(date_time, experiment_id, api_credentials, send_queues=True):
+def single_update(date_time, experiment_id, api_credentials, send_queues=True,
+                  fixed_times=True, delta_t_2=60, delta_t_1=120):
     api_token = api_wrapper.get_access(api_credentials.get('username'),
                                api_credentials.get('password'))
+
+    "Fetch Neutral terms from s3 Bucket"
+    neutral_path = PRIMEMOVER_PATH + '/resources/input_data/neutral_searchterms_pool.json'
+    if not os.path.exists(neutral_path):
+        neutral_in = s3_wrapper.fetch_neutral()
+    else:
+        with open(neutral_path) as file:
+            neutral_in = json.load(file)
+    nr_neutral = 1
+    neutral = []
+    if len(neutral_in) < nr_neutral:
+        neutral_in += s3_wrapper.fetch_neutral()
+        with open(neutral_path, 'w') as file:
+            json.dump(neutral_in, file)
+    for i in range(nr_neutral):
+        neutral.append(neutral_in.pop(0))
+
     # Again we set the global schedule
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,
@@ -40,10 +60,41 @@ def single_update(date_time, experiment_id, api_credentials, send_queues=True):
 
         crawler.add_task(tasks.GoogleSearch, to_session=session_id,
                          params={'term': 'Joe Biden'})
-    t_0 = datetime.now() + timedelta(minutes=1)
-    for crawler in crawler_list:
-        crawler.queues[0].start_at = t_0
-        t_0 += timedelta(minutes=2, seconds=30)
+
+    for c in crawler_list:
+        c.schedule = TimeHandler("US-CA-LOS_ANGELES",
+                                 interval=120,
+                                 wake_time=18 * 60 * 60,
+                                 bed_time=21 * 60 * 60,
+                                 date_time=date_time)
+        session_id = c.add_task(tasks.HandleCookiesGoogle,
+                                to_session=True)
+        c.add_task(tasks.NeutralGoogleSearch, to_session=session_id,
+                   params={'term': neutral[1]})
+
+    if fixed_times:
+        queues_1 = [c.queues[0] for c in crawler_list]
+        queues_1.sort(key=lambda q: datetime.fromisoformat(q.start_at))
+        # t_0 = datetime.fromisoformat(queues_1[0].start_at)
+        # t_0 = datetime.fromisoformat(
+        #     f'{date_time.date().isoformat()}T10:00:00-06:00')
+        t_0 = datetime.now() + timedelta(minutes=1)
+        print(t_0)
+        delta_t_1 = int(delta_t_1)
+        for q in queues_1:
+            q.start_at = t_0.isoformat()
+            t_0 += timedelta(seconds=delta_t_1)
+
+        queues_2 = [c.queues[1] for c in crawler_list]
+        queues_2.sort(key=lambda q: datetime.fromisoformat(q.start_at))
+        # t_0 = datetime.fromisoformat(
+        #     f'{date_time.date().isoformat()}T21:00:00-06:00')00
+        t_0 += timedelta(minutes=5)
+        print(t_0)
+        delta_t_2 = int(delta_t_2)
+        for q in queues_2:
+            q.start_at = t_0.isoformat()
+            t_0 += timedelta(seconds=delta_t_2)
 
     with open(PRIMEMOVER_PATH + "/resources/updates/generated.json",
               'w') as file:
