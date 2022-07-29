@@ -29,3 +29,5 @@ sudo usermod -aG docker $USER
 newgrp docker 
 ```
 before retrying the previous command.
+
+This will run for a long time if there is no prior version of the docker image.

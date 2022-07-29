@@ -15,7 +15,7 @@ for this file to ensure keys are not stored in plain text). Create a new file "r
 and fill it with the following fields.
 
 ```json
-{"GEOSURF": {"username": "<username>"", "password": "<password>"},
+{"GEOSURF": {"username": "<username>", "password": "<password>"},
 "ROTATING": {"username": "<username>", "password": "<password>"},
 "PRIVATE": {"username": "<username>", "password": "<password>"},
 "PRIMEMOVER":{"username": "<username>", "password": "<password>"},
