@@ -22,4 +22,10 @@ While still in the primemover folder run
 ```bash
 docker build -t "primemover_py" .  
 ```
-
+You might be missing permissions. In that case, run
+```bash
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker 
+```
+before retrying the previous command.
