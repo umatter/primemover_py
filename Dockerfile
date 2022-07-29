@@ -1,11 +1,11 @@
 # execute "docker build -t "primemover_py" ." in the primemover_py folder
 # to run container run
 
-FROM ubuntu:latest
-
-RUN apt-get update && apt-get upgrade -y
+FROM ubuntu:20.04
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install tzdata
+RUN apt-get upgrade -y
+
 
 ENV TZ=CET
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
