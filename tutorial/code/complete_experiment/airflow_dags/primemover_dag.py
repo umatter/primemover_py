@@ -51,12 +51,6 @@ dag = DAG(
     catchup=False
 )
 
-t0 = PythonOperator(
-    task_id="api_key",
-    python_callable=src.worker.api_wrapper.get_access,
-    op_kwargs={"email": Variable.get('api_email'), "password":Variable.get('api_password')}
-)
-
 # t1, t2 and t3 are examples of tasks created by instantiating operators
 t1 = PythonOperator(
     task_id="fetch_results",

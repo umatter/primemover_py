@@ -13,9 +13,10 @@ from airflow.utils.dates import days_ago
 # These args will get passed on to each operator
 # You can override them on a per-task basis during operator initialization
 import src
+from tutorial.code import complete_experiment
 
 default_args = {
-    "owner": "johannes",
+    "owner": "<Owner Here>",
     "depends_on_past": False,
     "start_date": datetime(2021, 1, 1),
     "email": ["johannesl@me.com"],
@@ -55,6 +56,6 @@ t0 = PythonOperator(
 # t1, t2 and t3 are examples of tasks created by instantiating operators
 t1 = PythonOperator(
     task_id="create_experiment",
-    python_callable=src.experiment_2.launch_experiment,
+    python_callable=complete_experiment.experiment.experiment_setup.launch_experiment,
     dag=dag
 )

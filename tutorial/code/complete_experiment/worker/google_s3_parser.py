@@ -5,13 +5,16 @@ from bs4 import BeautifulSoup
 
 
 def GoogleParser(behaviors, raw_html, job_id):
-
+    term = None
+    for b in behaviors:
+        if b['name'] == 'text':
+            term = b['value']
     if raw_html is None:
-        return {'issue': 'unknown'}
+        return {'issue': 'unknown', 'term': term}
 
     if 'captcha' in str(raw_html):
         print(f'Captcha: {job_id} ')
-        return {'issue': 'Captcha'}
+        return {'issue': 'Captcha', 'term': term}
 
     soup = BeautifulSoup(raw_html, "html.parser")
     results_in = soup.find_all(class_='g')
@@ -42,7 +45,7 @@ def GoogleParser(behaviors, raw_html, job_id):
             body = ''
 
         parsed_data.append(
-            {'rank': rank, 'title': title, 'url': url,
+            {'rank': rank, 'term': term, 'title': title, 'url': url,
              'body': body,
              'domain': domain})
 

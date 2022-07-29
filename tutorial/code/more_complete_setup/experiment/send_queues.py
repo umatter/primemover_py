@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import src.worker.api_wrapper as api_wrapper
 import json
 import pathlib
+import os
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.parent.parent.absolute())
 
@@ -21,6 +22,17 @@ def single_update(date_time, experiment_id, api_token, send_queues=True):
     # Create python objects from the json returned by the API
     crawler_list = Crawler.from_list(raw_experiment['crawlers'],
                                      date_time=date_time)
+
+    if os.path.exists(
+            f'{PRIMEMOVER_PATH}/resources/cleaned_data/{date_time.date().isoformat()}.json'):
+        with open(
+                f'{PRIMEMOVER_PATH}/resources/cleaned_data/{date_time.date().isoformat()}.json',
+                'r') as file:
+            cleaned_data = json.load(file)
+        for crawler in crawler_list:
+            if crawler.flag != 'neutral':
+                crawler.update_crawler(results=cleaned_data)
+
     # Assign Tasks
     for crawler in crawler_list:
         # create a queue and begin by accepting Googles cookie preferences

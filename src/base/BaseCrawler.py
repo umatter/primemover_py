@@ -380,7 +380,7 @@ class BaseCrawler:
     def clear_day(self):
         self.queues = []
 
-    def update_crawler(self, results=None, proxy_update=None, terms=True):
+    def update_crawler(self, results=None, proxy_update=None):
         update_location = None
         if proxy_update is not None:
             update_location = self.proxy.update_proxy(proxy_update)
@@ -391,6 +391,5 @@ class BaseCrawler:
             self.agent.location = update_location
             self.send_agent = True
 
-        self.configuration.update_config(None, update_location,
-                                         terms=terms)
+        self.configuration.update_config(None, update_location)
         return self

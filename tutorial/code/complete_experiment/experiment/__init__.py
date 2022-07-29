@@ -1,3 +1,3 @@
-from . import experiment_setup, send_queues
+from . import experiment_setup, update_experiment
 
-__all__ = [experiment_2, UpdateExperiment]
+__all__ = [experiment_setup, update_experiment]

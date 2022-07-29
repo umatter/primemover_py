@@ -11,15 +11,15 @@ from src.worker import api_wrapper as api
 from datetime import datetime, timedelta
 from src.worker.Experiment import Experiment
 
+import os
 import json
 import pathlib
-import pdb
-
+import random as r
 PRIMEMOVER_PATH = str(
     pathlib.Path(__file__).parent.parent.parent.parent.parent.absolute())
 
 
-def first_experiment(api_token, update_files=False, push=True):
+def launch_experiment(api_token, update_files=False, push=True):
     """
     Param:
         update_files, Bool: If False, first_crawler will not attempt to fetch valid_cities, outlets and terms from s3
@@ -54,7 +54,7 @@ def first_experiment(api_token, update_files=False, push=True):
     # different tasks
     config_list_neutral = [
         Config(name='Config/neutral', location=l, pi=0) for
-        l in 1 * GEO_SURF_PROXIES]
+        l in 2 * GEO_SURF_PROXIES]
     # generate crawlers from neutral configs
     # the flag for the crawler is automatically taken from config, the assignment here is therefore redundant.
     crawler_list = [
@@ -65,7 +65,7 @@ def first_experiment(api_token, update_files=False, push=True):
     config_list_left = [
         Config(name='Config', location=l, flag='left')
         for l in
-        2 * GEO_SURF_PROXIES]
+        3 * GEO_SURF_PROXIES]
     config_list_right = [
         Config(name='Config',
                location=left_config.location,
@@ -78,27 +78,36 @@ def first_experiment(api_token, update_files=False, push=True):
         in
         config_list_right + config_list_left]
 
-    [crawler.add_task(tasks.BrowserLeaks) for crawler in crawler_list]
-    t_0 = datetime.now() + timedelta(minutes=5)
-    for crawler in crawler_list:
-        crawler.queues[0].start_at = t_0
-        t_0 += timedelta(minutes=2)
+    # Assign some crawlers different privacy settings retroactively
+    with_privacy = r.sample(crawler_list, k=20)
+    for i, crawler in enumerate(with_privacy):
+        if i < 3:
+            crawler.agent.multilogin_profile.geolocation = 'BLOCK'
+        elif i < 6:
+            crawler.agent.multilogin_profile.do_not_track = 1
+        elif i < 9:
+            crawler.agent.multilogin_profile.hardware_canvas = "BLOCK"
+        elif i < 12:
+            crawler.agent.multilogin_profile.local_storage = False
+            crawler.agent.multilogin_profile.service_worker_cache = False
 
-    with open(
-            PRIMEMOVER_PATH + "/resources/crawlers/more_complete_setup.json",
-            'w') as file:
+
+    if not os.path.isdir(PRIMEMOVER_PATH + '/resources/crawlers'):
+        os.mkdir(PRIMEMOVER_PATH + '/resources/crawlers')
+    with open(PRIMEMOVER_PATH + "/resources/crawlers/experiment_3.json",
+              'w') as file:
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
-
     if push:
         return_data = api.push_new(access_token=api_token,
-                                   path=PRIMEMOVER_PATH + "/resources/crawlers/more_complete_setup.json")
-
+                                   path=PRIMEMOVER_PATH + "/resources/crawlers/experiment_3.json")
         data_as_dict = json.loads(return_data.text)
+
         with open(
-                f'{PRIMEMOVER_PATH}/resources/crawlers/more_complete_setup_{datetime.now().date().isoformat()}.json',
+                PRIMEMOVER_PATH + "/resources/crawlers/more_complete_setup.json",
                 'w') as file:
-            json.dump(data_as_dict, file, indent='  ')
+            json.dump([crawler.as_dict() for crawler in crawler_list], file,
+                      indent='  ')
 
     return exp_id
 
@@ -108,4 +117,4 @@ if __name__ == "__main__":
         KEYS = json.load(f)
     key = api.get_access(KEYS['PRIMEMOVER']['username'],
                          KEYS['PRIMEMOVER']['password'])
-    first_experiment(key, False, True)
+    launch_experiment(key, False, True)

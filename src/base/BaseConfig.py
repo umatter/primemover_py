@@ -314,7 +314,7 @@ class BaseConfig:
         #                                            self.history.history.keys()))})
         return return_dict
 
-    def update_config(self, results, new_location, terms=True):
+    def update_config(self, results, new_location):
         """
         Update self according to results
         """
