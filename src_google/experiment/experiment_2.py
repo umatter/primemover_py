@@ -96,7 +96,10 @@ def distribute_proxies(location_groups, exp_id, proxy_credentials,
     return crawler_list
 
 
-def launch_experiment(api_token, proxy_credentials):
+def launch_experiment(api_credentials, proxy_credentials):
+    api_token = api.get_access(api_credentials.get('username'),
+                               api_credentials.get('password'))
+
     exp = Experiment(
         name='Test Experiment testing',
         description='A test of all systems based on a future experiment set up',
@@ -207,7 +210,5 @@ def launch_experiment(api_token, proxy_credentials):
 if __name__ == "__main__":
     with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
         KEYS = json.load(f)
-
-    key = api.get_access(KEYS['PRIMEMOVER']['username'],
-                         KEYS['PRIMEMOVER']['password'])
-    launch_experiment(api_token=key, proxy_credentials=KEYS)
+    launch_experiment(api_credentials=KEYS.get('PRIMEMOVER'),
+                      proxy_credentials=KEYS)

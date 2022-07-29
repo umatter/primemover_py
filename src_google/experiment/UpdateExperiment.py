@@ -13,9 +13,12 @@ import os
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 
-def single_update(date_time, experiment_id,api_token, manual=False, fixed_times=False, update_preferences =True,
+def single_update(date_time, experiment_id, api_credentials, manual=False, fixed_times=False, update_preferences =True,
                   update_proxies=True,
                   delta_t_1=120, delta_t_2=36):
+
+    api_token = api.get_access(api_credentials.get('username'),
+                        api_credentials.get('password'))
     "Fetch Neutral terms from s3 Bucket"
     neutral_path = PRIMEMOVER_PATH + '/resources/input_data/neutral_searchterms_pool.json'
     if not os.path.exists(neutral_path):
@@ -197,11 +200,10 @@ if __name__ == "__main__":
 
     with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
         KEYS = json.load(f)
-    key = api.get_access(KEYS['PRIMEMOVER']['username'],
-                         KEYS['PRIMEMOVER']['password'])
+
     single_update(date_time=datetime.now(),
                   experiment_id=50,
-                  api_token=key,
+                  api_credentials=KEYS['PRIMEMOVER'],
                   manual=True,
                   update_preferences=False,
                   update_proxies=False,

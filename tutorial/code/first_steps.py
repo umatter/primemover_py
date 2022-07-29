@@ -16,13 +16,17 @@ PRIMEMOVER_PATH = str(
     pathlib.Path(__file__).parent.parent.parent.absolute())
 
 
-def first_crawler(api_token, update_valid_cities=False, push=True):
+def first_crawler(api_credentials, update_valid_cities=False, push=True):
     """
     wrapped version of the code found in 1 first steps.md.,
     Param:
         update_valid_cities, Bool: If False, first_crawler will not attempt to fetch valid_cities from s3
         push, Bool: if False, no new experiment will be created and no queues will be pushed
     """
+
+    api_token = api.get_access(api_credentials.get('username'),
+                               api_credentials.get('password'))
+
     if update_valid_cities:
         s3_wrapper.update_valid_cities()
 
@@ -76,6 +80,5 @@ if __name__ == "__main__":
 
     with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
         KEYS = json.load(f)
-    key = api.get_access(KEYS['PRIMEMOVER']['username'],
-                         KEYS['PRIMEMOVER']['password'])
-    first_crawler(key, False, False)
+
+    first_crawler(KEYS.get("PRIMEMOVER"), False, False)

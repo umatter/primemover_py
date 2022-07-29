@@ -10,7 +10,9 @@ import os
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.parent.parent.absolute())
 
 
-def single_update(date_time, experiment_id, api_token, send_queues=True):
+def single_update(date_time, experiment_id, api_credentials, send_queues=True):
+    api_token = api_wrapper.get_access(api_credentials.get('username'),
+                               api_credentials.get('password'))
     # Again we set the global schedule
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,
@@ -80,6 +82,5 @@ def single_update(date_time, experiment_id, api_token, send_queues=True):
 if __name__ == "__main__":
     with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
         KEYS = json.load(f)
-    key = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
-                                 KEYS['PRIMEMOVER']['password'])
-    print(single_update(date_time=datetime.now(), experiment_id=54, api_token=key, send_queues=True))
+
+    print(single_update(date_time=datetime.now(), experiment_id=54, api_credentials=KEYS.get("PRIMEMOVER"), send_queues=True))

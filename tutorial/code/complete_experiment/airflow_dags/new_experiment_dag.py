@@ -7,13 +7,15 @@ sys.path += [PATH_MODULES]
 
 from airflow import DAG
 # Operators; we need this to operate!
-from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
-from airflow.utils.dates import days_ago
-# These args will get passed on to each operator
-# You can override them on a per-task basis during operator initialization
+
 import src
 from tutorial.code import complete_experiment
+
+# These args will get passed on to each operator
+# You can override them on a per-task basis during operator initialization
+
+
 
 default_args = {
     "owner": "<Owner Here>",
@@ -50,12 +52,13 @@ dag = DAG(
 t0 = PythonOperator(
     task_id="api_key",
     python_callable=src.worker.api_wrapper.get_access,
-    op_kwargs={"email": Variable.get('api_email'), "password":Variable.get('api_password')}
+    op_kwargs={"email": Variable.get('api_email'), "password": Variable.get('api_password')}
 )
 
 # t1, t2 and t3 are examples of tasks created by instantiating operators
 t1 = PythonOperator(
     task_id="create_experiment",
     python_callable=complete_experiment.experiment.experiment_setup.launch_experiment,
-    dag=dag
+    dag=dag,
+    op_kwargs= xcom_pull(task_ids='pushing_task')}
 )

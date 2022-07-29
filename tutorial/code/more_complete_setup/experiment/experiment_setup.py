@@ -19,12 +19,14 @@ PRIMEMOVER_PATH = str(
     pathlib.Path(__file__).parent.parent.parent.parent.parent.absolute())
 
 
-def first_experiment(api_token, update_files=False, push=True):
+def first_experiment(api_credentials, update_files=False, push=True):
     """
     Param:
         update_files, Bool: If False, first_crawler will not attempt to fetch valid_cities, outlets and terms from s3
         push, Bool: if False, no new experiment will be created and no queues will be pushed
     """
+    api_token = api.get_access(api_credentials.get('username'),
+                               api_credentials.get('password'))
     if update_files:
         s3_wrapper.update_valid_cities()
         s3_wrapper.fetch_outlets()
@@ -106,6 +108,5 @@ def first_experiment(api_token, update_files=False, push=True):
 if __name__ == "__main__":
     with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
         KEYS = json.load(f)
-    key = api.get_access(KEYS['PRIMEMOVER']['username'],
-                         KEYS['PRIMEMOVER']['password'])
-    first_experiment(key, False, True)
+
+    first_experiment(KEYS.get("PRIMEMOVER"), False, True)
