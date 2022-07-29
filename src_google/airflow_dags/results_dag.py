@@ -9,12 +9,11 @@ from airflow.models import Variable
 
 from airflow import DAG
 # Operators; we need this to operate!
-from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
-from airflow.utils.dates import days_ago
 # These args will get passed on to each operator
 # You can override them on a per-task basis during operator initialization
 import src
+import src_google
 
 default_args = {
     "owner": "johannesl",
@@ -52,19 +51,24 @@ dag = DAG(
 # t1, t2 and t3 are examples of tasks created by instantiating operators
 t1 = PythonOperator(
     task_id="fetch_results",
-    python_callable=src.Results.fetch_results,
-    op_kwargs={"date": datetime.now().date()},
+    python_callable=src.base.Results.fetch_results,
+    op_kwargs={"date": datetime.now().date(),
+               "api_credentials": Variable.get("PRIMEMOVER",
+                                               deserialize_json=True)},
     dag=dag,
 )
 
 t2 = PythonOperator(
     task_id="parse_all_results",
-    python_callable=src.Results.process_results,
+    python_callable=src.base.Results.process_results,
     op_kwargs={"set_reviewed": True,
-               "parser_dict": src.worker.s3_parser.ParserDict,
+               "parser_dict": src_google.worker.google_s3_parser.ParserDict,
                "path_end": "all_data_",
                "date_time": datetime.now().date,
-               "process": "ALL"},
+               "process": "ALL",
+               "api_credentials": Variable.get("PRIMEMOVER",
+                                               deserialize_json=True)
+               },
     dag=dag)
 
 t3 = PythonOperator(
@@ -76,7 +80,7 @@ t3 = PythonOperator(
 
 t7 = PythonOperator(
     task_id="send_mail",
-    python_callable=src.worker.Notify.send_update,
+    python_callable=src.base.Notify.send_update,
     op_kwargs={"email_list": Variable.get("email_list", "[johannesl@me.com]"),
                "password": Variable.get("email_password", "password_missing"),
                "date": datetime.now().date()},

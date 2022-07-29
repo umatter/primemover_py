@@ -19,7 +19,8 @@ class JobResult:
     Stores and processes the returned data for a single job
     """
 
-    def __init__(self, crawler_id=None, job_id=None, job_type=None, started_at=None,
+    def __init__(self, crawler_id=None, job_id=None, job_type=None,
+                 started_at=None,
                  status_code=None, status_message=None,
                  created_at=None, updated_at=None, finished_at=None,
                  behaviors=None, flag_list=None, reports=None,
@@ -80,15 +81,18 @@ class JobResult:
                 raw_data.close()
 
     def _download_full_report(self):
-        raw_data, success = s3.fetch_report(self.job_id, self.job_type, self.task, 'static')
+        raw_data, success = s3.fetch_report(self.job_id, self.job_type,
+                                            self.task, 'static')
         return raw_data
 
     def _download_html(self):
-        raw_html, success = s3.download_finalsource(self.job_id, self.job_type, self.task)
+        raw_html, success = s3.download_finalsource(self.job_id, self.job_type,
+                                                    self.task)
         return raw_html, success
 
     def _download_dynamic(self):
-        raw_dict, success = s3.download_finalsource(self.job_id, self.job_type, self.task)
+        raw_dict, success = s3.download_finalsource(self.job_id, self.job_type,
+                                                    self.task)
         return raw_dict, success
 
     def _extract_flags(self):
@@ -201,6 +205,7 @@ class SessionResult:
         session_results = [cls.from_dict(ind_session, parser_dict=parser_dict)
                            for ind_session in
                            result_list]
+
         if set_reviewed:
             for sess in session_results:
                 api_wrapper.set_reviewed(queue_id=sess._queue_id,
@@ -262,14 +267,18 @@ def generate_summary(session_data):
     return failed_task_df, summary
 
 
-def process_results(api_token, set_reviewed=True, parser_dict=Parser.ParserDict,
-                    path_end='', date=datetime.now().date(), process = None):
+def process_results(api_credentials, set_reviewed=True,
+                    parser_dict=Parser.ParserDict,
+                    path_end='', date=datetime.now().date(), process=None):
     path = f'{PRIMEMOVER_PATH}/resources/raw_data/{date.isoformat()}.json'
+
+    api_token = api_wrapper.get_access(api_credentials.get('username'),
+                                       api_credentials.get('password'))
 
     with open(path, 'r') as file:
         raw_data = json.load(file)
     session_data = SessionResult.from_list(raw_data['data'],
-                                           api_token = api_token,
+                                           api_token=api_token,
                                            set_reviewed=set_reviewed,
                                            parser_dict=parser_dict)
 
@@ -301,11 +310,14 @@ def process_results(api_token, set_reviewed=True, parser_dict=Parser.ParserDict,
         log[f'Summary {process}'] = summary
         json.dump(log, f, indent='  ')
     if process == 'ALL':
-        job_df.to_csv(PRIMEMOVER_PATH + f'/resources/log/issues_log_{date.isoformat()}.csv')
+        job_df.to_csv(
+            PRIMEMOVER_PATH + f'/resources/log/issues_log_{date.isoformat()}.csv')
     return 'Success'
 
 
-def fetch_results(api_token, date=datetime.now().date()):
+def fetch_results(api_credentials, date=datetime.now().date()):
+    api_token = api_wrapper.get_access(api_credentials.get('username'),
+                                       api_credentials.get('password'))
     try:
         api_wrapper.fetch_results(access_token=api_token)
         fetch_error = False
@@ -331,8 +343,6 @@ if __name__ == "__main__":
     with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
         KEYS = json.load(f)
 
-    ACCESS_TOKEN = api_wrapper.get_access(KEYS['PRIMEMOVER']['username'],
-                                          KEYS['PRIMEMOVER']['password'])
-    api_wrapper.fetch_results(access_token=ACCESS_TOKEN)
+    fetch_results(api_credentials=KEYS.get("PRIMEMOVER"))
     # process_results(set_reviewed=False, parser_dict=Parser.ParserDict,
     #                 path_end='all_data_', date=d)

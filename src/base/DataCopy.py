@@ -8,18 +8,19 @@ from src.worker.UpdateObject import UpdateObject
 
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
-
-
 from src.base.BaseCrawler import BaseCrawler
 
 
-def extract_data(experiment_id: int,api_token, crawler_class = BaseCrawler):
+def extract_data(experiment_id: int, api_credentials,
+                 crawler_class=BaseCrawler):
     """
     Extract_data reads crawlers as seen in the file "resources/updates/generated.csv"
 
     input: str, path to json containing generated crawlers
     output: pandas DataFrame, columns all parameters set in the configuration functions
     """
+    api_token = api_wrapper.get_access(api_credentials.get('username'),
+                                       api_credentials.get('password'))
 
     crawler_list_raw = api_wrapper.fetch_experiment(access_token=api_token,
                                                     id=
@@ -50,12 +51,14 @@ def extract_data(experiment_id: int,api_token, crawler_class = BaseCrawler):
     return pd.DataFrame(data=data_restructure)
 
 
-def extract_list_params(object_name, experiment_id, crawler_class=BaseCrawler):
+def extract_list_params(object_name, experiment_id,api_credentials, crawler_class=BaseCrawler):
     """
     input:
         object_name: str, one of media or terms
     """
-    crawler_list_raw = api_wrapper.fetch_experiment(access_token=ACCESS_TOKEN,
+    api_token = api_wrapper.get_access(api_credentials.get('username'),
+                                       api_credentials.get('password'))
+    crawler_list_raw = api_wrapper.fetch_experiment(access_token=api_token,
                                                     id=
                                                     experiment_id)
 
@@ -84,13 +87,12 @@ def extract_list_params(object_name, experiment_id, crawler_class=BaseCrawler):
             data_restructure.append(new_row)
     return pd.DataFrame(data=data_restructure)
 
-def setup_copy(experiment_id, date=datetime.now()):
+
+def setup_copy(experiment_id, api_credentials, date=datetime.now()):
     s3_wrapper.append_csv(f'config_{experiment_id}/single_params.csv',
-                          extract_data(experiment_id))
+                          extract_data(experiment_id, api_credentials))
     s3_wrapper.append_csv(f'config_{experiment_id}/terms.csv',
-                          extract_list_params('terms', experiment_id))
+                          extract_list_params('terms', experiment_id, api_credentials))
     s3_wrapper.append_csv(f'config_{experiment_id}/media.csv',
-                          extract_list_params('media', experiment_id))
+                          extract_list_params('media', experiment_id, api_credentials))
     return "Success"
-
-

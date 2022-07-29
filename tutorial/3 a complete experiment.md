@@ -183,4 +183,147 @@ from . import complete_experiment
 
 __all__ = [complete_experiment]
 ```
+Having added these __init__ files to all folders we are interested in, we can now
+setup our first airflow dag (directed acyclic graph). For the purposes of the experiments
+we have run in the past, these were quite straightforward.
+
+Let us first create a DAG which runs the experiment setup script.
+To do so we need to specify a path and load modules from it.
+```python
+from datetime import timedelta, datetime
+import sys
+
+PATH_MODULES = "/primemover_py"
+sys.path += [PATH_MODULES]
+# The DAG object; we"ll need this to instantiate a DAG
+
+from airflow import DAG
+# Operators; we need this to operate!
+from airflow.operators.python_operator import PythonOperator
+from airflow.models import Variable
+
+from tutorial.code import complete_experiment
+import src
+```
+
+Next we can set default parameters for our DAG and initialize it.
+```python
+default_args = {
+    "owner": "<Owner Here>",
+    "depends_on_past": False,
+    "start_date": datetime(2021, 1, 1),
+    "email": ["johannesl@me.com"],
+    "email_on_failure": True,
+    "email_on_retry": False,
+    "retries": 0,
+    "retry_delay": timedelta(minutes=15),
+    "catchup": False
+}
+
+dag = DAG(
+    "new_experiment",
+    default_args=default_args,
+    description="create new crawlers",
+    schedule_interval=None,
+    catchup=False
+)
+
+```
+If one wants the dag to run immediately, the start_date option has to be in the past.
+This particular DAG has schedule_interval = None since we want it to run when triggered only and do not intend
+to repeat it.
+Finally we assign tasks to this DAG. In our case this is a call of the launch_experiment function
+in experiment_setup.py. 
+```python
+t1 = PythonOperator(
+    task_id="create_experiment",
+    python_callable=complete_experiment.experiment.experiment_setup.launch_experiment,
+    dag=dag,
+    op_kwargs={"api_credentials": Variable.get("PRIMEMOVER",
+                                               deserialize_json=True)}
+)
+
+t1
+```
+Use op_kwargs to pass named parameters. Here I pass "api_credentials". These credentials are stored as airflow variables.
+We will see how to set these variables later on when we install and launch airflow.
+
+I create two more DAGs, one pushes browser leaks jobs for these crawlers using the src/base/browser_leaks.py
+module and I wont discuss it here.
+
+The second DAG will be the core of the application. The initial setup of the DAG is identical. With two key
+exceptions. 
+
+```python
+dag = DAG(
+    dag_id="update",
+    default_args=default_args,
+    description="update crawler config and tasks",
+    schedule_interval="30 8 * * *",
+    catchup=False
+)
+```
+Here, the  value of schedule_interval is "30 8 * * *" which is a CRON schedule.
+This specific one will start the DAG at 8:30 every day. Note, the time will be in UTC
+not your local time.
+
+The first step of our update procedure will be to fetch results and parse them.
+```python
+t1 = PythonOperator(
+    task_id="fetch_results",
+    python_callable=src.base.Results.fetch_results,
+    op_kwargs={"date": datetime.now().date(),
+               "api_credentials": Variable.get("PRIMEMOVER",
+                                               deserialize_json=True)},
+    dag=dag,
+)
+
+t2 = PythonOperator(
+    task_id="parse_all_results",
+    python_callable=src.base.Results.process_results,
+    op_kwargs={"set_reviewed": True,
+               "parser_dict": complete_experiment.worker.google_s3_parser.ParserDict,
+               "path_end": "all_data_",
+               "date": datetime.now().date(),
+               "process": "ALL",
+               "api_credentials": Variable.get("PRIMEMOVER",
+                                               deserialize_json=True)
+               },
+    dag=dag)
+
+```
+Before we upload the parsed results to the s3 Bucket.
+
+```python
+t3 = PythonOperator(
+    task_id="upload_results",
+    python_callable=src.worker.s3_wrapper.upload_data,
+    op_kwargs={"filename": f"output/{datetime.now().date().isoformat()}.json",
+               "path": f"/resources/cleaned_data/all_data_{datetime.now().date().isoformat()}.json"},
+    dag=dag)
+
+```
+To generate the results file for updating, We parse the results again, this time with the UpdateParser
+```python
+
+t4 = PythonOperator(
+    task_id="parse_search_results",
+    python_callable=src.base.Results.process_results,
+    op_kwargs={"set_reviewed": False,
+               "parser_dict": complete_experiment.worker.google_s3_parser.UpdateParser,
+               "date_time": datetime.now(),
+               "process": "neutral search",
+               "api_credentials": Variable.get("PRIMEMOVER",
+                                               deserialize_json=True)
+               },
+    dag=dag)
+```
+This particular experiment includes the automated selection of search results. Since
+this is implemented in the runner, primemover_py includes a copy of the selection functionality
+and can be run to validate the selection. This is done using google_data_copy.py. The base version of the module
+src/base/DataCopy.py 's  setup copy function simply copies all parameters of the configuration object into s3.
+```python
+
+```
+
 

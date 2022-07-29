@@ -8,13 +8,12 @@ from airflow.models import Variable
 
 from airflow import DAG
 # Operators; we need this to operate!
-from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
-from airflow.utils.dates import days_ago
 # These args will get passed on to each operator
 # You can override them on a per-task basis during operator initialization
 import src
-from src.worker.Utilities import string_to_bool
+import src_google
+from src.worker.utilities import string_to_bool
 
 default_args = {
     "owner": "johannesl",
@@ -49,64 +48,42 @@ dag = DAG(
     catchup=False
 )
 
-# t1, t2 and t3 are examples of tasks created by instantiating operators
-
-
-# t2 = PythonOperator(
-#     task_id="parse_all_results",
-#     python_callable=src.Results.process_results,
-#     op_kwargs={"set_reviewed": True,
-#                "parser_dict": src.worker.s3_parser.ParserDict,
-#                "path_end": "all_data_",
-#                "date_time": datetime.now()},
-#     dag=dag)
-#
-# t3 = PythonOperator(
-#     task_id="upload_results",
-#     python_callable=src.worker.s3_wrapper.upload_data,
-#     op_kwargs={"filename": f"output/{datetime.now().date_time().isoformat()}.json",
-#                "path": f"/resources/cleaned_data/all_data_{datetime.now().date_time().isoformat()}.json"},
-#     dag=dag)
-#
-# t4 = PythonOperator(
-#     task_id="parse_search_results",
-#     python_callable=src.Results.process_results,
-#     op_kwargs={"set_reviewed": False,
-#                "parser_dict": src.worker.s3_parser.UpdateParser,
-#                "date_time": datetime.now()},
-#     dag=dag)
-#
-#
-#
-
 t5 = PythonOperator(
     task_id="csv_hist",
-    python_callable=src.worker.DataCopy.create_copy,
+    python_callable=src_google.worker.google_data_copy.create_copy,
     op_kwargs={"experiment_id": Variable.get("experiment_id", "id_missing"),
-               "date": datetime.now().date()},
-    dag=dag,
+               "date": datetime.now().date(),
+               "api_credentials": Variable.get("PRIMEMOVER",
+                                               deserialize_json=True)
+               },
     retries=2,
-
+    dag=dag
 )
 
 t6 = PythonOperator(
     task_id="update_crawlers",
-    python_callable=src.UpdateExperiment.single_update,
+    python_callable=src_google.experiment.UpdateExperiment.single_update,
     op_kwargs={"date_time": datetime.now(),
                "experiment_id": Variable.get("experiment_id", "id_missing"),
-               "fixed_times": string_to_bool(Variable.get("fixed_times", False)),
-               "update_preferences": string_to_bool(Variable.get("update_preferences", False)),
-               "update_proxies": string_to_bool(Variable.get("update_proxies", False)),
+               "fixed_times": string_to_bool(
+                   Variable.get("fixed_times", False)),
+               "update_preferences": string_to_bool(
+                   Variable.get("update_preferences", False)),
+               "update_proxies": string_to_bool(
+                   Variable.get("update_proxies", False)),
                "delta_t_1": int(Variable.get("delta_t_1", 120)),
-               "delta_t_2": int(Variable.get("delta_t_2", 36))
+               "delta_t_2": int(Variable.get("delta_t_2", 36)),
+               "api_credentials": Variable.get("PRIMEMOVER",
+                                               deserialize_json=True)
                },
     dag=dag
 )
 
 t7 = PythonOperator(
     task_id="send_mail",
-    python_callable=src.worker.Notify.send_update,
-    op_kwargs={"email_list": Variable.get("email_list", ["johannesl@me.com"], deserialize_json=True),
+    python_callable=src.base.Notify.send_update,
+    op_kwargs={"email_list": Variable.get("email_list",
+                                          deserialize_json=True),
                "password": Variable.get("email_password", "password_missing"),
                "date": datetime.now().date()},
     dag=dag)
@@ -117,4 +94,5 @@ t8 = PythonOperator(
     op_kwargs={"date_time": datetime.now(),
                "nr_days": 5},
     dag=dag)
+
 t5 >> t6 >> t7 >> t8

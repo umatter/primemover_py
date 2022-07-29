@@ -7,12 +7,12 @@ sys.path += [PATH_MODULES]
 
 from airflow import DAG
 # Operators; we need this to operate!
-from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
-from airflow.utils.dates import days_ago
+from airflow.models import Variable
+
 # These args will get passed on to each operator
 # You can override them on a per-task basis during operator initialization
-import src
+import src_google
 
 default_args = {
     "owner": "johannes",
@@ -45,16 +45,10 @@ dag = DAG(
     schedule_interval=None,
     catchup=False
 )
-
-t0 = PythonOperator(
-    task_id="api_key",
-    python_callable=src.worker.api_wrapper.get_access,
-    op_kwargs={"email": Variable.get('api_email'), "password":Variable.get('api_password')}
-)
-
 # t1, t2 and t3 are examples of tasks created by instantiating operators
 t1 = PythonOperator(
     task_id="create_experiment",
-    python_callable=src.experiment_2.launch_experiment,
-    dag=dag
-)
+    python_callable=src_google.experiment.experiment_2.launch_experiment,
+    dag=dag,
+    op_kwargs={
+        "api_credentials": Variable.get("PRIMEMOVER", deserialize_json=True)})

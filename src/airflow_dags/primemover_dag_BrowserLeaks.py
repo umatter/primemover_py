@@ -9,9 +9,7 @@ from airflow.models import Variable
 
 from airflow import DAG
 # Operators; we need this to operate!
-from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
-from airflow.utils.dates import days_ago
 # These args will get passed on to each operator
 # You can override them on a per-task basis during operator initialization
 import src
@@ -54,17 +52,23 @@ dag = DAG(
 
 t1 = PythonOperator(
     task_id="setup_copy",
-    python_callable=src.worker.DataCopy.setup_copy,
+    python_callable=src.base.DataCopy.setup_copy,
     op_kwargs={"experiment_id": Variable.get("experiment_id", "id_missing"),
-               "date": datetime.now().date()},
+               "date": datetime.now().date(),
+               "api_credentials": Variable.get("PRIMEMOVER",
+                                               deserialize_json=True)
+               },
     dag=dag
 )
 
 t2 = PythonOperator(
     task_id="addTasks",
-    python_callable=src.BrowserLeaks.single_update,
+    python_callable=src.base.browser_leaks.single_update,
     op_kwargs={"date_time": datetime.now(),
-               "experiment_id": Variable.get("experiment_id", "id_missing")},
+               "experiment_id": Variable.get("experiment_id", "id_missing"),
+               "api_credentials": Variable.get("PRIMEMOVER",
+                                               deserialize_json=True)
+               },
     dag=dag
 )
 

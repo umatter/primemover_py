@@ -15,11 +15,14 @@ import pathlib
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
 
 
-def single_update(experiment_id, api_token,
+def single_update(experiment_id, api_credentials,
                   date_time=datetime.now(), crawler_class=BaseCrawler):
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=12 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
+
+    api_token = api_wrapper.get_access(api_credentials.get('username'),
+                                       api_credentials.get('password'))
 
     raw_experiment = api_wrapper.fetch_experiment(access_token=api_token, id=
     experiment_id)
@@ -41,7 +44,7 @@ def single_update(experiment_id, api_token,
 
     queues = [c.queues[0] for c in crawler_list]
     t_0 = datetime.fromisoformat(
-        f'{date_time.date().isoformat()}T14:42:00+01:00')
+        f'{date_time.date().isoformat()}T12:00:00')
     print(t_0)
     delta_t_1 = int(90)
 
@@ -53,7 +56,7 @@ def single_update(experiment_id, api_token,
         json.dump([crawler.as_dict() for crawler in crawler_list], file,
                   indent='  ')
 
-    return_data = api.push_new(access_token=key,
+    return_data = api.push_new(access_token=api_token,
                                path=PRIMEMOVER_PATH + "/resources/updates/generated.json")
     data_as_dict = json.loads(return_data.text)
     with open(
@@ -63,4 +66,9 @@ def single_update(experiment_id, api_token,
 
 
 if __name__ == "__main__":
-    single_update(experiment_id=46, date_time=datetime.now())
+    PRIMEMOVER_PATH = str(
+        pathlib.Path(__file__).parent.parent.parent.absolute())
+
+    with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
+        KEYS = json.load(f)
+    single_update(experiment_id=46, date_time=datetime.now(), api_credentials=KEYS.get("PRIMEMOVER"))

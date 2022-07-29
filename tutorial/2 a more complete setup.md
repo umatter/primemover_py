@@ -841,5 +841,5 @@ After fetching our results as before, we can now run:
 from src.base import Results
 #import the parser dict we just updated
 from tutorial.code.more_complete_setup.worker.google_s3_parser import ParserDict
-Results.process_results(api_token=key,set_reviewed=False,parser_dict=ParserDict, path_end='parsed_')
+Results.process_results(api_credentials=KEYS.get("PRIMEMOVER"),set_reviewed=False,parser_dict=ParserDict, path_end='parsed_')
 ```

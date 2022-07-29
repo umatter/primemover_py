@@ -12,7 +12,7 @@ First off, if you haven't done so already, you should run "makefile.sh". To do s
 navigate to the primemover_py directory in your terminal window and 
 execute:
 ```bash
-chmod makefile.sh
+chmod +x makefile.sh
 ./makefile.sh
 ```
 The idea behind this program is to control a series of bots via an API. This consists

@@ -9,13 +9,12 @@ from airflow.models import Variable
 
 from airflow import DAG
 # Operators; we need this to operate!
-from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
-from airflow.utils.dates import days_ago
 # These args will get passed on to each operator
 # You can override them on a per-task basis during operator initialization
 import src
-from src.worker.Utilities import string_to_bool
+import src_google
+from src.worker.utilities import string_to_bool
 
 default_args = {
     "owner": "johannesl",
@@ -82,21 +81,28 @@ dag = DAG(
 
 t6 = PythonOperator(
     task_id="update_crawlers",
-    python_callable=src.UpdateExperiment.single_update,
+    python_callable=src_google.experiment.UpdateExperiment.single_update,
     op_kwargs={"date_time": datetime.now(),
                "experiment_id": Variable.get("experiment_id", "id_missing"),
-               "fixed_times": string_to_bool(Variable.get("fixed_times", False)),
-               "update_preferences": string_to_bool(Variable.get("update_preferences", False)),
-               "update_proxies": string_to_bool(Variable.get("update_proxies", False)),
+               "fixed_times": string_to_bool(
+                   Variable.get("fixed_times", False)),
+               "update_preferences": string_to_bool(
+                   Variable.get("update_preferences", False)),
+               "update_proxies": string_to_bool(
+                   Variable.get("update_proxies", False)),
                "delta_t_1": int(Variable.get("delta_t_1", 120)),
-               "delta_t_2": int(Variable.get("delta_t_2", 36))
+               "delta_t_2": int(Variable.get("delta_t_2", 36)),
+               "api_credentials": Variable.get("PRIMEMOVER",
+                                               deserialize_json=True)
                },
     dag=dag
 )
+
 t7 = PythonOperator(
     task_id="send_mail",
-    python_callable=src.worker.Notify.send_update,
-    op_kwargs={"email_list": Variable.get("email_list", ["johannesl@me.com"], deserialize_json=True),
+    python_callable=src.base.Notify.send_update,
+    op_kwargs={"email_list": Variable.get("email_list",
+                                          deserialize_json=True),
                "password": Variable.get("email_password", "password_missing"),
                "date": datetime.now().date()},
     dag=dag)
@@ -107,4 +113,5 @@ t8 = PythonOperator(
     op_kwargs={"date_time": datetime.now(),
                "nr_days": 5},
     dag=dag)
+
 t6 >> t7 >> t8
