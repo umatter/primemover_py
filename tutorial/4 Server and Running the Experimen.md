@@ -17,6 +17,9 @@ Let's begin by running the makefile.
 ```bash
 cd primemover_py
 sh makefile.sh
-cd
+```
+While still in the primemover folder run 
+```bash
+docker build -t "primemover_py" .  
 ```
 
