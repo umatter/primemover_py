@@ -17,7 +17,6 @@ RUN apt -y upgrade
 
 
 RUN apt install -y python3 python3-pip
-RUN apt-get install python3.10-venv
 
 COPY /src /primemover_py/src
 COPY /resources /primemover_py/resources
