@@ -15,6 +15,13 @@ execute:
 chmod +x makefile.sh
 ./makefile.sh
 ```
+This library and its dependencies in requirements.txt is known to work with python 3.9.
+If you have not previously installed python your best bet for getting this programm to work
+is to simply follow the steps of the docker file. That is installing python 3.9 before 
+creating a virtual enviornment
+
+
+
 The idea behind this program is to control a series of bots via an API. This consists
 of ____ key components:
 - setting up new bots (crawlers)
