@@ -1,2 +1,2 @@
-from . import base, worker, BrowserLeaks, Makefile
-__all__ = [base,worker, BrowserLeaks, Makefile]
+from . import base, worker, Makefile
+__all__ = [base, worker, Makefile]

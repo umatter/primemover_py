@@ -142,7 +142,7 @@ for updating exist and if so, passes these to the update crawler method of each 
 
 Let us also add some new tasks. In particular, let us add a "neutral" search. The search terms
 come from the s3 bucket and are to be searched one after the other, one each day.
-This is to occour in a separate Queue.
+This is to occur in a separate Queue.
 
 First, we load the neutral terms
 ```python

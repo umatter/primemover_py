@@ -555,12 +555,14 @@ import pathlib
 PRIMEMOVER_PATH = str(
     pathlib.Path(__file__).parent.parent.parent.parent.parent.absolute())
 
-def first_experiment(api_token, update_files=False, push=True):
+def first_experiment(api_credentials, update_files=False, push=True):
     """
     Param:
         update_files, Bool: If False, first_crawler will not attempt to fetch valid_cities, outlets and terms from s3
         push, Bool: if False, no new experiment will be created and no queues will be pushed
     """
+    api_token = api.get_access(api_credentials.get('username'),
+                               api_credentials.get('password'))
     if update_files:
         s3_wrapper.update_valid_cities()
         s3_wrapper.fetch_outlets()
@@ -679,7 +681,11 @@ import pathlib
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 
-def single_update(date_time, experiment_id,api_token):
+def single_update(date_time, experiment_id,api_crdentials):
+    
+    api_token = api_wrapper.get_access(api_credentials.get('username'),
+                               api_credentials.get('password'))
+    
     #Again we set the global schedule
     TimeHandler.GLOBAL_SCHEDULE = Schedule(interval=600,
                                            start_at=14 * 60 * 60,

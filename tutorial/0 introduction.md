@@ -8,17 +8,23 @@ experiments inteded for an investigation of Google search.
 The completed code for this specific example is stored in src_google.
 
 ### 1. About Primemover
-First off, if you haven't done so already, you should run "makefile.sh". To do so,
+First off, if you haven't done so already, you should clone the repository and run "makefile.sh". To do so,
 navigate to the primemover_py directory in your terminal window and 
 execute:
 ```bash
+git clone https://github.com/umatter/primemover_py.git
 chmod +x makefile.sh
 ./makefile.sh
 ```
 This library and its dependencies in requirements.txt is known to work with python 3.9.
-If you have not previously installed python your best bet for getting this programm to work
+If you have not previously installed python your best bet for getting this program to work
 is to simply follow the steps of the docker file. That is installing python 3.9 before 
-creating a virtual enviornment
+creating a virtual environment and running the modules in this file. Do this by executing the 
+statements behind the "run" command in your terminal. Note, this will only work for unix
+operating systems and is not guaranteed to work with your specific version. If everything does get
+installed, py should run fine. If airflow fails to install localy, which is quite likely, this does not prevent
+you from running most code locally. If you want to see other requirements check out the requirements.txt file.
+
 
 
 

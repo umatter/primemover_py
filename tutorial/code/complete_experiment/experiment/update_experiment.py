@@ -12,7 +12,7 @@ PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.parent.parent.
 
 
 def single_update(date_time, experiment_id, api_credentials, send_queues=True,
-                  fixed_times=True, delta_t_2=60, delta_t_1=120):
+                  fixed_times=True, delta_t_2=60, delta_t_1=120, update_crawlers=True):
     api_token = api_wrapper.get_access(api_credentials.get('username'),
                                api_credentials.get('password'))
 
@@ -41,8 +41,19 @@ def single_update(date_time, experiment_id, api_credentials, send_queues=True,
                                                   id=experiment_id)
 
     # Create python objects from the json returned by the API
-    crawler_list = Crawler.from_list(raw_experiment['crawlers'],
-                                     date_time=date_time)
+    crawler_list = Crawler.from_list(raw_experiment['crawlers'],date_time=date_time)
+
+    # Update Crawlers
+    if os.path.exists(
+            f'{PRIMEMOVER_PATH}/resources/cleaned_data/{date_time.date().isoformat()}.json' and update_crawlers):
+        with open(
+                f'{PRIMEMOVER_PATH}/resources/cleaned_data/{date_time.date().isoformat()}.json',
+                'r') as file:
+            cleaned_data = json.load(file)
+        for crawler in crawler_list:
+            if crawler.flag != 'neutral':
+                crawler.update_crawler(results=cleaned_data)
+
     # Assign Tasks
     for crawler in crawler_list:
         # create a queue and begin by accepting Googles cookie preferences

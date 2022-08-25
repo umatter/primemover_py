@@ -45,6 +45,32 @@ first_crawler.as_dict()
 ```
 
 This should look very similar to the example at "resources/examples/example_base_crawler.json"
+At this stage it's worth looking at how we can export and import crawlers and other objects to and from json files.
+All core objects that are part of this package, have an as_dict() method as seen above.
+This returns a dictionary that is precisely in the format that the API expects. All of these dictionaries can
+be stored as json files.
+```python
+import pathlib
+import json
+PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.absolute())
+
+with open(PRIMEMOVER_PATH + "/resources/crawlers/first_crawler.json",
+              'w') as file:
+        json.dump(first_crawler.as_dict(), file,
+                  indent='  ')
+```
+We can also read this file into a crawler object.
+```python
+from src.base.BaseCrawler import BaseCrawler
+with open(PRIMEMOVER_PATH + "/resources/crawlers/first_crawler.json",
+              'w') as file:
+        raw_crawler_dict = json.loads(first_crawler.as_dict(), file,
+                  indent='  ')
+first_crawler = BaseCrawler.from_dict(raw_crawler_dict)
+```
+All relevant objects have a from_dict method. The Crawler object also has a from_list method 
+incase you have multiple crawlers in a list. The crawlers returned by the API, are however in a dictioanry.
+These methods are fairly robust to different formats that they might encounter.
 
 We have three options to change parameters. Consider the location. The current default is Auburn Alabama
 "US-AL-AUBURN". Let's change it to Phoenix Arizona "US-AZ-PHOENIX". Notice, that it occurs twice.
@@ -141,9 +167,9 @@ This code only generates an empty, local experiment. We need an experiment id to
 Load the API wrapper and connect to the api by generating keys.
 ```python
 import src.worker.api_wrapper as api
-api_token = api.get_access("<username>", "<password>")
+api_credentials = {"username":"<username>","password":"<password>"}
 
-exp_return = api.new_experiment(api_token, exp.as_dict())
+exp_return = api.new_experiment(api_credentials, exp.as_dict())
 exp_id = Experiment.from_dict(exp_return).id
 
 print(exp_id)
@@ -154,7 +180,7 @@ Assign the experiment id to the crawler (you can also assign the experiment id w
 second_crawler.experiment_id = exp_id
 ```
 
-It is now time to push the new crawler to the API.
+It is now time to push the new crawler to the API. We first store it as a json file.
 ```python
 import json
 import pathlib
@@ -167,7 +193,10 @@ with open(PRIMEMOVER_PATH + "/resources/crawlers/experiment_first_steps.json",
               'w') as file:
         json.dump([second_crawler.as_dict()], file,
                   indent='  ')
-return_data = api.push_new(access_token=api_token,
+```
+Before using the api_push_new method to upload the data to the api
+```python
+return_data = api.push_new(api_credentials=api_credentials,
                            path=PRIMEMOVER_PATH + "/resources/crawlers/experiment_first_steps.json")
 data_as_dict = json.loads(return_data.text)
 with open(
@@ -182,7 +211,7 @@ First let us download the results.
 
 ```python
 from src.base import Results
-Results.fetch_results(api_token=api_token)
+Results.fetch_results(api_credentials=api_credentials)
 ```
 The raw results will have been saved under "resources/raw_data/<todays_date>". 
 If you wish to run fetch results again on the same day you will have to delete or rename this file.
