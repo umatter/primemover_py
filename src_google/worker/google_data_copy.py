@@ -22,11 +22,11 @@ def extract_selection_data(experiment_id, api_credentials, path_cleaned_data):
         raw_data = json.load(file)
 
     crawler_list_raw = api_wrapper.fetch_experiment(access_token=api_token,
-                                                    id=
+                                                    exp_id=
                                                     experiment_id)
 
     crawler_list = Crawler.from_list(crawler_list_raw['crawlers'])
-    crawler_list = UpdateObject(crawler_list, 'config')
+    crawler_list = UpdateObject(crawler_list, 'config', api_token)
 
     crawler_data_dict = {}
     for c in crawler_list:

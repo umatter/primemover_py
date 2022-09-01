@@ -691,7 +691,7 @@ def single_update(date_time, experiment_id,api_crdentials):
                                            start_at=14 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
     # Fetch the experiment we created earlier
-    raw_experiment = api_wrapper.fetch_experiment(access_token=api_token, id=
+    raw_experiment = api_wrapper.fetch_experiment(access_token=api_token, exp_id=
     experiment_id)
     
     # Create python objects from the json returned by the API

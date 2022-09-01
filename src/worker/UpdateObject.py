@@ -1,7 +1,7 @@
 from src.worker import api_wrapper
 
 
-def UpdateObject(crawler_list, desired_object):
+def UpdateObject(crawler_list, desired_object, api_token):
     object_name = desired_object.__bases__[0].__name__
     if object_name == 'object':
         object_name = desired_object.__name__
@@ -10,16 +10,16 @@ def UpdateObject(crawler_list, desired_object):
         raise ValueError(f'{desired_object.__name__} is not a valid object')
     if object_name == 'BaseCrawler':
         ids = [c.crawler_info.crawler_id for c in crawler_list]
-        values = [api_wrapper.fetch_crawler(i) for i in ids ]
+        values = [api_wrapper.fetch_crawler(api_token, i) for i in ids ]
     elif object_name == 'BaseProxy':
         ids = [c.proxy.info.proxy_id for c in crawler_list]
-        values = [api_wrapper.fetch_proxy(i) for i in ids]
+        values = [api_wrapper.fetch_proxy(api_token, i) for i in ids]
     elif object_name == 'BaseAgent':
         ids = [c.agent.info.agent_id for c in crawler_list]
-        values = [api_wrapper.fetch_agent(i) for i in ids]
+        values = [api_wrapper.fetch_agent(api_token, i) for i in ids]
     elif object_name == 'BaseConfig':
         ids = [c.configuration.info.configuration_id for c in crawler_list]
-        values = [api_wrapper.fetch_config(i) for i in ids]
+        values = [api_wrapper.fetch_config(api_token, i) for i in ids]
     else:
         raise Exception('This should not happen!')
     updated_dict = {}

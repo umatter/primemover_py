@@ -24,7 +24,7 @@ def single_update(experiment_id, api_credentials,
     api_token = api_wrapper.get_access(api_credentials.get('username'),
                                        api_credentials.get('password'))
 
-    raw_experiment = api_wrapper.fetch_experiment(access_token=api_token, id=
+    raw_experiment = api_wrapper.fetch_experiment(access_token=api_token, exp_id=
     experiment_id)
 
     crawler_list = crawler_class.from_list(raw_experiment['crawlers'],

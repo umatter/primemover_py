@@ -119,4 +119,4 @@ Unpause "primemover_dag", make sure this occurs after 10:30, the dag will otherw
 There is no need to manually trigger this Dag, it will now proceed to execute every morning.
 
 ## Server Setup
-Follow docker image setup and the instructions for docker.
+Follow instructions in the tutorial

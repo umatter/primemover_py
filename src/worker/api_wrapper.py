@@ -225,14 +225,16 @@ def update_experiment(access_token, experiment, exp_id):
     return r.json()['data']
 
 
-def fetch_experiment(access_token, id):
+def fetch_experiment(access_token, exp_id):
     """
     Wrapper function to fetch an existing experiment object
     Returns:
         contents of response json at key 'data'
     """
-    r = requests.get(DOMAIN + f'experiments/{id}',
+    r = requests.get(DOMAIN + f'experiments/{exp_id}',
                      headers={'authorization': f'Bearer {access_token}'})
+    if r.status_code!= 200:
+        raise Exception(f"Make sure the experiment with id {exp_idid} exists. Request returned status code {r.status_code}.")
     return r.json()['data']
 
 
@@ -247,28 +249,28 @@ def fetch_all_experiments(access_token):
     return r.json()['data']
 
 
-def fetch_agent(id):
-    r = requests.get(DOMAIN + f'agents/{id}')
+def fetch_agent(access_token,id):
+    r = requests.get(DOMAIN + f'agents/{id}', headers={'authorization': f'Bearer {access_token}'})
     return r.json()['data']
 
 
-def fetch_crawler(id):
-    r = requests.get(DOMAIN + f'crawlers/{id}')
+def fetch_crawler(access_token,id):
+    r = requests.get(DOMAIN + f'crawlers/{id}', headers={'authorization': f'Bearer {access_token}'})
     return r.json()['data']
 
 
-def fetch_queue(id):
-    r = requests.get(DOMAIN + f'queues/{id}')
+def fetch_queue(access_token, id):
+    r = requests.get(DOMAIN + f'queues/{id}', headers={'authorization': f'Bearer {access_token}'})
     return r.json()['data']
 
 
-def fetch_proxy(id):
-    r = requests.get(DOMAIN + f'proxies/{id}')
+def fetch_proxy(access_token, id):
+    r = requests.get(DOMAIN + f'proxies/{id}', headers={'authorization': f'Bearer {access_token}'})
     return r.json()['data']
 
 
-def fetch_config(id):
-    r = requests.get(DOMAIN + f'configurations/{id}')
+def fetch_config(access_token, id):
+    r = requests.get(DOMAIN + f'configurations/{id}', headers={'authorization': f'Bearer {access_token}'})
     return r.json()['data']
 
 

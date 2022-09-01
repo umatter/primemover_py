@@ -39,13 +39,13 @@ def single_update(date_time, experiment_id, api_credentials, manual=False, fixed
                                            start_at=14 * 60 * 60,
                                            end_at=(9 + 24) * 60 * 60)
 
-    raw_experiment = api_wrapper.fetch_experiment(access_token=api_token, id=
+    raw_experiment = api_wrapper.fetch_experiment(access_token=api_token, exp_id=
     experiment_id)
 
     crawler_list = Crawler.from_list(raw_experiment['crawlers'],
                                              date_time=date_time)
 
-    crawler_list = UpdateObject(crawler_list, Config)
+    crawler_list = UpdateObject(crawler_list, Config, api_token)
     "Compute Proxy Changes"
     if update_proxies:
         update_proxies_dict = update_all_proxies()
@@ -201,7 +201,7 @@ if __name__ == "__main__":
         KEYS = json.load(f)
 
     single_update(date_time=datetime.now(),
-                  experiment_id=50,
+                  experiment_id=54,
                   api_credentials=KEYS['PRIMEMOVER'],
                   manual=True,
                   update_preferences=False,

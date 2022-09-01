@@ -19,7 +19,7 @@ def single_update(date_time, experiment_id, api_credentials, send_queues=True):
                                            end_at=(9 + 24) * 60 * 60)
     # Fetch the experiment we created earlier
     raw_experiment = api_wrapper.fetch_experiment(access_token=api_token,
-                                                  id=experiment_id)
+                                                  exp_id=experiment_id)
 
     # Create python objects from the json returned by the API
     crawler_list = Crawler.from_list(raw_experiment['crawlers'],

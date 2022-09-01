@@ -109,4 +109,4 @@ if __name__ == "__main__":
     with open(PRIMEMOVER_PATH + '/resources/other/keys.json', 'r') as f:
         KEYS = json.load(f)
 
-    first_experiment(KEYS.get("PRIMEMOVER"), False, True)
+    print(first_experiment(KEYS.get("PRIMEMOVER"), False, True))

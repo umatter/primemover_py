@@ -23,11 +23,11 @@ def extract_data(experiment_id: int, api_credentials,
                                        api_credentials.get('password'))
 
     crawler_list_raw = api_wrapper.fetch_experiment(access_token=api_token,
-                                                    id=
+                                                    exp_id=
                                                     experiment_id)
 
     crawler_list = crawler_class.from_list(crawler_list_raw['crawlers'])
-    crawler_list = UpdateObject(crawler_list, 'config')
+    crawler_list = UpdateObject(crawler_list, 'config', api_token)
 
     data_restructure = []
     date = datetime.today().date().isoformat()
@@ -59,11 +59,11 @@ def extract_list_params(object_name, experiment_id,api_credentials, crawler_clas
     api_token = api_wrapper.get_access(api_credentials.get('username'),
                                        api_credentials.get('password'))
     crawler_list_raw = api_wrapper.fetch_experiment(access_token=api_token,
-                                                    id=
+                                                    exp_id=
                                                     experiment_id)
 
     crawler_list = crawler_class.from_list(crawler_list_raw['crawlers'])
-    crawler_list = UpdateObject(crawler_list, 'config')
+    crawler_list = UpdateObject(crawler_list, 'config', api_token)
 
     data_restructure = []
     date = datetime.today().date().isoformat()

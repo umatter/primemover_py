@@ -152,7 +152,7 @@ if __name__ == '__main__':
     key = api.get_access(KEYS['PRIMEMOVER']['username'],
                          KEYS['PRIMEMOVER']['password'])
     for id in range(1550, 1800):
-        file = api.fetch_agent(id)
+        file = api.fetch_agent(key, id)
         test = BaseAgent.from_dict(file)
         comp = json.loads(file['multilogin_profile'])
         prof = BaseProfile.from_dict(json.loads(file['multilogin_profile']))
