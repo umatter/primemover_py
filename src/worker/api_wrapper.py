@@ -234,7 +234,7 @@ def fetch_experiment(access_token, exp_id):
     r = requests.get(DOMAIN + f'experiments/{exp_id}',
                      headers={'authorization': f'Bearer {access_token}'})
     if r.status_code!= 200:
-        raise Exception(f"Make sure the experiment with id {exp_idid} exists. Request returned status code {r.status_code}.")
+        raise Exception(f"Make sure the experiment with id {exp_id} exists. Request returned status code {r.status_code}.")
     return r.json()['data']
 
 
