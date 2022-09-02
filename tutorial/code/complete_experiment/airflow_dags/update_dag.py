@@ -40,6 +40,7 @@ t1 = PythonOperator(
     task_id="fetch_results",
     python_callable=src.base.Results.fetch_results,
     op_kwargs={"date": datetime.now().date(),
+               "experiment_id": Variable.get("experiment_id"),
                "api_credentials": Variable.get("PRIMEMOVER",
                                                deserialize_json=True)},
     dag=dag,

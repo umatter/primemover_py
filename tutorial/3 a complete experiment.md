@@ -331,12 +331,13 @@ Here, the  value of schedule_interval is "30 8 * * *" which is a CRON schedule.
 This specific one will start the DAG at 8:30 every day. Note, the time will be in UTC
 not your local time.
 
-The first step of our update procedure will be to fetch results and parse them.
+The first step of our update procedure will be to fetch results and parse them. We can specify an experiment ID to get only the relevant results.
 ```python
 t1 = PythonOperator(
     task_id="fetch_results",
     python_callable=src.base.Results.fetch_results,
     op_kwargs={"date": datetime.now().date(),
+               "experiment_id":Variable.get("experiment_id"),
                "api_credentials": Variable.get("PRIMEMOVER",
                                                deserialize_json=True)},
     dag=dag,

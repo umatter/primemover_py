@@ -201,7 +201,7 @@ if __name__ == "__main__":
         KEYS = json.load(f)
 
     single_update(date_time=datetime.now(),
-                  experiment_id=54,
+                  experiment_id=41,
                   api_credentials=KEYS['PRIMEMOVER'],
                   manual=True,
                   update_preferences=False,
