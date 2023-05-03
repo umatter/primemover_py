@@ -12,6 +12,8 @@ Available Functions:
     - get_terms: Fetch all terms from primemover_api
 
 J.L. 11.2020
+
+Edited by: Atharwa Deshmukh, 05.2023
 """
 
 import requests
@@ -25,7 +27,6 @@ from src.worker.Experiment import Experiment
 PRIMEMOVER_PATH = str(pathlib.Path(__file__).parent.parent.parent.absolute())
 
 DOMAIN = "https://primemoverswitch.wimando.ch/api/v1/"
-
 
 def get_access(e_mail, password):
     """
@@ -46,7 +47,7 @@ def get_access(e_mail, password):
     return token
 
 
-def push_new(access_token,
+def push_new(access_token, experiment_id=None,
              path=PRIMEMOVER_PATH + '/resources/examples/test_crawler_py.json'):
     """
     Wrapper for the primemover load function. Use to post json like data from path.
@@ -56,10 +57,12 @@ def push_new(access_token,
     Returns:
         response from primemover api
     """
+    
     with open(path, 'r') as f:
         data_crawlers = json.load(f)
-    post_crawlers = requests.post(DOMAIN + 'load', json=data_crawlers, headers={
+    post_crawlers = requests.post(DOMAIN + f'experiments/{experiment_id}/upload' , json=data_crawlers, headers={
         'authorization': 'Bearer ' + access_token})
+
 
     return post_crawlers
 
